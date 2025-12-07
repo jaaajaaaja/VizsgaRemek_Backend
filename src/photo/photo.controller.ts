@@ -28,7 +28,7 @@ export class PhotoController {
 
     @Get('/getAllByPlace/:placeID')
     async getAllByPlace(@Param('placeID') placeID: string) {
-        return this.photoService.getAllByUser(Number(placeID))
+        return this.photoService.getAllByPlace(Number(placeID))
 
         // http://localhost:3000/photo/getAllByPlace/1
     }

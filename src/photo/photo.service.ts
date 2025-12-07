@@ -47,7 +47,7 @@ export class PhotoService {
 
     async getAllByPlace(placeID: number) {
         return this.prisma.photo.findMany({
-            where: { userID: placeID },
+            where: { placeID: placeID },
             select: {
                 id: true,
                 location: true,
