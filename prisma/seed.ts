@@ -5,7 +5,7 @@ import { faker } from '@faker-js/faker'
 const prisma = new PrismaClient()
 
 async function main() {
-    console.log("\nStarting seed...\n")
+    console.log("\nSeeding...\n")
 
     const userCount = 15
     const defaultPassword = await bcrypt.hash('password123', 10)
@@ -22,11 +22,11 @@ async function main() {
     })
 
     const users = await prisma.user.findMany()
-    console.log("Users inserted:", users.length)
+    console.log("Users in database:", users.length)
 
     const placeCount = 20
     const placeData = Array.from({ length: placeCount }, () => ({
-        googleplaceID: `place_${faker.string.alphanumeric(20)}`,
+        googleplaceID: `${faker.string.alphanumeric(20)}`,
         name: faker.company.name(),
         address: faker.location.streetAddress({ useFullAddress: true }),
     }))
@@ -37,7 +37,7 @@ async function main() {
     })
 
     const places = await prisma.place.findMany()
-    console.log("Places inserted:", places.length)
+    console.log("Places in database:", places.length)
 
     const commentCount = 50
     const commentData = Array.from({ length: commentCount }, () => ({
@@ -53,10 +53,10 @@ async function main() {
     })
 
     const comments = await prisma.comment.findMany()
-    console.log("Comments inserted:", comments.length)
+    console.log("Comments in database:", comments.length)
 
     const photoCount = 40
-    const imageTypes = ['jpg', 'jpeg', 'png', 'webp']
+    const imageTypes = ['jpg', 'jpeg', 'png', 'gif']
     const photoData = Array.from({ length: photoCount }, () => ({
         location: `uploads/${faker.string.alphanumeric(10)}.${faker.helpers.arrayElement(imageTypes)}`,
         type: faker.helpers.arrayElement(imageTypes),
@@ -70,7 +70,7 @@ async function main() {
     })
 
     const photos = await prisma.photo.findMany()
-    console.log("Photos inserted:", photos.length)
+    console.log("Photos in database:", photos.length)
 
     console.log("\nSeed complete!\n")
 }

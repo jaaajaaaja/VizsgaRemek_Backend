@@ -809,5 +809,5 @@ A projekt fejlesztése során kérjük, hogy:
 ---
 
 **Készítette:** BarSonar fejlesztői csapat  
-**Verzió:** 0.0.67 
+**Verzió:** 0.0.67  
 **Utolsó frissítés:** 2026
