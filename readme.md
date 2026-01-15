@@ -1,122 +1,146 @@
-# 🍻 BarSonar Backend API
+# BarSonar Backend
 
-A **BarSonar** backend API-ja, amely egy NestJS-alapú RESTful szolgáltatást nyújt a kocsma- és bárkereső alkalmazáshoz. Az API felhasználókezelést, helyek (bárok/kocsmák) kezelését, értékeléseket, kommenteket és fotófeltöltést biztosít.
+## Tartalomjegyzék
 
----
-
-## 📋 Tartalomjegyzék
-
-- [Technológiai stack](#-technológiai-stack)
-- [Előfeltételek](#-előfeltételek)
-- [Telepítés](#-telepítés)
-- [Környezeti változók](#-környezeti-változók)
-- [Adatbázis beállítása](#-adatbázis-beállítása)
-- [Futtatás](#-futtatás)
-- [API dokumentáció](#-api-dokumentáció)
-- [Projekt struktúra](#-projekt-struktúra)
-- [Tesztelés](#-tesztelés)
-- [Biztonsági megjegyzések](#-biztonsági-megjegyzések)
+- [Stack](#stack)
+- [Előfeltételek](#előfeltételek)
+- [Telepítés](#telepítés)
+- [Adatbázis felépítése](#adatbázis-felépítése)
+- [Adatbázis seed-elése](#adatbázis-seedelése)
+- [Futtatás](#futtatás)
+- [API dokumentáció](#api-dokumentáció)
+- [Tesztelés](#tesztelés)
+- [Biztonsági megjegyzések](#biztonsági-megjegyzések)
+- [Hozzájárulás](#hozzájárulás)
 
 ---
 
-## 🛠 Technológiai stack
+## Stack
 
 - **Framework:** [NestJS](https://nestjs.com/) (Node.js)
-- **Programozási nyelv:** TypeScript
-- **Adatbázis:** MySQL
-- **ORM:** Prisma
-- **Autentikáció:** JWT (JSON Web Tokens)
-- **Jelszó titkosítás:** bcrypt
-- **Fájlfeltöltés:** Multer
-- **Validáció:** class-validator, class-transformer
-- **Template engine:** EJS
+- **Programozási nyelv:** [TypeScript](https://www.typescriptlang.org/)
+- **Adatbázis:** [MySQL](https://www.mysql.com/)
+- **ORM:** [Prisma](https://www.prisma.io/)
+- **Autentikáció:** [JWT](https://www.jwt.io/) (JSON Web Tokens)
+- **Jelszó titkosítás:** [bcrypt](https://www.npmjs.com/package/bcrypt)
+- **Fájlfeltöltés:** [Multer](https://www.npmjs.com/package/multer)
+- **Validáció:** [class-validator, class-transformer](https://docs.nestjs.com/techniques/validation)
+- **Template engine:** [EJS](https://www.npmjs.com/package/ejs)
+- **Tesztelés:** [Jest](https://www.npmjs.com/package/jest), [Supertest](https://www.npmjs.com/package/supertest)
+- **Kód formázás:** [Prettier](https://prettier.io/), [ESLint](https://eslint.org/)
+- **Teszt adatok generálása:** [Faker](https://fakerjs.dev/)
 
 ---
 
-## 📦 Előfeltételek
+## Előfeltételek
 
 A projekt futtatásához szükséges:
 
-- **Node.js** (v18 vagy újabb)
+- **Node.js**
 - **npm** vagy **yarn**
-- **MySQL** adatbázis szerver
-- **Prisma CLI** (automatikusan települ a függőségekkel)
+- **MySQL** adatbázis
 
 ---
 
-## 🚀 Telepítés
+## Telepítés
 
 ### 1. Klónozás és függőségek telepítése
 
 ```bash
-# Klónozd a repository-t
+# Klónozd a repository-t  
 git clone <repository-url>
-cd VizsgaRemek_Backend
 
-# Telepítsd a függőségeket
+# Lépj be a mappába ahova klónoztad aztán telepítsd a függőségeket (node_modules mappa)  
 npm install
 ```
 
-### 2. Környezeti változók beállítása
+```sql
+Hozz létre egy adatbázist MySQL-ben
 
-Hozz létre egy `.env` fájlt a projekt gyökerében:
-
-```env
-DATABASE_URL="mysql://felhasznalonev:jelszo@localhost:3306/adatbazis_nev"
-JWT_SECRET="titkos_kulcs_ide"
-PORT=3000
+CREATE DATABASE adatbazis_neve
 ```
 
-> **Megjegyzés:** A `JWT_SECRET` egy erős, véletlenszerű karakterlánc legyen ha publikálni akarod a weboldalt.
+### 2. Környezeti változók
+
+Nevezd át a projekt gyökerében lévő `.env.example` fájlt `.env`-re és állítsd be a következő képpen:
+
+```env
+DATABASE_URL="mysql://felhasznalonev:jelszo@localhost:3306/adatbazis_neve"
+JWT_SECRET="titkos_kulcs_ide"
+PORT=[számmal add meg a portot amelyen szeretnéd hogy fusson a backend]
+```
+
+Megjegyzés:  
+
+Ha nem állítottál be külön felhasználót és annak egy jelszót az adatbázisban, akkor a felhasználó `root` lesz, a jelszót pedig üresen kell hagyni, de a kettőspontnak benne kell maradnia.
+
+A `JWT_SECRET` pedig egy erős, véletlenszerű karakterlánc legyen ha publikálni akarod a weboldalt. Éles környezetben használj legalább 32 karakter hosszú stringet.
 
 ### 3. Adatbázis beállítása
 
 ```bash
 # Prisma migrációk futtatása
-npx prisma migrate dev
+npx prisma migrate dev --name migracio_neve
 
 # Prisma Client generálása
 npx prisma generate
 ```
 
+## Adatbázis felépítése
+
+Az adatbázis a következő táblákat tartalmazza:
+
+```ts
+User {
+  id: string
+  userName: string
+  email: string
+  password: string
+}
+
+Place {
+  id: string
+  googlePlaceID: string
+  name: string
+  address: string
+}
+
+Comment {
+  id: string
+  commentText: string
+  rating: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+Photo {
+  id: string
+  location: string
+  type: string
+}
+```
+
+### Kapcsolatok
+
+- Egy felhasználó több kommentet és fotót hozhat létre
+- Egy helyhez több komment és fotó tartozhat
+- Kommentek és fotók törlésekor a kapcsolódó felhasználó és hely nem törlődik
+- Ha törlünk egy felhasználót vagy egy helyet, akkor törlődik az összes hozzá tartozó fotó és komment
+
 ---
 
-## 🔧 Környezeti változók
+## Adatbázis seedelése
 
-| Változó | Leírás | Kötelező |
-|---------|--------|----------|
-| `DATABASE_URL` | MySQL adatbázis kapcsolati string | ✅ Igen |
-| `JWT_SECRET` | JWT token aláíráshoz használt titkos kulcs | ✅ Igen |
-| `PORT` | Szerver port (alapértelmezett: 3000) | ❌ Nem |
-
----
-
-## 🗄 Adatbázis beállítása
-
-### Adatmodell
-
-Az alkalmazás a következő főbb entitásokat tartalmazza:
-
-- **User** - Felhasználók (id, userName, email, password)
-- **Place** - Helyek/Bárok (id, googleplaceID, name, address)
-- **Comment** - Kommentek/Értékelések (id, commentText, rating, createdAt, updatedAt)
-- **Photo** - Fotók (id, location, type)
-
-### Migrációk
+Az adatbázis feltöltése tesztadatokkal, Faker-t használ a valósághű adatok generálásához.
 
 ```bash
-# Új migráció létrehozása
-npx prisma migrate dev --name migracio_neve
-
-# Prisma Studio indítása (adatbázis böngésző, Prisma fiók szükséges hozzá)
-npx prisma studio
+# Seed script futtatása
+npx prisma db seed
 ```
 
 ---
 
-## ▶️ Futtatás
-
-### Fejlesztői mód
+## Futtatás
 
 ```bash
 npm run start:dev
@@ -124,7 +148,9 @@ npm run start:dev
 
 A szerver a `http://localhost:3000` címen lesz elérhető (vagy a `PORT` környezeti változóban megadott porton).
 
-## 📚 API dokumentáció
+---
+
+## API dokumentáció
 
 ### Alap URL
 
@@ -134,15 +160,20 @@ http://localhost:3000
 
 ### Autentikáció
 
-A védett végpontokhoz JWT token szükséges. A token a `Authorization` header-ben kell küldeni:
+A védett végpontokhoz JWT token szükséges. A token a `Auth` header-ben kell küldeni
 
-```
-Authorization: Bearer <token>
-```
+### HTTP státusz kódok
 
----
+Az API a következő HTTP státusz kódokat használja:
 
-### 🔐 Autentikáció (`/auth`)
+- `200 OK` - Sikeres kérés
+- `201 Created` - Sikeres létrehozás
+- `400 Bad Request` - Hibás kérés (validációs hiba)
+- `401 Unauthorized` - Nincs jogosultság (hiányzó vagy érvénytelen token)
+- `404 Not Found` - Erőforrás nem található
+- `500 Internal Server Error` - Szerver hiba
+
+### Autentikáció (`/auth`)
 
 #### Bejelentkezés
 
@@ -156,10 +187,18 @@ Content-Type: application/json
 }
 ```
 
-**Válasz:**
+**Sikeres válasz (200 OK):**
 ```json
 {
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Hibás válasz (401 Unauthorized):**
+```json
+{
+  "statusCode": 401,
+  "message": "Unauthorized"
 }
 ```
 
@@ -170,7 +209,7 @@ GET /auth/profile
 Authorization: Bearer <token>
 ```
 
-**Válasz:**
+**Válasz (200 OK):**
 ```json
 {
   "sub": 1,
@@ -180,7 +219,7 @@ Authorization: Bearer <token>
 
 ---
 
-### 👤 Felhasználók (`/user`)
+### Felhasználók (`/user`)
 
 #### Összes felhasználó lekérése
 
@@ -188,10 +227,40 @@ Authorization: Bearer <token>
 GET /user
 ```
 
+**Válasz (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "userName": "FelhasznaloNev",
+    "email": "user@example.com",
+    "password": "$2b$10$..."
+  }
+]
+```
+
 #### Felhasználó lekérése email alapján
 
 ```http
 GET /user/:email
+```
+
+**Válasz (200 OK):**
+```json
+{
+  "id": 1,
+  "userName": "FelhasznaloNev",
+  "email": "user@example.com",
+  "password": "$2b$10$..."
+}
+```
+
+**Hibás válasz (404 Not Found):**
+```json
+{
+  "statusCode": 404,
+  "message": "User not found"
+}
 ```
 
 #### Új felhasználó regisztrálása
@@ -207,6 +276,25 @@ Content-Type: application/json
 }
 ```
 
+**Válasz (201 Created):**
+```json
+{
+  "id": 1,
+  "userName": "FelhasznaloNev",
+  "email": "user@example.com",
+  "password": "$2b$10$..."
+}
+```
+
+**Hibás válasz (400 Bad Request) - validációs hiba:**
+```json
+{
+  "statusCode": 400,
+  "message": ["email must be an email", "password should not be empty"],
+  "error": "Bad Request"
+}
+```
+
 #### Felhasználó frissítése
 
 ```http
@@ -219,15 +307,35 @@ Content-Type: application/json
 }
 ```
 
+**Válasz (200 OK):**
+```json
+{
+  "id": 1,
+  "userName": "UjNev",
+  "email": "ujemail@example.com",
+  "password": "$2b$10$..."
+}
+```
+
 #### Felhasználó törlése
 
 ```http
 DELETE /user/:id
 ```
 
+**Válasz (200 OK):**
+```json
+{
+  "id": 1,
+  "userName": "FelhasznaloNev",
+  "email": "user@example.com",
+  "password": "$2b$10$..."
+}
+```
+
 ---
 
-### 📍 Helyek (`/place`)
+### Helyek (`/place`)
 
 #### Összes hely lekérése
 
@@ -235,10 +343,32 @@ DELETE /user/:id
 GET /place
 ```
 
+**Válasz (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "googleplaceID": "ChIJN1t_tDeuEmsRUsoyG83frY4",
+    "name": "Kocsma Neve",
+    "address": "Budapest, Fő utca 1."
+  }
+]
+```
+
 #### Hely lekérése ID alapján
 
 ```http
 GET /place/:id
+```
+
+**Válasz (200 OK):**
+```json
+{
+  "id": 1,
+  "googleplaceID": "ChIJN1t_tDeuEmsRUsoyG83frY4",
+  "name": "Kocsma Neve",
+  "address": "Budapest, Fő utca 1."
+}
 ```
 
 #### Új hely hozzáadása
@@ -248,6 +378,16 @@ POST /place
 Content-Type: application/json
 
 {
+  "googleplaceID": "ChIJN1t_tDeuEmsRUsoyG83frY4",
+  "name": "Kocsma Neve",
+  "address": "Budapest, Fő utca 1."
+}
+```
+
+**Válasz (201 Created):**
+```json
+{
+  "id": 1,
   "googleplaceID": "ChIJN1t_tDeuEmsRUsoyG83frY4",
   "name": "Kocsma Neve",
   "address": "Budapest, Fő utca 1."
@@ -266,20 +406,55 @@ Content-Type: application/json
 }
 ```
 
+**Válasz (200 OK):**
+```json
+{
+  "id": 1,
+  "googleplaceID": "ChIJN1t_tDeuEmsRUsoyG83frY4",
+  "name": "Frissített Név",
+  "address": "Új cím"
+}
+```
+
 #### Hely törlése
 
 ```http
 DELETE /place/:id
 ```
 
+**Válasz (200 OK):**
+```json
+{
+  "id": 1,
+  "googleplaceID": "ChIJN1t_tDeuEmsRUsoyG83frY4",
+  "name": "Kocsma Neve",
+  "address": "Budapest, Fő utca 1."
+}
+```
+
 ---
 
-### 💬 Kommentek (`/comment`)
+### Kommentek (`/comment`)
 
 #### Összes komment lekérése
 
 ```http
 GET /comment
+```
+
+**Válasz (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "commentText": "Nagyszerű hely!",
+    "rating": 5,
+    "createdAt": "2024-01-01T12:00:00.000Z",
+    "updatedAt": "2024-01-01T12:00:00.000Z",
+    "userID": 1,
+    "placeID": 1
+  }
+]
 ```
 
 #### Komment lekérése ID alapján
@@ -288,16 +463,59 @@ GET /comment
 GET /comment/:id
 ```
 
+**Válasz (200 OK):**
+```json
+{
+  "id": 1,
+  "commentText": "Nagyszerű hely!",
+  "rating": 5,
+  "createdAt": "2024-01-01T12:00:00.000Z",
+  "updatedAt": "2024-01-01T12:00:00.000Z",
+  "userID": 1,
+  "placeID": 1
+}
+```
+
 #### Felhasználó összes kommentje
 
 ```http
 GET /comment/findAllByUser/:userID
 ```
 
+**Válasz (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "commentText": "Nagyszerű hely!",
+    "rating": 5,
+    "createdAt": "2024-01-01T12:00:00.000Z",
+    "updatedAt": "2024-01-01T12:00:00.000Z",
+    "userID": 1,
+    "placeID": 1
+  }
+]
+```
+
 #### Hely összes kommentje
 
 ```http
 GET /comment/findAllByPlace/:placeID
+```
+
+**Válasz (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "commentText": "Nagyszerű hely!",
+    "rating": 5,
+    "createdAt": "2024-01-01T12:00:00.000Z",
+    "updatedAt": "2024-01-01T12:00:00.000Z",
+    "userID": 1,
+    "placeID": 1
+  }
+]
 ```
 
 #### Új komment hozzáadása
@@ -314,6 +532,21 @@ Content-Type: application/json
 }
 ```
 
+**Válasz (201 Created):**
+```json
+{
+  "id": 1,
+  "commentText": "Nagyszerű hely!",
+  "rating": 5,
+  "createdAt": "2024-01-01T12:00:00.000Z",
+  "updatedAt": "2024-01-01T12:00:00.000Z",
+  "userID": 1,
+  "placeID": 1
+}
+```
+
+**Megjegyzés:** A `rating` mező opcionális (1-5 közötti érték).
+
 #### Komment frissítése
 
 ```http
@@ -326,20 +559,59 @@ Content-Type: application/json
 }
 ```
 
+**Válasz (200 OK):**
+```json
+{
+  "id": 1,
+  "commentText": "Frissített komment",
+  "rating": 4,
+  "createdAt": "2024-01-01T12:00:00.000Z",
+  "updatedAt": "2024-01-01T13:00:00.000Z",
+  "userID": 1,
+  "placeID": 1
+}
+```
+
 #### Komment törlése
 
 ```http
 DELETE /comment/:id
 ```
 
+**Válasz (200 OK):**
+```json
+{
+  "id": 1,
+  "commentText": "Nagyszerű hely!",
+  "rating": 5,
+  "createdAt": "2024-01-01T12:00:00.000Z",
+  "updatedAt": "2024-01-01T12:00:00.000Z",
+  "userID": 1,
+  "placeID": 1
+}
+```
+
 ---
 
-### 📸 Fotók (`/photo`)
+### Fotók (`/photo`)
 
 #### Összes fotó lekérése
 
 ```http
 GET /photo
+```
+
+**Válasz (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "location": "uploads/1234567890.jpg",
+    "type": "jpg",
+    "userID": 1,
+    "placeID": 1
+  }
+]
 ```
 
 #### Fotó lekérése ID alapján
@@ -348,16 +620,53 @@ GET /photo
 GET /photo/:id
 ```
 
+**Válasz (200 OK):**
+```json
+{
+  "id": 1,
+  "location": "uploads/1234567890.jpg",
+  "type": "jpg",
+  "userID": 1,
+  "placeID": 1
+}
+```
+
 #### Felhasználó összes fotója
 
 ```http
 GET /photo/getAllByUser/:userID
 ```
 
+**Válasz (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "location": "uploads/1234567890.jpg",
+    "type": "jpg",
+    "userID": 1,
+    "placeID": 1
+  }
+]
+```
+
 #### Hely összes fotója
 
 ```http
 GET /photo/getAllByPlace/:placeID
+```
+
+**Válasz (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "location": "uploads/1234567890.jpg",
+    "type": "jpg",
+    "userID": 1,
+    "placeID": 1
+  }
+]
 ```
 
 #### Fotó feltöltése
@@ -371,21 +680,21 @@ userID: 1
 placeID: 1
 ```
 
-**Megjegyzések:**
+**Korlátok:**
 - Maximum 3 fájl tölthető fel egyszerre
 - Engedélyezett formátumok: JPEG, PNG, GIF
 - Maximum fájlméret: 2 MB
 - A feltöltött fájlok az `uploads/` mappában kerülnek tárolásra
 
-**Válasz:**
+**Válasz (201 Created):**
 ```json
 {
   "message": "File uploaded successfully",
   "images": [
     {
       "id": 1,
-      "location": "1234567890.jpg",
-      "type": "image/jpeg",
+      "location": "uploads/1234567890.jpg",
+      "type": "jpg",
       "userID": 1,
       "placeID": 1
     }
@@ -393,10 +702,39 @@ placeID: 1
 }
 ```
 
+**Hibás válasz (400 Bad Request) - fájl túl nagy:**
+```json
+{
+  "statusCode": 400,
+  "message": "File too large",
+  "error": "Bad Request"
+}
+```
+
+**Hibás válasz (400 Bad Request) - nem engedélyezett fájltípus:**
+```json
+{
+  "statusCode": 400,
+  "message": "Invalid file type",
+  "error": "Bad Request"
+}
+```
+
 #### Fotó törlése
 
 ```http
 DELETE /photo/:id
+```
+
+**Válasz (200 OK):**
+```json
+{
+  "id": 1,
+  "location": "uploads/1234567890.jpg",
+  "type": "jpg",
+  "userID": 1,
+  "placeID": 1
+}
 ```
 
 ---
@@ -409,118 +747,59 @@ A feltöltött képek elérése:
 http://localhost:3000/uploads/<fájlnév>
 ```
 
----
-
-## 📁 Projekt struktúra
-
+Példa:
 ```
-VizsgaRemek_Backend/
-├── src/
-│   ├── auth/              # Autentikáció modul
-│   │   ├── auth.controller.ts
-│   │   ├── auth.service.ts
-│   │   ├── auth.guard.ts
-│   │   └── auth.module.ts
-│   ├── user/              # Felhasználó modul
-│   │   ├── user.controller.ts
-│   │   ├── user.service.ts
-│   │   ├── user.module.ts
-│   │   └── dto/
-│   ├── place/             # Helyek modul
-│   │   ├── place.controller.ts
-│   │   ├── place.service.ts
-│   │   ├── place.module.ts
-│   │   └── dto/
-│   ├── comment/           # Komment modul
-│   │   ├── comment.controller.ts
-│   │   ├── comment.service.ts
-│   │   ├── comment.module.ts
-│   │   └── dto/
-│   ├── photo/             # Fotó modul
-│   │   ├── photo.controller.ts
-│   │   ├── photo.service.ts
-│   │   ├── photo.module.ts
-│   │   └── dto/
-│   ├── prisma/            # Prisma modul
-│   │   ├── prisma.service.ts
-│   │   └── prisma.module.ts
-│   ├── common/            # Közös validátorok
-│   ├── app.module.ts      # Fő modul
-│   ├── app.controller.ts
-│   ├── app.service.ts
-│   └── main.ts            # Alkalmazás belépési pont
-├── prisma/
-│   ├── schema.prisma      # Prisma séma
-│   └── migrations/        # Adatbázis migrációk
-├── uploads/               # Feltöltött fájlok
-├── public/                # Statikus fájlok
-├── views/                 # EJS template-ek
-├── test/                  # E2E tesztek
-├── package.json
-├── tsconfig.json
-└── README.md
+http://localhost:3000/uploads/123456789.jpg
 ```
 
 ---
 
-## 🧪 Tesztelés
+## Tesztelés
 
 ### Unit tesztek
 
 ```bash
+# Összes unit teszt futtatása
 npm run test
-```
 
-### Tesztek watch módban
-
-```bash
-npm run test:watch
-```
-
-### Teszt lefedettség
-
-```bash
-npm run test:cov
+# Vagy:
+npm test
 ```
 
 ### E2E tesztek
 
 ```bash
+# E2E tesztek futtatása
 npm run test:e2e
 ```
 
+### Tesztelési best practice-ek
+
+- Minden service és controller modulhoz tartozik teszt fájl
+- A tesztek az `src/` mappában találhatók `*.spec.ts` kiterjesztéssel
+- E2E tesztek a `test/` mappában találhatók
+
 ---
 
-## 🔒 Biztonsági megjegyzések
+## Biztonsági megjegyzések
 
-### ⚠️ Fontos!
+### Fontos figyelmeztetések
 
-1. **CORS:** A jelenlegi beállítás minden eredetű kérést engedélyez (`origin: '*'`). Éles környezetben korlátozd a megengedett eredeteket.
-
-2. **JWT Secret:** Használj erős, véletlenszerű JWT secret-et éles környezetben.
-
-3. **Fájlfeltöltés:** 
+1. **Fájlfeltöltés:** 
    - A fájlméret korlátozva van (2 MB)
-   - Csak bizonyos fájltípusok engedélyezettek
-   - Érdemes lehet vírusellenőrzést is implementálni
+   - Csak bizonyos fájltípusok engedélyezettek (JPEG, PNG, GIF)
+   - Érdemes vírusellenőrzést is implementálni
+   - Használj cloud storage-t `/uploads` mappa helyett nagyobb projekteknél
 
-4. **Validáció:** A DTO-k validációja a `ValidationPipe` segítségével történik.
-
----
-
----
-
-## 📝 További információk
-
-- **NestJS dokumentáció:** https://docs.nestjs.com/
-- **Prisma dokumentáció:** https://www.prisma.io/docs
-- **JWT:** https://jwt.io/
+2. **Rate Limiting:**  
+   - Fontold meg a rate limiting implementálását, hogy megelőzd a DDoS támadásokat és az API visszaélést.
 
 ---
 
-## 👥 Hozzájárulás
+## Hozzájárulás
 
 A projekt fejlesztése során kérjük, hogy:
+
 1. Fork-old a repository-t
 2. Hozz létre egy feature branch-et (`git checkout -b feature/uj-funkcio`)
 3. Commit-old a változtatásaidat (`git commit -m 'Hozzáadva: új funkció'`)
@@ -529,10 +808,6 @@ A projekt fejlesztése során kérjük, hogy:
 
 ---
 
-## 📄 Licenc
-
-Ez a projekt privát és nem licencelt.
-
-
-**Készítve:** BarSonar fejlesztői csapat  
-**Verzió:** 0.0.1
+**Készítette:** BarSonar fejlesztői csapat  
+**Verzió:** 0.0.67 
+**Utolsó frissítés:** 2026
