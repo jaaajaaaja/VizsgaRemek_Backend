@@ -1,5 +1,4 @@
 module.exports = {
-  preset: 'ts-jest',
   testEnvironment: 'node',
   rootDir: 'src',
   testRegex: '.*\\.spec\\.ts$',
@@ -11,11 +10,13 @@ module.exports = {
     '^generated/(.*)$': '<rootDir>/../generated/$1',
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
-  globals: {
-    'ts-jest': {
+  transform: {
+    '^.+\\.ts$': ['ts-jest', {
       tsconfig: {
         module: 'commonjs',
+        moduleResolution: 'node',
+        resolvePackageJsonExports: false,
       },
-    },
+    }],
   },
 }
