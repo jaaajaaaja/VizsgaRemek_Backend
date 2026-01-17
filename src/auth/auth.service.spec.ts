@@ -2,19 +2,23 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
+import { UnauthorizedException } from '@nestjs/common';
+
+jest.mock('bcrypt')
+import * as bcrypt from "bcrypt";
 
 describe('AuthService', () => {
-  let service: AuthService;
+  let service: AuthService
+  let userService: UserService
+  let jwtService: JwtService
 
   const mockUserService = {
-    findOne: jest.fn(),
-    create: jest.fn(),
-  };
+    findOne: jest.fn()
+  }
 
   const mockJwtService = {
-    sign: jest.fn(),
-    signAsync: jest.fn(),
-  };
+    signAsync: jest.fn()
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -29,12 +33,52 @@ describe('AuthService', () => {
           useValue: mockJwtService,
         },
       ],
-    }).compile();
+    }).compile()
 
-    service = module.get<AuthService>(AuthService);
-  });
+    service = module.get<AuthService>(AuthService)
+    userService = module.get<UserService>(UserService)
+    jwtService = module.get<JwtService>(JwtService)
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-});
+    expect(service).toBeDefined()
+  })
+
+  describe("signIn", () => {
+    it("should throw UnauthorizedException when user does not exist", async () => {
+      userService.findOne("")
+
+      await expect(
+        service.signIn('test@test.com', 'password'),
+      ).rejects.toThrow(UnauthorizedException)
+      expect(userService.findOne).toHaveBeenCalledWith("test@test.com")
+    })
+
+    it("should return jwt token", async () => {
+      const mockUser = {
+        id: 1,
+        userName: "test username",
+        email: "test@test.com",
+        password: "password"
+      }
+
+      mockUserService.findOne.mockResolvedValue(mockUser)
+      jest.mocked(bcrypt.compare).mockResolvedValue(true as never)
+      mockJwtService.signAsync.mockResolvedValue("jwt-token")
+
+      const result = await service.signIn(mockUser.email, mockUser.password)
+
+      expect(result).toEqual({ access_token: "jwt-token" })
+      expect(jwtService.signAsync).toHaveBeenCalledWith(
+        {
+          sub: mockUser.id,
+          username: mockUser.userName
+        }
+      )
+    })
+  })
+})

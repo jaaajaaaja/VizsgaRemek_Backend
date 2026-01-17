@@ -1,7 +1,6 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
-import * as bcrypt from 'bcrypt'
 
 @Controller('auth')
 export class AuthController {
