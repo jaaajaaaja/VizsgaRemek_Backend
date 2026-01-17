@@ -21,7 +21,9 @@ export class PhotoService {
             }
         })
 
-        if (!photo) return "Nincs ilyen fotó";
+        if (!photo) {
+            return { error: "Nincs ilyen fotó" }
+        }
 
         return {
             id: photo.id,
@@ -33,7 +35,7 @@ export class PhotoService {
     }
 
     async getAllByUser(userID: number) {
-        return this.prisma.photo.findMany({
+        const allByUser = await this.prisma.photo.findMany({
             where: { userID: userID },
             select: {
                 id: true,
@@ -43,10 +45,16 @@ export class PhotoService {
                 place: { select: { name: true } }
             }
         })
+
+        if (!allByUser) {
+            return { error: "A felhasználó még nem töltött fel képet!" }
+        }
+
+        return allByUser
     }
 
     async getAllByPlace(placeID: number) {
-        return this.prisma.photo.findMany({
+        const allByPlace = await this.prisma.photo.findMany({
             where: { placeID: placeID },
             select: {
                 id: true,
@@ -56,6 +64,12 @@ export class PhotoService {
                 place: { select: { name: true } }
             }
         })
+
+        if(!allByPlace) {
+            return {error: "A helyhez még nincsenek fotók feltöltve!"}
+        }
+
+        return allByPlace
     }
 
     async add(file: Express.Multer.File, userID: number, placeID: number) {

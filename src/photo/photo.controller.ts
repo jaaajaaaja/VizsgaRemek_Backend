@@ -1,9 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UploadedFile, UseInterceptors, Response, UploadedFiles } from '@nestjs/common';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { diskStorage, memoryStorage } from 'multer';
+import { Body, Controller, Delete, Get, Param, Post, UseInterceptors, UploadedFiles, ParseIntPipe } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 import { PhotoService } from './photo.service';
 import { extname } from 'path';
 import { Photo } from 'generated/prisma/client';
+import { NotFoundError } from 'rxjs';
+import { response } from 'express';
 
 @Controller('photo')
 export class PhotoController {
@@ -15,27 +17,29 @@ export class PhotoController {
     }
 
     @Get(':id')
-    async getOne(@Param('id') id: string) {
-        return this.photoService.getOne(Number(id))
+    async getOne(@Param('id', ParseIntPipe) id:number) {
+        const photo = await this.photoService.getOne(id)
+
+        return photo
     }
 
     @Get('/getAllByUser/:userID')
-    async getAllByUser(@Param('userID') userID: string) {
-        return this.photoService.getAllByUser(Number(userID))
+    async getAllByUser(@Param('userID', ParseIntPipe) userID:number) {
+        return this.photoService.getAllByUser(userID)
 
         // http://localhost:3000/photo/getAllByUser/1
     }
 
     @Get('/getAllByPlace/:placeID')
-    async getAllByPlace(@Param('placeID') placeID: string) {
-        return this.photoService.getAllByPlace(Number(placeID))
+    async getAllByPlace(@Param('placeID', ParseIntPipe) placeID:number) {
+        return this.photoService.getAllByPlace(placeID)
 
         // http://localhost:3000/photo/getAllByPlace/1
     }
 
     @Delete(':id')
-    async remove(@Param('id') id: string) {
-        return this.photoService.remove(Number(id))
+    async remove(@Param('id', ParseIntPipe) id:number) {
+        return this.photoService.remove(id)
     }
 
     @Post()
@@ -47,7 +51,7 @@ export class PhotoController {
                 callback(null, randomName);
             }
         }),
-        limits: { fileSize: 2 * 1024 * 1024 },
+        limits: { fileSize: 2 * 1024 * 1024 }, // 2 MB
         fileFilter: (req, file, callback) => {
             const allowedTypes = ['image/jpeg', 'image/png', 'image/gif']
 
@@ -66,7 +70,7 @@ export class PhotoController {
 
         for (const file of files) {
             const newPhoto = await this.photoService.add(file, userID, placeID)
-            createdPhotos.push(newPhoto);
+            createdPhotos.push(newPhoto)
         }
 
         return {
