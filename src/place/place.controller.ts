@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { PlaceService } from './place.service';
 import { CreatePlaceDto } from './dto/create-place.dto';
 import { UpdatePlaceDto } from './dto/update-place.dto';
@@ -13,8 +13,8 @@ export class PlaceController {
     }
 
     @Get(':id')
-    async getOne(@Param('id') id:string) {
-        return this.placeService.getOne(Number(id))
+    async getOne(@Param('id', ParseIntPipe) id:number) {
+        return this.placeService.getOne(id)
     }
 
     @Post()
@@ -23,12 +23,12 @@ export class PlaceController {
     }
 
     @Delete(':id')
-    async remove(@Param('id') id:string) {
-        return this.placeService.remove(Number(id))
+    async remove(@Param('id', ParseIntPipe) id:number) {
+        return this.placeService.remove(id)
     }
 
     @Put(':id')
-    async update(@Param('id') id:string, @Body() body:UpdatePlaceDto) {
-        return this.placeService.update(Number(id), body)
+    async update(@Param('id', ParseIntPipe) id:number, @Body() body:UpdatePlaceDto) {
+        return this.placeService.update(id, body)
     }
 }

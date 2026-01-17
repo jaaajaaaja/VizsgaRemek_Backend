@@ -5,25 +5,36 @@ import { CreatePlaceDto } from './dto/create-place.dto';
 
 @Injectable()
 export class PlaceService {
-    constructor(private prisma:PrismaService) {}
+    constructor(private prisma: PrismaService) { }
 
     async getAll() {
-        return this.prisma.place.findMany()
+        const places = await this.prisma.place.findMany()
+
+        if (places.length === 0) {
+            return { error: "Még nincsenek helyek!" }
+        }
+
+        return places
     }
 
-    async getOne(id:number) {
-        return this.prisma.place.findUnique({ where: {id} })
+    async getOne(id: number) {
+        const place = await this.prisma.place.findUnique({ where: { id } })
+
+        if (!place) {
+            return { error: "Nincs ilyen hely!" }
+        }
+        return place
     }
 
-    async add(data:CreatePlaceDto) {
+    async add(data: CreatePlaceDto) {
         return this.prisma.place.create({ data })
     }
 
-    async remove(id:number) {
-        return this.prisma.place.delete({ where: {id} })
+    async remove(id: number) {
+        return this.prisma.place.delete({ where: { id } })
     }
 
-    async update(id:number, data:UpdatePlaceDto) {
-        return this.prisma.place.update({ where: {id}, data })
+    async update(id: number, data: UpdatePlaceDto) {
+        return this.prisma.place.update({ where: { id }, data })
     }
 }
