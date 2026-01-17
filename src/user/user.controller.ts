@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -20,8 +20,8 @@ export class UserController {
 
     @Post()
     async add(@Body() body: CreateUserDto) {
-        const salt = await bcrypt.genSalt(10);
-        const hash = await bcrypt.hash(body.password, salt);
+        const salt = await bcrypt.genSalt(10)
+        const hash = await bcrypt.hash(body.password, salt)
 
         return this.userService.add({
             userName: body.userName,
@@ -31,12 +31,12 @@ export class UserController {
     }
 
     @Delete(':id')
-    async remove(@Param('id') id: string) {
-        return this.userService.remove(Number(id))
+    async remove(@Param('id', ParseIntPipe) id:number) {
+        return this.userService.remove(id)
     }
 
     @Put(':id')
-    async update(@Param('id') id: string, @Body() body: UpdateUserDto) {
-        return this.userService.update(Number(id), body)
+    async update(@Param('id', ParseIntPipe) id:number, @Body() body: UpdateUserDto) {
+        return this.userService.update(id, body)
     }
 }

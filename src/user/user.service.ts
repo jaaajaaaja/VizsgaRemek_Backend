@@ -19,7 +19,7 @@ export class UserService {
         const user = await this.findOne(data.email);
 
         if (user != null) {
-            return { "error": "Email already in use" };
+            return { error: "Ez az email már használatban van!" };
         }
 
         return this.prisma.user.create({ data })
