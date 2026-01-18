@@ -25,7 +25,6 @@
 - **Jelszó titkosítás:** [bcrypt](https://www.npmjs.com/package/bcrypt)
 - **Fájlfeltöltés:** [Multer](https://www.npmjs.com/package/multer)
 - **Validáció:** [class-validator, class-transformer](https://docs.nestjs.com/techniques/validation)
-- **Template engine:** [EJS](https://www.npmjs.com/package/ejs)
 - **Tesztelés:** [Jest](https://www.npmjs.com/package/jest), [Supertest](https://www.npmjs.com/package/supertest)
 - **Kód formázás:** [Prettier](https://prettier.io/), [ESLint](https://eslint.org/)
 - **Teszt adatok generálása:** [Faker](https://fakerjs.dev/)

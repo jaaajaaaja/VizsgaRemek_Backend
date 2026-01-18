@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, UseInterceptors, UploadedFiles, ParseIntPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseInterceptors, UploadedFiles, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { PhotoService } from './photo.service';
@@ -6,6 +6,7 @@ import { extname } from 'path';
 import { Photo } from 'generated/prisma/client';
 import { NotFoundError } from 'rxjs';
 import { response } from 'express';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('photo')
 export class PhotoController {
@@ -38,11 +39,13 @@ export class PhotoController {
     }
 
     @Delete(':id')
+    @UseGuards(AuthGuard)
     async remove(@Param('id', ParseIntPipe) id:number) {
         return this.photoService.remove(id)
     }
 
     @Post()
+    @UseGuards(AuthGuard)
     @UseInterceptors(FilesInterceptor('file', 3, {
         storage: diskStorage({
             destination: './uploads',
