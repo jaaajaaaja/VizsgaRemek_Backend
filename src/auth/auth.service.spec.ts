@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
-import { UnauthorizedException } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 
 jest.mock('bcrypt')
 import * as bcrypt from "bcrypt";
@@ -49,13 +49,11 @@ describe('AuthService', () => {
   })
 
   describe("signIn", () => {
-    it("should throw UnauthorizedException when user does not exist", async () => {
-      userService.findOne("")
+    it("should throw NotFoundException when user does not exist", async () => {
+      mockUserService.findOne.mockResolvedValue(null)
 
-      await expect(
-        service.signIn('test@test.com', 'password'),
-      ).rejects.toThrow(UnauthorizedException)
-      expect(userService.findOne).toHaveBeenCalledWith("test@test.com")
+      await expect(service.signIn('test@test.com', 'password')).rejects.toThrow(NotFoundException)
+      expect(mockUserService.findOne).toHaveBeenCalledWith("test@test.com")
     })
 
     it("should return jwt token", async () => {

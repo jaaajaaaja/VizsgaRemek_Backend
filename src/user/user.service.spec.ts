@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from './user.service';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 
 describe('UserService', () => {
   let service: UserService
@@ -76,6 +77,14 @@ describe('UserService', () => {
       expect(mockPrismaService.user.findUnique).toHaveBeenCalledTimes(1)
       expect(mockPrismaService.user.findUnique).toHaveBeenCalledWith({ where: { email: "test@test.com" } })
     })
+
+    it("should throw NotFoundException when email not found", async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(null)
+
+      await expect(service.findOne("test@test.com")).rejects.toThrow(NotFoundException)
+      expect(mockPrismaService.user.findUnique).toHaveBeenCalledTimes(1)
+      expect(mockPrismaService.user.findUnique).toHaveBeenCalledWith({ where: { email: "test@test.com" } })
+    })
   })
 
   describe("add", () => {
@@ -90,18 +99,18 @@ describe('UserService', () => {
       expect(mockPrismaService.user.create).toHaveBeenCalledWith({ data: mockUser })
     })
 
-    it("should return error when email already in use", async () => {
+    it("should throw ConflictException when email already in use", async () => {
       mockPrismaService.user.findUnique.mockResolvedValue(mockUser)
+      mockPrismaService.user.create.mockResolvedValue(mockUser)
 
-      const result = await service.add(mockUser)
-
-      expect(result).toEqual({ error: "Ez az email már használatban van!" })
+      await expect(service.add(mockUser)).rejects.toThrow(ConflictException)
       expect(mockPrismaService.user.create).toHaveBeenCalledTimes(0)
     })
   })
 
   describe("remove", () => {
     it("should delete a user by id", async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(mockUser)
       mockPrismaService.user.delete.mockResolvedValue(mockUser)
 
       const result = await service.remove(1)
@@ -110,10 +119,19 @@ describe('UserService', () => {
       expect(mockPrismaService.user.delete).toHaveBeenCalledTimes(1)
       expect(mockPrismaService.user.delete).toHaveBeenCalledWith({ where: { id: 1 } })
     })
+
+    it("should throw NotFoundException when user not found", async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(null)
+      mockPrismaService.user.delete.mockResolvedValue(mockUser)
+
+      await expect(service.remove(1)).rejects.toThrow(NotFoundException)
+      expect(mockPrismaService.user.delete).toHaveBeenCalledTimes(0)      
+    })
   })
 
   describe("update", () => {
     it("should update a user by id", async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(mockUser)
       mockPrismaService.user.update.mockResolvedValue(mockUser)
 
       const result = await service.update(1, mockUser)
@@ -121,6 +139,14 @@ describe('UserService', () => {
       expect(result).toEqual(mockUser)
       expect(mockPrismaService.user.update).toHaveBeenCalledTimes(1)
       expect(mockPrismaService.user.update).toHaveBeenCalledWith({ where: { id: 1 }, data: mockUser })
+    })
+
+    it("should throw NotFoundException when user not found", async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(null)
+      mockPrismaService.user.update.mockResolvedValue(mockUser)
+
+      await expect(service.update(1, mockUser)).rejects.toThrow(NotFoundException)
+      expect(mockPrismaService.user.update).toHaveBeenCalledTimes(0)      
     })
   })
 })

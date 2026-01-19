@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -22,7 +22,7 @@ export class PhotoService {
         })
 
         if (!photo) {
-            return { error: "Nincs ilyen fotó" }
+            throw new NotFoundException("Photo not found!")
         }
 
         return {
@@ -47,7 +47,7 @@ export class PhotoService {
         })
 
         if (!allByUser) {
-            return { error: "A felhasználó még nem töltött fel képet!" }
+            throw new NotFoundException("User did not upload any photos!")
         }
 
         return allByUser
@@ -65,8 +65,8 @@ export class PhotoService {
             }
         })
 
-        if(!allByPlace) {
-            return {error: "A helyhez még nincsenek fotók feltöltve!"}
+        if (!allByPlace) {
+            throw new NotFoundException("Place does not have any photos!")
         }
 
         return allByPlace
@@ -86,6 +86,12 @@ export class PhotoService {
     }
 
     async remove(id: number) {
+        const photo = await this.prisma.photo.findUnique({ where: { id } })
+
+        if(!photo) {
+            throw new NotFoundException("Photo not found!")
+        }
+
         return this.prisma.photo.delete({ where: { id } })
     }
 }

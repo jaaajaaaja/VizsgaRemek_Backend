@@ -41,8 +41,8 @@ export class CommentController {
 
   @Delete(':id')
   @UseGuards(AuthGuard)
-  async delete(@Param('id', ParseIntPipe) id:number) {
-    return this.commentService.remove(id)
+  async delete(@Param('id', ParseIntPipe) id:number, @Param('userID', ParseIntPipe) userID:number) {
+    return this.commentService.remove(id, userID)
   }
 
   @Put(':id')

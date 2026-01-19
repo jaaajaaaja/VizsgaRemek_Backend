@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PlaceService } from './place.service';
+import { NotFoundException } from '@nestjs/common';
 
 describe('PlaceService', () => {
   let service: PlaceService
@@ -70,15 +71,6 @@ describe('PlaceService', () => {
       expect(result).toEqual(mockPlaces)
       expect(mockPrismaService.place.findMany).toHaveBeenCalledTimes(1)
     })
-
-    it("should return error when no places", async () => {
-      mockPrismaService.place.findMany.mockResolvedValue([])
-
-      const result = await service.getAll()
-
-      expect(result).toEqual({ error: "Még nincsenek helyek!" })
-      expect(mockPrismaService.place.findMany).toHaveBeenCalledTimes(1)
-    })
   })
 
   describe("getOne", () => {
@@ -92,12 +84,10 @@ describe('PlaceService', () => {
       expect(mockPrismaService.place.findUnique).toHaveBeenCalledWith({ where: { id: 1 } })
     })
 
-    it("should return error when place does not exist", async () => {
+    it("should throw NotFoundException when place does not exist", async () => {
       mockPrismaService.place.findUnique.mockResolvedValue(null)
 
-      const result = await service.getOne(1)
-
-      expect(result).toEqual({ error: "Nincs ilyen hely!" })
+      await expect(service.getOne(1)).rejects.toThrow(NotFoundException)
       expect(mockPrismaService.place.findUnique).toHaveBeenCalledWith({ where: { id: 1 } })
     })
   })
@@ -116,6 +106,7 @@ describe('PlaceService', () => {
 
   describe("remove", () => {
     it("should delete a place by id", async () => {
+      mockPrismaService.place.findUnique.mockResolvedValue(mockPlace)
       mockPrismaService.place.delete.mockResolvedValue(mockPlace)
 
       const result = await service.remove(1)
@@ -123,16 +114,33 @@ describe('PlaceService', () => {
       expect(result).toEqual(mockPlace)
       expect(mockPrismaService.place.delete).toHaveBeenCalledWith({ where: { id: 1 } })
     })
+
+    it("should throw NotFoundException when place does not exist", async () => {
+      mockPrismaService.place.findUnique.mockResolvedValue(null)
+      mockPrismaService.place.delete.mockResolvedValue(null)
+
+      await expect(service.remove(1)).rejects.toThrow(NotFoundException)
+      expect(mockPrismaService.place.delete).toHaveBeenCalledTimes(0)
+    })
   })
 
   describe("update", () => {
     it("should update a place by id", async () => {
+      mockPrismaService.place.findUnique.mockResolvedValue(mockPlace)
       mockPrismaService.place.update.mockResolvedValue(mockPlace)
 
       const result = await service.update(1, mockPlace)
 
       expect(result).toEqual(mockPlace)
       expect(mockPrismaService.place.update).toHaveBeenCalledWith({ where: { id: 1 }, data: mockPlace })
+    })
+
+    it("should throw NotFoundException when place does not exist", async () => {
+      mockPrismaService.place.findUnique.mockResolvedValue(null)
+      mockPrismaService.place.update.mockResolvedValue(mockPlace)
+
+      await expect(service.update(1, mockPlace)).rejects.toThrow(NotFoundException)
+      expect(mockPrismaService.place.update).toHaveBeenCalledTimes(0)
     })
   })
 })

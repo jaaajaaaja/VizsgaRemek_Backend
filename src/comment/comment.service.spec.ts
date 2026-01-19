@@ -3,6 +3,7 @@ import { CommentService } from './comment.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { NotFoundException } from '@nestjs/common';
 
 describe('CommentService', () => {
   let service: CommentService
@@ -92,15 +93,6 @@ describe('CommentService', () => {
       expect(result).toEqual(mockComments)
       expect(mockPrismaService.comment.findMany).toHaveBeenCalledTimes(1)
     })
-
-    it('should return error message when no comments exist', async () => {
-      mockPrismaService.comment.findMany.mockResolvedValue([])
-
-      const result = await service.findAll()
-
-      expect(result).toEqual({ error: 'Még nincsenek kommentek' })
-      expect(mockPrismaService.comment.findMany).toHaveBeenCalledTimes(1)
-    })
   })
 
   describe('findOne', () => {
@@ -115,12 +107,10 @@ describe('CommentService', () => {
       })
     })
 
-    it('should return null when comment does not exist', async () => {
+    it('should throw NotFoundException when comment does not exist', async () => {
       mockPrismaService.comment.findUnique.mockResolvedValue(null)
 
-      const result = await service.findOne(999)
-
-      expect(result).toBeNull()
+      await expect(service.findOne(999)).rejects.toThrow(NotFoundException)
       expect(mockPrismaService.comment.findUnique).toHaveBeenCalledWith({
         where: { id: 999 },
       })
@@ -139,12 +129,10 @@ describe('CommentService', () => {
       })
     })
 
-    it('should return message when user has no comments', async () => {
+    it('should throw NotFoundException when user has no comments', async () => {
       mockPrismaService.comment.findMany.mockResolvedValue([])
 
-      const result = await service.findAllByUser(1)
-
-      expect(result).toEqual({ message: 'Még nincsenek kommentek' })
+      await expect(service.findAllByUser(1)).rejects.toThrow(NotFoundException)
       expect(mockPrismaService.comment.findMany).toHaveBeenCalledWith({
         where: { userID: 1 },
       })
@@ -163,12 +151,10 @@ describe('CommentService', () => {
       })
     })
 
-    it('should return message when place has no comments', async () => {
+    it('should throw NotFoundException when place has no comments', async () => {
       mockPrismaService.comment.findMany.mockResolvedValue([])
 
-      const result = await service.findAllByPlace(1)
-
-      expect(result).toEqual({ message: 'A helyhez még nincsenek kommentek' })
+      await expect(service.findAllByPlace(1)).rejects.toThrow(NotFoundException)
       expect(mockPrismaService.comment.findMany).toHaveBeenCalledWith({
         where: { placeID: 1 },
       })
@@ -204,14 +190,25 @@ describe('CommentService', () => {
 
   describe('remove', () => {
     it('should delete a comment by id', async () => {
+      mockPrismaService.comment.findUnique.mockResolvedValue(mockComment)
       mockPrismaService.comment.delete.mockResolvedValue(mockComment)
 
       const result = await service.remove(1)
 
       expect(result).toEqual(mockComment)
+      expect(mockPrismaService.comment.findUnique).toHaveBeenCalledWith({
+        where: { id: 1 },
+      })
       expect(mockPrismaService.comment.delete).toHaveBeenCalledWith({
         where: { id: 1 },
       })
+    })
+
+    it("should throw NotFoundException when comment does not exits", async () => {
+      mockPrismaService.comment.findUnique.mockResolvedValue(null)
+
+      await expect(service.remove(1)).rejects.toThrow(NotFoundException)
+      expect(mockPrismaService.comment.delete).toHaveBeenCalledTimes(0)
     })
   })
 
@@ -232,11 +229,12 @@ describe('CommentService', () => {
         updatedAt: new Date(),
       }
 
-      mockPrismaService.comment.update.mockResolvedValue(mockUpdatedComment)
+      mockPrismaService.comment.findUnique.mockResolvedValue(mockUpdatedComment)
+      mockPrismaService.comment.update.mockResolvedValue(updateCommentDto)
 
       const result = await service.update(1, updateCommentDto)
 
-      expect(result).toEqual(mockUpdatedComment)
+      expect(result).toEqual(updateCommentDto)
       expect(mockPrismaService.comment.update).toHaveBeenCalledWith({
         where: { id: 1 },
         data: updateCommentDto,
@@ -304,16 +302,14 @@ describe('CommentService', () => {
       })
     })
 
-    it('should return empty array when place does not exist', async () => {
+    it('should throw NotFountException when place does not exist', async () => {
       mockPrismaService.place.findFirst.mockResolvedValue(null)
 
-      const result = await service.findAllByGooglePlace('invalid-id')
-
-      expect(result).toEqual([])
+      await expect(service.findAllByGooglePlace('invalid-id')).rejects.toThrow(NotFoundException)
       expect(mockPrismaService.place.findFirst).toHaveBeenCalledWith({
         where: { googleplaceID: 'invalid-id' },
       })
-      expect(mockPrismaService.comment.findMany).not.toHaveBeenCalled()
+      expect(mockPrismaService.comment.findMany).toHaveBeenCalledTimes(0)
     })
   })
 })

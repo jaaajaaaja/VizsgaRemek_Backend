@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -12,24 +12,43 @@ export class UserService {
     }
 
     async findOne(email: string) {
-        return this.prisma.user.findUnique({ where: { email } })
+        const user = await this.prisma.user.findUnique({ where: { email } })
+
+        if (!user) {
+            throw new NotFoundException("User not found")
+        }
+
+        return user
     }
 
     async add(data: CreateUserDto) {
-        const user = await this.findOne(data.email);
+        const email = data.email
+        const user = await this.prisma.user.findUnique({ where: { email } })
 
-        if (user != null) {
-            return { error: "Ez az email már használatban van!" };
+        if (user) {
+            throw new ConflictException("Email already in use!")
         }
 
         return this.prisma.user.create({ data })
     }
 
     async remove(id: number) {
+        const user = await this.prisma.user.findUnique({ where: { id } })
+
+        if (!user) {
+            throw new NotFoundException("User not found!")
+        }
+
         return this.prisma.user.delete({ where: { id } })
     }
 
     async update(id: number, data: UpdateUserDto) {
+        const user = await this.prisma.user.findUnique({ where: { id } })
+
+        if (!user) {
+            throw new NotFoundException("User not found!")
+        }
+        
         return this.prisma.user.update({ where: { id }, data })
     }
 }

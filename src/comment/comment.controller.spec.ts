@@ -3,6 +3,7 @@ import { CommentController } from './comment.controller';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 describe('CommentController', () => {
   let controller: CommentController
@@ -50,7 +51,9 @@ describe('CommentController', () => {
           useValue: mockCommentService
         }
       ]
-    }).compile()
+    }).overrideGuard(AuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile()
 
     controller = module.get<CommentController>(CommentController)
     service = module.get<CommentService>(CommentService)

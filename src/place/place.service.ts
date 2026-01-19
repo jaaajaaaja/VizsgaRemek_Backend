@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdatePlaceDto } from './dto/update-place.dto';
 import { CreatePlaceDto } from './dto/create-place.dto';
@@ -10,10 +10,6 @@ export class PlaceService {
     async getAll() {
         const places = await this.prisma.place.findMany()
 
-        if (places.length === 0) {
-            return { error: "Még nincsenek helyek!" }
-        }
-
         return places
     }
 
@@ -21,7 +17,7 @@ export class PlaceService {
         const place = await this.prisma.place.findUnique({ where: { id } })
 
         if (!place) {
-            return { error: "Nincs ilyen hely!" }
+            throw new NotFoundException("Place not found!")
         }
         return place
     }
@@ -31,10 +27,22 @@ export class PlaceService {
     }
 
     async remove(id: number) {
+        const place = await this.prisma.place.findUnique({ where: { id } })
+
+        if (!place) {
+            throw new NotFoundException("Place not found!")
+        }
+
         return this.prisma.place.delete({ where: { id } })
     }
 
     async update(id: number, data: UpdatePlaceDto) {
+        const place = await this.prisma.place.findUnique({ where: { id } })
+
+        if (!place) {
+            throw new NotFoundException("Place not found!")
+        }
+
         return this.prisma.place.update({ where: { id }, data })
     }
 }

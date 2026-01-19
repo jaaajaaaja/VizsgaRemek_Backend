@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 describe('UserController', () => {
   let controller: UserController
@@ -40,7 +41,9 @@ describe('UserController', () => {
           useValue: mockUserService
         }
       ]
-    }).compile()
+    }).overrideGuard(AuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile()
 
     controller = module.get<UserController>(UserController)
     service = module.get<UserService>(UserService)

@@ -3,6 +3,7 @@ import { PhotoController } from './photo.controller';
 import { PrismaService } from 'src/prisma.service';
 import { PhotoService } from './photo.service';
 import { Photo } from 'generated/prisma/client';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 describe('PhotoController', () => {
   let controller: PhotoController
@@ -55,7 +56,9 @@ describe('PhotoController', () => {
           useValue: mockPhotoService
         }
       ]
-    }).compile()
+    }).overrideGuard(AuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile()
 
     controller = module.get<PhotoController>(PhotoController)
     service = module.get<PhotoService>(PhotoService)

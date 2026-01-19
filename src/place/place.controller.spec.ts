@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PlaceController } from './place.controller';
 import { PlaceService } from './place.service';
 import { UpdatePlaceDto } from './dto/update-place.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 describe('PlaceController', () => {
   let controller: PlaceController
@@ -31,7 +32,9 @@ describe('PlaceController', () => {
           useValue: mockPlaceService
         }
       ]
-    }).compile()
+    }).overrideGuard(AuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile()
 
     controller = module.get<PlaceController>(PlaceController)
     service = module.get<PlaceService>(PlaceService)
