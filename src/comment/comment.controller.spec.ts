@@ -142,10 +142,10 @@ describe('CommentController', () => {
     it('should delete a comment by id', async () => {
       mockCommentService.remove.mockResolvedValue(mockComment)
 
-      const result = await controller.delete(1)
+      const result = await controller.delete(1, 1)
 
       expect(result).toEqual(mockComment)
-      expect(service.remove).toHaveBeenCalledWith(1)
+      expect(service.remove).toHaveBeenCalledWith(1, 1)
     })
   })
 

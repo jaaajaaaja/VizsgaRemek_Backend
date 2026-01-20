@@ -193,7 +193,7 @@ describe('CommentService', () => {
       mockPrismaService.comment.findUnique.mockResolvedValue(mockComment)
       mockPrismaService.comment.delete.mockResolvedValue(mockComment)
 
-      const result = await service.remove(1)
+      const result = await service.remove(1, 1)
 
       expect(result).toEqual(mockComment)
       expect(mockPrismaService.comment.findUnique).toHaveBeenCalledWith({
@@ -207,7 +207,7 @@ describe('CommentService', () => {
     it("should throw NotFoundException when comment does not exits", async () => {
       mockPrismaService.comment.findUnique.mockResolvedValue(null)
 
-      await expect(service.remove(1)).rejects.toThrow(NotFoundException)
+      await expect(service.remove(1, 1)).rejects.toThrow(NotFoundException)
       expect(mockPrismaService.comment.delete).toHaveBeenCalledTimes(0)
     })
   })
