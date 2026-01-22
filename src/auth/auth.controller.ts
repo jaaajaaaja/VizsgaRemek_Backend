@@ -9,14 +9,13 @@ export class AuthController {
 
     @HttpCode(HttpStatus.OK)
     @SkipThrottle({place: true, basic: true, postput:true})
-    @SkipThrottle({place: true})
     @Post('login')
     async signIn(@Body() body: Record<string, any>) {
         return this.authService.signIn(body.email, body.password)
     }
 
     @UseGuards(AuthGuard)
-    @SkipThrottle({place: true, login: true, basic: true, postput:true})
+    @SkipThrottle({place: true, login: true, postput:true})
     @Get('profile')
     getProfile(@Request() req) {
         return req.user;

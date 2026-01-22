@@ -10,31 +10,31 @@ export class CommentController {
   constructor(private commentService: CommentService) { }
 
   @Get()
-  @SkipThrottle({postput: true, place: true, login: true})
+  @SkipThrottle({ postput: true, place: true, login: true })
   async getAll() {
     return this.commentService.findAll()
   }
 
   @Get(':id')
-  @SkipThrottle({postput: true, place: true, login: true})
+  @SkipThrottle({ postput: true, place: true, login: true })
   async getOne(@Param('id', ParseIntPipe) id: number) {
     return this.commentService.findOne(id)
   }
 
   @Get('/findAllByUser/:userID')
-  @SkipThrottle({postput: true, place: true, login: true})
+  @SkipThrottle({ postput: true, place: true, login: true })
   async getAllByUser(@Param('userID', ParseIntPipe) userID: number) {
     return this.commentService.findAllByUser(userID)
   }
 
   @Get('/findAllByPlace/:placeID')
-  @SkipThrottle({postput: true, place: true, login: true})
+  @SkipThrottle({ postput: true, place: true, login: true })
   async findAllByPlace(@Param('placeID', ParseIntPipe) placeID: number) {
     return this.commentService.findAllByPlace(placeID)
   }
-  
+
   @Get('/findAllByGooglePlace/:googlePlaceID')
-  @SkipThrottle({postput: true, place: true, login: true})
+  @SkipThrottle({ postput: true, place: true, login: true })
   async findAllByGooglePlace(@Param('googlePlaceID') googlePlaceID: string) {
     return this.commentService.findAllByGooglePlace(googlePlaceID)
   }
@@ -48,14 +48,14 @@ export class CommentController {
 
   @Delete(':id')
   @UseGuards(AuthGuard)
-  @SkipThrottle({postput: true, place: true, login: true})
-  async delete(@Param('id', ParseIntPipe) id: number, @Req() request:Request) {
+  @SkipThrottle({ postput: true, place: true, login: true })
+  async delete(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
     return this.commentService.remove(id, request["user"].sub)
   }
 
   @Put(':id')
   @UseGuards(AuthGuard)
-  @SkipThrottle({basic: true, place: true, login: true})
+  @SkipThrottle({ basic: true, place: true, login: true })
   async update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateCommentDto, @Req() request: Request) {
     return this.commentService.update(id, body, request["user"].sub)
   }

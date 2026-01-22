@@ -1,20 +1,4 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, ValidateIf } from "class-validator"
+import { PartialType } from '@nestjs/mapped-types'
+import { CreatePhotoDto } from './create-photo.dto';
 
-export class UpdatePhotoDto {
-    @IsOptional()
-    @ValidateIf(o => o.type !== undefined)
-    data:Buffer
-
-    @IsOptional()
-    @IsString()
-    @ValidateIf(o => o.data !== undefined)
-    type:string
-    
-    @IsNotEmpty()
-    @IsNumber()
-    userID:number
-    
-    @IsNotEmpty()
-    @IsNumber()
-    placeID:number
-}
+export class UpdatePhotoDto extends PartialType(CreatePhotoDto) {}

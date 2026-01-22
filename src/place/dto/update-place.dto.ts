@@ -1,23 +1,4 @@
-import { Transform, TransformFnParams } from "class-transformer";
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
-import sanitizeHtml from 'sanitize-html';
+import { PartialType } from '@nestjs/mapped-types'
+import { CreatePlaceDto } from './create-place.dto';
 
-export class UpdatePlaceDto {
-    @IsOptional()
-    @IsNotEmpty()
-    @IsString()
-    @Transform((params: TransformFnParams) => sanitizeHtml(params.value))
-    googleplaceID:string
-
-    @IsOptional()
-    @IsNotEmpty()
-    @IsString()
-    @Transform((params: TransformFnParams) => sanitizeHtml(params.value))
-    name:string
-
-    @IsOptional()
-    @IsNotEmpty()
-    @IsString()
-    @Transform((params: TransformFnParams) => sanitizeHtml(params.value))
-    address:string
-}
+export class UpdatePlaceDto extends PartialType(CreatePlaceDto) {}

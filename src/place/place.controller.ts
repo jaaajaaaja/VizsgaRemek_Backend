@@ -16,14 +16,14 @@ export class PlaceController {
     }
 
     @Get(':id')
-    @SkipThrottle({postput: true, place: true, login: true})
+    @SkipThrottle({ postput: true, place: true, login: true })
     async getOne(@Param('id', ParseIntPipe) id: number) {
         return this.placeService.getOne(id)
     }
 
     @Post()
     @UseGuards(AuthGuard)
-    @SkipThrottle({basic: true, place: true, login: true})
+    @SkipThrottle({ basic: true, place: true, login: true })
     @Throttle({ place: { ttl: 60000, limit: 10 } })
     async add(@Body() body: CreatePlaceDto) {
         return this.placeService.add(body)
@@ -31,7 +31,7 @@ export class PlaceController {
 
     @Delete(':id')
     @UseGuards(AuthGuard)
-    @SkipThrottle({postput: true, place: true, login: true})
+    @SkipThrottle({ postput: true, place: true, login: true })
     @Throttle({ place: { ttl: 60000, limit: 3 } })
     async remove(@Param('id', ParseIntPipe) id: number) {
         return this.placeService.remove(id)
@@ -39,7 +39,7 @@ export class PlaceController {
 
     @Put(':id')
     @UseGuards(AuthGuard)
-    @SkipThrottle({basic: true, place: true, login: true})
+    @SkipThrottle({ basic: true, place: true, login: true })
     async update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdatePlaceDto) {
         return this.placeService.update(id, body)
     }
