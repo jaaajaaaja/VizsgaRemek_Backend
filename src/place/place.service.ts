@@ -19,6 +19,7 @@ export class PlaceService {
         if (!place) {
             throw new NotFoundException("Place not found!")
         }
+        
         return place
     }
 

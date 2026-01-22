@@ -1,58 +1,62 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @Controller('comment')
 export class CommentController {
-  constructor(private commentService: CommentService) {}
+  constructor(private commentService: CommentService) { }
 
   @Get()
+  @SkipThrottle({postput: true, place: true, login: true})
   async getAll() {
     return this.commentService.findAll()
   }
 
   @Get(':id')
-  async getOne(@Param('id', ParseIntPipe) id:number) {
+  @SkipThrottle({postput: true, place: true, login: true})
+  async getOne(@Param('id', ParseIntPipe) id: number) {
     return this.commentService.findOne(id)
   }
 
   @Get('/findAllByUser/:userID')
-  async getAllByUser(@Param('userID', ParseIntPipe) userID:number) {
+  @SkipThrottle({postput: true, place: true, login: true})
+  async getAllByUser(@Param('userID', ParseIntPipe) userID: number) {
     return this.commentService.findAllByUser(userID)
   }
 
-  /*@Get('/findOneByUser/:userID')
-    async getOneByUser(@Param('userID') userID:string) {
-        return this.commentService.findOneByUser(Number(userID))
-    }*/
-
   @Get('/findAllByPlace/:placeID')
-  async findAllByPlace(@Param('placeID', ParseIntPipe) placeID:number) {
+  @SkipThrottle({postput: true, place: true, login: true})
+  async findAllByPlace(@Param('placeID', ParseIntPipe) placeID: number) {
     return this.commentService.findAllByPlace(placeID)
+  }
+  
+  @Get('/findAllByGooglePlace/:googlePlaceID')
+  @SkipThrottle({postput: true, place: true, login: true})
+  async findAllByGooglePlace(@Param('googlePlaceID') googlePlaceID: string) {
+    return this.commentService.findAllByGooglePlace(googlePlaceID)
   }
 
   @Post()
   @UseGuards(AuthGuard)
-  async add(@Body() body: CreateCommentDto) {
-    return this.commentService.add(body)
+  @SkipThrottle({basic: true, place: true, login: true})
+  async add(@Body() body: CreateCommentDto, @Req() request: Request) {
+    return this.commentService.add(body, request["user"].sub)
   }
 
   @Delete(':id')
   @UseGuards(AuthGuard)
-  async delete(@Param('id', ParseIntPipe) id:number, @Param('userID', ParseIntPipe) userID:number) {
-    return this.commentService.remove(id, userID)
+  @SkipThrottle({postput: true, place: true, login: true})
+  async delete(@Param('id', ParseIntPipe) id: number, @Req() request:Request) {
+    return this.commentService.remove(id, request["user"].sub)
   }
 
   @Put(':id')
   @UseGuards(AuthGuard)
-  async update(@Param('id', ParseIntPipe) id:number, @Body() body: UpdateCommentDto) {
-    return this.commentService.update(id, body)
-  }
-
-  @Get('/findAllByGooglePlace/:googlePlaceID')
-  async findAllByGooglePlace(@Param('googlePlaceID') googlePlaceID: string) {
-    return this.commentService.findAllByGooglePlace(googlePlaceID)
+  @SkipThrottle({basic: true, place: true, login: true})
+  async update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateCommentDto, @Req() request: Request) {
+    return this.commentService.update(id, body, request["user"].sub)
   }
 }

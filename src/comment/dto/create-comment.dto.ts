@@ -18,9 +18,5 @@ export class CreateCommentDto {
 
     @IsNotEmpty()
     @IsNumber()
-    userID:number
-
-    @IsNotEmpty()
-    @IsNumber()
     placeID:number
 }

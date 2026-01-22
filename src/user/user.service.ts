@@ -32,21 +32,29 @@ export class UserService {
         return this.prisma.user.create({ data })
     }
 
-    async remove(id: number) {
+    async remove(id: number, loggedInUserId: number) {
         const user = await this.prisma.user.findUnique({ where: { id } })
 
         if (!user) {
             throw new NotFoundException("User not found!")
         }
 
+        if(user.id != loggedInUserId) {
+            throw new NotFoundException("You can only delete your own profile!")
+        }
+
         return this.prisma.user.delete({ where: { id } })
     }
 
-    async update(id: number, data: UpdateUserDto) {
+    async update(id: number, data: UpdateUserDto, loggedInUserId: number) {
         const user = await this.prisma.user.findUnique({ where: { id } })
 
         if (!user) {
             throw new NotFoundException("User not found!")
+        }
+
+        if(user.id != loggedInUserId) {
+            throw new NotFoundException("You can only edit your own profile!")
         }
         
         return this.prisma.user.update({ where: { id }, data })

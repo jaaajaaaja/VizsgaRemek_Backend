@@ -1,24 +1,29 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Req, UseGuards, } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt'
+import { AuthGuard } from 'src/auth/auth.guard';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @Controller('user')
 export class UserController {
     constructor(private userService: UserService) { }
 
     @Get()
+    @SkipThrottle({postput: true, place: true, login: true})
     async getAll() {
         return this.userService.findAll()
     }
 
     @Get(':email')
+    @SkipThrottle({postput: true, place: true, login: true})
     async getOne(@Param('email') email: string) {
         return this.userService.findOne(email)
     }
 
     @Post()
+    @SkipThrottle({basic: true, place: true, login: true})
     async add(@Body() body: CreateUserDto) {
         const salt = await bcrypt.genSalt(10)
         const hash = await bcrypt.hash(body.password, salt)
@@ -31,12 +36,16 @@ export class UserController {
     }
 
     @Delete(':id')
-    async remove(@Param('id', ParseIntPipe) id:number) {
-        return this.userService.remove(id)
+    @UseGuards(AuthGuard)
+    @SkipThrottle({postput: true, place: true, login: true})
+    async remove(@Param('id', ParseIntPipe) id:number, @Req() request: Request) {
+        return this.userService.remove(id, request["user"].sub)
     }
 
     @Put(':id')
-    async update(@Param('id', ParseIntPipe) id:number, @Body() body: UpdateUserDto) {
-        return this.userService.update(id, body)
+    @UseGuards(AuthGuard)
+    @SkipThrottle({basic: true, place: true, login: true})
+    async update(@Param('id', ParseIntPipe) id:number, @Body() body: UpdateUserDto, @Req() request: Request) {
+        return this.userService.update(id, body, request["user"].sub)
     }
 }

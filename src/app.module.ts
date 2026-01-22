@@ -16,12 +16,47 @@ import { CommentController } from './comment/comment.controller';
 import { UserService } from './user/user.service';
 import { CommentService } from './comment/comment.service';
 import { AuthModule } from './auth/auth.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
-  imports: [ConfigModule.forRoot({
-    isGlobal: true,
-  }), PrismaModule, CommentModule, UserModule, PlaceModule, PhotoModule, AuthModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          name: "basic",
+          ttl: 60000,
+          limit: 120
+        },
+        {
+          name: "postput",
+          ttl: 60000,
+          limit: 60
+        },
+        {
+          name: "place",
+          ttl: 60000,
+          limit: 10,
+        },
+        {
+          name: "login",
+          ttl: 60000,
+          limit: 3
+        }
+      ]
+    },
+    ),
+    PrismaModule,
+    CommentModule,
+    UserModule,
+    PlaceModule,
+    PhotoModule,
+    AuthModule,
+  ],
   controllers: [AppController, PlaceController, PhotoController, UserController, CommentController],
-  providers: [AppService, PlaceService, PhotoService, UserService, CommentService],
+  providers: [AppService, PlaceService, PhotoService, UserService, CommentService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
-export class AppModule {}
+export class AppModule { }

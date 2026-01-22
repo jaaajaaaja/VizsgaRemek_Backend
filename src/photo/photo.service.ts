@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -72,24 +72,28 @@ export class PhotoService {
         return allByPlace
     }
 
-    async add(file: Express.Multer.File, userID: number, placeID: number) {
+    async add(file: Express.Multer.File, placeID: number, loggedInUserId: number) {
         const fileName = `${Date.now()}-${Math.floor(Math.random() * 10000)}`
 
         return this.prisma.photo.create({
             data: {
                 location: `/uploads/${file.filename}`,
                 type: file.mimetype,
-                userID: userID,
+                userID: loggedInUserId,
                 placeID: placeID,
             },
         })
     }
 
-    async remove(id: number) {
-        const photo = await this.prisma.photo.findUnique({ where: { id } })
+    async remove(id: number, loggedInUserId: number) {
+        const photo = await this.prisma.photo.findUnique({ where: { id } })        
 
         if(!photo) {
             throw new NotFoundException("Photo not found!")
+        }
+
+        if(photo.id != loggedInUserId) {
+            throw new UnauthorizedException("You can only delete your own photos")
         }
 
         return this.prisma.photo.delete({ where: { id } })

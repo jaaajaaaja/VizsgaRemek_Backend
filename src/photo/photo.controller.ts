@@ -1,23 +1,24 @@
-import { Body, Controller, Delete, Get, Param, Post, UseInterceptors, UploadedFiles, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseInterceptors, UploadedFiles, ParseIntPipe, UseGuards, Req } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { PhotoService } from './photo.service';
 import { extname } from 'path';
 import { Photo } from 'generated/prisma/client';
-import { NotFoundError } from 'rxjs';
-import { response } from 'express';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @Controller('photo')
 export class PhotoController {
     constructor(private photoService: PhotoService) { }
 
     @Get()
+    @SkipThrottle({postput: true, place: true, login: true})
     async getAll() {
         return this.photoService.getAll()
     }
 
     @Get(':id')
+    @SkipThrottle({postput: true, place: true, login: true})
     async getOne(@Param('id', ParseIntPipe) id:number) {
         const photo = await this.photoService.getOne(id)
 
@@ -25,27 +26,27 @@ export class PhotoController {
     }
 
     @Get('/getAllByUser/:userID')
+    @SkipThrottle({postput: true, place: true, login: true})
     async getAllByUser(@Param('userID', ParseIntPipe) userID:number) {
         return this.photoService.getAllByUser(userID)
-
-        // http://localhost:3000/photo/getAllByUser/1
     }
 
     @Get('/getAllByPlace/:placeID')
+    @SkipThrottle({postput: true, place: true, login: true})
     async getAllByPlace(@Param('placeID', ParseIntPipe) placeID:number) {
         return this.photoService.getAllByPlace(placeID)
-
-        // http://localhost:3000/photo/getAllByPlace/1
     }
 
     @Delete(':id')
     @UseGuards(AuthGuard)
-    async remove(@Param('id', ParseIntPipe) id:number) {
-        return this.photoService.remove(id)
+    @SkipThrottle({postput: true, place: true, login: true})
+    async remove(@Param('id', ParseIntPipe) id:number, @Req() request: Request) {
+        return this.photoService.remove(id, request["user"].sub)
     }
 
     @Post()
     @UseGuards(AuthGuard)
+    @SkipThrottle({basic: true, place: true, login: true})
     @UseInterceptors(FilesInterceptor('file', 3, {
         storage: diskStorage({
             destination: './uploads',
@@ -65,14 +66,13 @@ export class PhotoController {
             callback(null, true);
         }
     }))
-    async uploadFile(@UploadedFiles() files: Express.Multer.File[], @Body() body: { userID: string; placeID: string }) {
-        const userID = Number(body.userID)
+    async uploadFile(@UploadedFiles() files: Express.Multer.File[], @Body() body: { userID: string; placeID: string }, @Req() request: Request) {
         const placeID = Number(body.placeID)
 
         const createdPhotos:Photo[] = []
 
         for (const file of files) {
-            const newPhoto = await this.photoService.add(file, userID, placeID)
+            const newPhoto = await this.photoService.add(file, request["user"].sub, placeID)
             createdPhotos.push(newPhoto)
         }
 
