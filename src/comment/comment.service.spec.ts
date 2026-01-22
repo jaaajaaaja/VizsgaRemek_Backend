@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { NotFoundException } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 describe('CommentService', () => {
   let service: CommentService
@@ -70,7 +71,10 @@ describe('CommentService', () => {
           useValue: mockPrismaService,
         },
       ],
-    }).compile()
+    })
+      .overrideProvider(AuthGuard)
+      .useValue(() => { canActivate: { sub: 1 } })
+      .compile()
 
     service = module.get<CommentService>(CommentService)
     prismaService = module.get<PrismaService>(PrismaService)
@@ -102,9 +106,7 @@ describe('CommentService', () => {
       const result = await service.findOne(1)
 
       expect(result).toEqual(mockComment)
-      expect(mockPrismaService.comment.findUnique).toHaveBeenCalledWith({
-        where: { id: 1 },
-      })
+      expect(mockPrismaService.comment.findUnique).toHaveBeenCalledWith({ where: { id: 1 } })
     })
 
     it('should throw NotFoundException when comment does not exist', async () => {
@@ -166,24 +168,24 @@ describe('CommentService', () => {
       const createCommentDto: CreateCommentDto = {
         commentText: 'Amazing place!',
         rating: 5,
-        userID: 1,
         placeID: 1,
       }
 
       const mockCreatedComment = {
         id: 1,
         ...createCommentDto,
+        userID: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
       }
 
       mockPrismaService.comment.create.mockResolvedValue(mockCreatedComment)
 
-      const result = await service.add(createCommentDto)
+      const result = await service.add(createCommentDto, 1)
 
       expect(result).toEqual(mockCreatedComment)
       expect(mockPrismaService.comment.create).toHaveBeenCalledWith({
-        data: createCommentDto,
+        data: { ...createCommentDto, userID: 1 }
       })
     })
   })
@@ -219,36 +221,9 @@ describe('CommentService', () => {
         rating: 4,
       }
 
-      const mockUpdatedComment = {
+      const existingComment = {
         id: 1,
-        commentText: 'Updated comment text',
-        rating: 4,
-        userID: 1,
-        placeID: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }
-
-      mockPrismaService.comment.findUnique.mockResolvedValue(mockUpdatedComment)
-      mockPrismaService.comment.update.mockResolvedValue(updateCommentDto)
-
-      const result = await service.update(1, updateCommentDto)
-
-      expect(result).toEqual(updateCommentDto)
-      expect(mockPrismaService.comment.update).toHaveBeenCalledWith({
-        where: { id: 1 },
-        data: updateCommentDto,
-      })
-    })
-
-    it('should update only commentText when rating is not provided', async () => {
-      const updateCommentDto = {
-        commentText: 'Updated comment text',
-      } as UpdateCommentDto
-
-      const mockUpdatedComment = {
-        id: 1,
-        commentText: 'Updated comment text',
+        commentText: 'Old text',
         rating: 5,
         userID: 1,
         placeID: 1,
@@ -256,14 +231,50 @@ describe('CommentService', () => {
         updatedAt: new Date(),
       }
 
+      const mockUpdatedComment = {
+        ...existingComment,
+        ...updateCommentDto,
+      }
+
+      mockPrismaService.comment.findUnique.mockResolvedValue(existingComment)
       mockPrismaService.comment.update.mockResolvedValue(mockUpdatedComment)
 
-      const result = await service.update(1, updateCommentDto)
+      const result = await service.update(1, updateCommentDto, 1)
 
       expect(result).toEqual(mockUpdatedComment)
       expect(mockPrismaService.comment.update).toHaveBeenCalledWith({
         where: { id: 1 },
         data: updateCommentDto,
+      })
+    })
+
+    it('should update only commentText when rating is not provided', async () => {
+      const updateCommentDto: UpdateCommentDto = {
+        commentText: 'Updated comment text',
+      }
+
+      const existingComment = {
+        id: 1,
+        rating: 5,
+        userID: 1,
+        placeID: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+
+      const mockUpdatedComment = {
+        ...updateCommentDto,
+        ...existingComment
+      }
+
+      mockPrismaService.comment.update.mockResolvedValue(mockUpdatedComment)
+
+      const result = await service.update(1, updateCommentDto, 1)
+
+      expect(result).toEqual(mockUpdatedComment)
+      expect(mockPrismaService.comment.update).toHaveBeenCalledWith({
+        where: { id: 1 },
+        data: { commentText: 'Updated comment text' },
       })
     })
   })

@@ -57,7 +57,7 @@ describe('PhotoController', () => {
         }
       ]
     }).overrideGuard(AuthGuard)
-      .useValue({ canActivate: () => true })
+      .useValue(() => { canActivate: { sub: 1 } })
       .compile()
 
     controller = module.get<PhotoController>(PhotoController)
@@ -123,11 +123,11 @@ describe('PhotoController', () => {
     it("should delete a photo by id", async () => {
       mockPhotoService.remove.mockResolvedValue(mockPhoto[0])
 
-      const result = await controller.remove(1)
+      const result = await controller.remove(1, { user: { sub: 1 } } as any)
 
       expect(result).toEqual(mockPhoto[0])
       expect(mockPhotoService.remove).toHaveBeenCalledTimes(1)
-      expect(mockPhotoService.remove).toHaveBeenCalledWith(1)
+      expect(mockPhotoService.remove).toHaveBeenCalledWith(1, 1)
     })
   })
 
@@ -146,7 +146,7 @@ describe('PhotoController', () => {
       .mockResolvedValueOnce(mockPhoto[0])
       .mockResolvedValueOnce(mockPhoto[1])
 
-    const result = await controller.uploadFile(files, body)
+    const result = await controller.uploadFile(files, body, { user: { sub: 1 } } as any)
 
     expect(mockPhotoService.add).toHaveBeenCalledTimes(2)
     expect(mockPhotoService.add).toHaveBeenNthCalledWith(

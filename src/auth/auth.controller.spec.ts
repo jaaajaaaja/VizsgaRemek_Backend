@@ -29,10 +29,12 @@ describe('AuthController', () => {
         {
           provide: JwtService,
           useValue: mockJwtService,
-        },
-        AuthGuard,
+        }
       ],
-    }).compile()
+    })
+      .overrideGuard(AuthGuard)      
+      .useValue(() => { canActivate: { sub: 1 } })
+      .compile()
 
     controller = module.get<AuthController>(AuthController)
     service = module.get<AuthService>(AuthService)

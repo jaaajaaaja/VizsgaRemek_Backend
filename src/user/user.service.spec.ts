@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from './user.service';
 import { ConflictException, NotFoundException } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 describe('UserService', () => {
   let service: UserService
@@ -113,7 +114,7 @@ describe('UserService', () => {
       mockPrismaService.user.findUnique.mockResolvedValue(mockUser)
       mockPrismaService.user.delete.mockResolvedValue(mockUser)
 
-      const result = await service.remove(1)
+      const result = await service.remove(1, 1)
 
       expect(result).toEqual(mockUser)
       expect(mockPrismaService.user.delete).toHaveBeenCalledTimes(1)
@@ -124,8 +125,8 @@ describe('UserService', () => {
       mockPrismaService.user.findUnique.mockResolvedValue(null)
       mockPrismaService.user.delete.mockResolvedValue(mockUser)
 
-      await expect(service.remove(1)).rejects.toThrow(NotFoundException)
-      expect(mockPrismaService.user.delete).toHaveBeenCalledTimes(0)      
+      await expect(service.remove(1, 1)).rejects.toThrow(NotFoundException)
+      expect(mockPrismaService.user.delete).toHaveBeenCalledTimes(0)
     })
   })
 
@@ -134,7 +135,7 @@ describe('UserService', () => {
       mockPrismaService.user.findUnique.mockResolvedValue(mockUser)
       mockPrismaService.user.update.mockResolvedValue(mockUser)
 
-      const result = await service.update(1, mockUser)
+      const result = await service.update(1, mockUser, 1)
 
       expect(result).toEqual(mockUser)
       expect(mockPrismaService.user.update).toHaveBeenCalledTimes(1)
@@ -145,8 +146,8 @@ describe('UserService', () => {
       mockPrismaService.user.findUnique.mockResolvedValue(null)
       mockPrismaService.user.update.mockResolvedValue(mockUser)
 
-      await expect(service.update(1, mockUser)).rejects.toThrow(NotFoundException)
-      expect(mockPrismaService.user.update).toHaveBeenCalledTimes(0)      
+      await expect(service.update(1, mockUser, 1)).rejects.toThrow(NotFoundException)
+      expect(mockPrismaService.user.update).toHaveBeenCalledTimes(0)
     })
   })
 })

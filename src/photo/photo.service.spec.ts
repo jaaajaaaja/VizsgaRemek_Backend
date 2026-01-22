@@ -194,7 +194,7 @@ describe('PhotoService', () => {
         placeID,
       })
 
-      const result = await service.add(file, userID, placeID)
+      const result = await service.add(file, placeID, userID)
 
       expect(mockPrismaService.photo.create).toHaveBeenCalledWith({
         data: {
@@ -219,7 +219,7 @@ describe('PhotoService', () => {
       mockPrismaService.photo.findUnique.mockResolvedValue(mockPhoto[0])
       mockPrismaService.photo.delete.mockResolvedValue(mockPhoto[0])
 
-      const result = await service.remove(1)
+      const result = await service.remove(1, 1)
 
       expect(result).toEqual(mockPhoto[0])
       expect(mockPrismaService.photo.delete).toHaveBeenCalledTimes(1)
@@ -229,7 +229,7 @@ describe('PhotoService', () => {
     it("should throw NotFoundException when photo with id does not exist", async () => {
       mockPrismaService.photo.findUnique.mockResolvedValue(null)
 
-      await expect(service.remove(1)).rejects.toThrow(NotFoundException)
+      await expect(service.remove(1, 1)).rejects.toThrow(NotFoundException)
       expect(mockPrismaService.photo.delete).toHaveBeenCalledTimes(0)
     })
   })

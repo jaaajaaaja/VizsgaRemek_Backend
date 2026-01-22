@@ -51,8 +51,9 @@ describe('CommentController', () => {
           useValue: mockCommentService
         }
       ]
-    }).overrideGuard(AuthGuard)
-      .useValue({ canActivate: () => true })
+    })
+      .overrideGuard(AuthGuard)
+      .useValue(() => { canActivate: { sub: 1 } })
       .compile()
 
     controller = module.get<CommentController>(CommentController)
@@ -125,16 +126,15 @@ describe('CommentController', () => {
       const createCommentDto: CreateCommentDto = {
         commentText: 'Amazing place!',
         rating: 5,
-        userID: 1,
         placeID: 1,
-      };
+      }
 
       mockCommentService.add.mockResolvedValue(mockComment)
 
-      const result = await controller.add(createCommentDto)
+      const result = await controller.add(createCommentDto, { user: { sub: 1 } } as any)
 
       expect(result).toEqual(mockComment)
-      expect(service.add).toHaveBeenCalledWith(createCommentDto)
+      expect(service.add).toHaveBeenCalledWith(createCommentDto, 1)
     })
   })
 
@@ -142,7 +142,7 @@ describe('CommentController', () => {
     it('should delete a comment by id', async () => {
       mockCommentService.remove.mockResolvedValue(mockComment)
 
-      const result = await controller.delete(1, 1)
+      const result = await controller.delete(1, { user: { sub: 1 } } as any)
 
       expect(result).toEqual(mockComment)
       expect(service.remove).toHaveBeenCalledWith(1, 1)
@@ -158,10 +158,10 @@ describe('CommentController', () => {
 
       mockCommentService.update.mockResolvedValue(mockComment)
 
-      const result = await controller.update(1, updateCommentDto)
+      const result = await controller.update(1, updateCommentDto, { user: { sub: 1 } } as any)
 
       expect(result).toEqual(mockComment)
-      expect(service.update).toHaveBeenCalledWith(1, updateCommentDto)
+      expect(service.update).toHaveBeenCalledWith(1, updateCommentDto, 1)
     })
   })
 

@@ -41,8 +41,9 @@ describe('UserController', () => {
           useValue: mockUserService
         }
       ]
-    }).overrideGuard(AuthGuard)
-      .useValue({ canActivate: () => true })
+    })
+      .overrideGuard(AuthGuard)
+      .useValue(() => { canActivate: { sub: 1 } })
       .compile()
 
     controller = module.get<UserController>(UserController)
@@ -101,26 +102,26 @@ describe('UserController', () => {
     it("should delete a user by id", async () => {
       mockUserService.remove.mockResolvedValue(mockUser)
 
-      const result = await controller.remove(1)
+      const result = await controller.remove(1, { user: { sub: 1 } } as any)
 
       expect(result).toEqual(mockUser)
-      expect(service.remove).toHaveBeenCalledWith(1)
+      expect(service.remove).toHaveBeenCalledWith(1, 1)
       expect(service.remove).toHaveBeenCalledTimes(1)
     })
   })
 
   describe("update", () => {
     it("should update a user by id", async () => {
-      const data:UpdateUserDto = {
+      const data: UpdateUserDto = {
         userName: "testUsername"
       }
 
       mockUserService.update.mockResolvedValue(mockUser)
 
-      const result = await controller.update(1, data)
+      const result = await controller.update(1, data, { user: { sub: 1 } } as any)
 
       expect(result).toEqual(mockUser)
-      expect(service.update).toHaveBeenCalledWith(1, data)
+      expect(service.update).toHaveBeenCalledWith(1, data, 1)
     })
   })
 })
