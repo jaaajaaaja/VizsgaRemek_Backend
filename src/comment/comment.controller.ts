@@ -33,12 +33,6 @@ export class CommentController {
     return this.commentService.findAllByPlace(placeID)
   }
 
-  @Get('/findAllByGooglePlace/:googlePlaceID')
-  @SkipThrottle({ postput: true, place: true, login: true })
-  async findAllByGooglePlace(@Param('googlePlaceID') googlePlaceID: string) {
-    return this.commentService.findAllByGooglePlace(googlePlaceID)
-  }
-
   @Post()
   @UseGuards(AuthGuard)
   @SkipThrottle({basic: true, place: true, login: true})

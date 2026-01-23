@@ -84,19 +84,4 @@ export class CommentService {
 
     return this.prisma.comment.update({ where: { id }, data })
   }
-
-  async findAllByGooglePlace(googlePlaceID: string) {
-    const place = await this.prisma.place.findFirst({ where: { googleplaceID: googlePlaceID } })
-
-    if (!place) {
-      throw new NotFoundException("Place not found!")
-    }
-
-    return this.prisma.comment.findMany({
-      where: { placeID: place.id },
-      include: {
-        user: { select: { userName: true } },
-      },
-    })
-  }
 }
