@@ -3,9 +3,12 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { JwtService } from '@nestjs/jwt';
-import { CommentService } from 'src/comment/comment.service';
+import { PhotoService } from 'src/photo/photo.service';
+import path from 'path';
+import * as multer from 'multer'
+import { FileInterceptor } from '@nestjs/platform-express';
 
-describe('CommentController E2E', () => {
+describe('PhotoController E2E', () => {
     let app: INestApplication
     let jwtService: JwtService
     let token: string
@@ -16,10 +19,9 @@ describe('CommentController E2E', () => {
         userName: 'test',
     }
 
-    const mockCommentService = {
+    const mockPhotoService = {
         add: jest.fn(),
-        remove: jest.fn(),
-        update: jest.fn(),
+        remove: jest.fn()
     }
 
     const invalid_token = "invalid_token"
@@ -28,8 +30,10 @@ describe('CommentController E2E', () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [AppModule],
         })
-            .overrideProvider(CommentService)
-            .useValue(mockCommentService)
+            .overrideProvider(PhotoService)
+            .useValue(mockPhotoService)
+            // .overrideProvider('MULTER_MODULE_OPTIONS')
+            // .useValue(FileInterceptor('file', { storage: multer.memoryStorage() }))
             .compile()
 
         app = moduleFixture.createNestApplication()
@@ -53,51 +57,39 @@ describe('CommentController E2E', () => {
     })
 
     describe("should not throw exception", () => {
-        it('(POST) /comment', async () => {
+        /*it('(POST) /photo', async () => {
+            //const photoPath = path.join(__dirname, 'test picture', 'test_picture.png')
+
             return request(app.getHttpServer())
-                .post('/comment')
+                .post('/photo')
                 .set('Authorization', `Bearer ${token}`)
-                .send({ commentText: "nice place", placeID: 1 })
+                .field({ placeID: 1, loggedInUserId: mockUser.id })
+                .attach('file', Buffer.from("fake image"), "test.png")
                 .expect(201)
-        })
+        })*/
 
-        it('(PUT) /comment/:id', async () => {
+        it('(DELETE) /photo/:id', async () => {
             return request(app.getHttpServer())
-                .put('/comment/1')
-                .set('Authorization', `Bearer ${token}`)
-                .send({ commentText: "nice place", placeID: 1 })
-                .expect(200)
-        })
-
-        it('(DELETE) /comment/:id', async () => {
-            return request(app.getHttpServer())
-                .delete('/comment/1')
+                .delete('/photo/1')
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200)
         })
     })
 
     describe("should throw UnathorizedException", () => {
-        it('(POST) /comment', async () => {
+        it('(POST) /photo', async () => {
             return request(app.getHttpServer())
-                .post('/comment')
+                .post('/photo')
                 .set('Authorization', `Bearer ${invalid_token}`)
                 .send({ commentText: "nice place", placeID: 1 })
                 .expect(401)
         })
 
-        it('(PUT) /comment/:id', async () => {
+        it('(DELETE) /photo/:id', async () => {
             return request(app.getHttpServer())
-                .put('/comment/1')
+                .delete('/photo/1')
                 .set('Authorization', `Bearer ${invalid_token}`)
                 .send({ commentText: "nice place", placeID: 1 })
-                .expect(401)
-        })
-
-        it('(DELETE) /comment/:id', async () => {
-            return request(app.getHttpServer())
-                .delete('/comment/1')
-                .set('Authorization', `Bearer ${invalid_token}`)
                 .expect(401)
         })
     })

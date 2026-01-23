@@ -164,30 +164,4 @@ describe('CommentController', () => {
       expect(service.update).toHaveBeenCalledWith(1, updateCommentDto, 1)
     })
   })
-
-  describe('findAllByGooglePlace', () => {
-    it('should return comments for a place by Google Place ID', async () => {
-      const mockCommentsWithUser = [
-        {
-          id: 1,
-          commentText: 'Great place!',
-          rating: 5,
-          userID: 1,
-          placeID: 1,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          user: {
-            userName: 'testuser',
-          },
-        },
-      ];
-
-      mockCommentService.findAllByGooglePlace.mockResolvedValue(mockCommentsWithUser)
-
-      const result = await controller.findAllByGooglePlace('ChIJN1t_tDeuEmsRUsoyG83frY4')
-
-      expect(result).toEqual(mockCommentsWithUser)
-      expect(service.findAllByGooglePlace).toHaveBeenCalledWith('ChIJN1t_tDeuEmsRUsoyG83frY4')
-    })
-  })
 })

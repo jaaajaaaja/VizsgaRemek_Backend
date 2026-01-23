@@ -21,6 +21,12 @@ export class PlaceController {
         return this.placeService.getOne(id)
     }
 
+    @Get('/getByGooglePlaceId/:googleplaceID')
+    @SkipThrottle({ postput: true, place: true, login: true })
+    async getOneByGooglePlaceId(@Param('googleplaceID') googleplaceID: string) {
+        return this.placeService.getOneByGoogleplaceID(googleplaceID)
+    }
+
     @Post()
     @UseGuards(AuthGuard)
     @SkipThrottle({ basic: true, place: true, login: true })

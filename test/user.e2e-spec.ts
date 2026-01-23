@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { JwtService } from '@nestjs/jwt';
-import { CommentService } from 'src/comment/comment.service';
+import { UserService } from 'src/user/user.service';
 
 describe('CommentController E2E', () => {
     let app: INestApplication
@@ -16,8 +16,7 @@ describe('CommentController E2E', () => {
         userName: 'test',
     }
 
-    const mockCommentService = {
-        add: jest.fn(),
+    const mockUserService = {
         remove: jest.fn(),
         update: jest.fn(),
     }
@@ -28,8 +27,8 @@ describe('CommentController E2E', () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [AppModule],
         })
-            .overrideProvider(CommentService)
-            .useValue(mockCommentService)
+            .overrideProvider(UserService)
+            .useValue(mockUserService)
             .compile()
 
         app = moduleFixture.createNestApplication()
@@ -53,50 +52,34 @@ describe('CommentController E2E', () => {
     })
 
     describe("should not throw exception", () => {
-        it('(POST) /comment', async () => {
+        it('(PUT) /user/:id', async () => {
             return request(app.getHttpServer())
-                .post('/comment')
+                .put('/user/1')
                 .set('Authorization', `Bearer ${token}`)
-                .send({ commentText: "nice place", placeID: 1 })
-                .expect(201)
-        })
-
-        it('(PUT) /comment/:id', async () => {
-            return request(app.getHttpServer())
-                .put('/comment/1')
-                .set('Authorization', `Bearer ${token}`)
-                .send({ commentText: "nice place", placeID: 1 })
+                .send({ userName: "test" })
                 .expect(200)
         })
 
-        it('(DELETE) /comment/:id', async () => {
+        it('(DELETE) /user/:id', async () => {
             return request(app.getHttpServer())
-                .delete('/comment/1')
+                .delete('/user/1')
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200)
         })
     })
 
     describe("should throw UnathorizedException", () => {
-        it('(POST) /comment', async () => {
+        it('(PUT) /user/:id', async () => {
             return request(app.getHttpServer())
-                .post('/comment')
+                .put('/user/1')
                 .set('Authorization', `Bearer ${invalid_token}`)
                 .send({ commentText: "nice place", placeID: 1 })
                 .expect(401)
         })
 
-        it('(PUT) /comment/:id', async () => {
+        it('(DELETE) /user/:id', async () => {
             return request(app.getHttpServer())
-                .put('/comment/1')
-                .set('Authorization', `Bearer ${invalid_token}`)
-                .send({ commentText: "nice place", placeID: 1 })
-                .expect(401)
-        })
-
-        it('(DELETE) /comment/:id', async () => {
-            return request(app.getHttpServer())
-                .delete('/comment/1')
+                .delete('/user/1')
                 .set('Authorization', `Bearer ${invalid_token}`)
                 .expect(401)
         })

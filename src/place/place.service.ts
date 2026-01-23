@@ -23,6 +23,16 @@ export class PlaceService {
         return place
     }
 
+    async getOneByGoogleplaceID(googleplaceID: string) {
+        const place = await this.prisma.place.findUnique({ where: { googleplaceID } })
+
+        if (!place) {
+            throw new NotFoundException("Place not found!")
+        }
+        
+        return place
+    }
+
     async add(data: CreatePlaceDto) {
         return this.prisma.place.create({ data })
     }

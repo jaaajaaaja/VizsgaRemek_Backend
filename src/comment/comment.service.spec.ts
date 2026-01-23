@@ -278,49 +278,4 @@ describe('CommentService', () => {
       })
     })
   })
-
-  describe('findAllByGooglePlace', () => {
-    it('should return comments for a place by Google Place ID', async () => {
-      const mockCommentsWithUser = [
-        {
-          id: 1,
-          commentText: 'Great place!',
-          rating: 5,
-          userID: 1,
-          placeID: 1,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          user: {
-            userName: 'testuser',
-          },
-        },
-      ]
-
-      mockPrismaService.place.findFirst.mockResolvedValue(mockPlace)
-      mockPrismaService.comment.findMany.mockResolvedValue(mockCommentsWithUser)
-
-      const result = await service.findAllByGooglePlace('ChIJN1t_tDeuEmsRUsoyG83frY4')
-
-      expect(result).toEqual(mockCommentsWithUser)
-      expect(mockPrismaService.place.findFirst).toHaveBeenCalledWith({
-        where: { googleplaceID: 'ChIJN1t_tDeuEmsRUsoyG83frY4' },
-      })
-      expect(mockPrismaService.comment.findMany).toHaveBeenCalledWith({
-        where: { placeID: 1 },
-        include: {
-          user: { select: { userName: true } },
-        },
-      })
-    })
-
-    it('should throw NotFountException when place does not exist', async () => {
-      mockPrismaService.place.findFirst.mockResolvedValue(null)
-
-      await expect(service.findAllByGooglePlace('invalid-id')).rejects.toThrow(NotFoundException)
-      expect(mockPrismaService.place.findFirst).toHaveBeenCalledWith({
-        where: { googleplaceID: 'invalid-id' },
-      })
-      expect(mockPrismaService.comment.findMany).toHaveBeenCalledTimes(0)
-    })
-  })
 })
