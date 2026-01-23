@@ -10,7 +10,7 @@ import { UserService } from 'src/user/user.service';
 
 jest.setTimeout(30000)
 
-describe('Throttle E2E Test', () => {
+describe('Throttle E2E', () => {
     let app: INestApplication
 
     let mockAuthService = {
