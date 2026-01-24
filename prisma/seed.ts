@@ -4,6 +4,27 @@ import { faker } from '@faker-js/faker'
 
 const prisma = new PrismaClient()
 
+const GOOGLE_PLACE_CATEGORIES = [
+    'bar',
+    'pub',
+    'nightclub',
+    'cocktail_bar',
+    'dance_club',
+    'beer_bar',
+    'wine_bar',
+    'karaoke',
+    'lounge',
+    'sports_bar',
+    'dive_bar',
+    'beer_garden',
+    'tavern',
+    'live_music_venue',
+    'bowling_alley',
+    'billiard_hall',
+    'brewery',
+    'distillery'
+]
+
 async function main() {
     console.log("\nSeeding...\n")
 
@@ -18,7 +39,13 @@ async function main() {
         password: defaultPassword,
     }))
 
-    await prisma.user.create({ data: { userName: "test", email: "test@test.test", password: defaultPassword } })
+    await prisma.user.create({
+        data: {
+            userName: "test",
+            email: "test@test.test",
+            password: defaultPassword,
+        }
+    })
 
     await prisma.user.createMany({
         data: userData,
@@ -27,6 +54,37 @@ async function main() {
 
     const users = await prisma.user.findMany()
     console.log("Users in database:", users.length)
+
+    //USER_INTEREST
+
+    const userInterestData = users.flatMap(user =>
+        faker.helpers.arrayElements(GOOGLE_PLACE_CATEGORIES, { min: 0, max: 3 }).map(interest => ({
+            interest,
+            userId: user.id == 1 ? faker.number.int({ min: 2, max: 20 }) : user.id
+        }))
+    )
+
+    await prisma.user_Interest.create({
+        data: {
+            interest: "billiard_hall",
+            userId: 1
+        }
+    })
+
+    await prisma.user_Interest.create({
+        data: {
+            interest: "beer_bar",
+            userId: 1
+        }
+    })
+
+    await prisma.user_Interest.createMany({
+        data: userInterestData,
+        skipDuplicates: true,
+    })
+
+    const userInterests = await prisma.user_Interest.findMany()
+    console.log("User Interests in database:", userInterests.length)
 
     //PLACES
 
@@ -43,7 +101,7 @@ async function main() {
     const placeData = Array.from({ length: placeCount }, () => ({
         googleplaceID: `${faker.string.alphanumeric(20)}`,
         name: faker.company.name(),
-        address: faker.location.streetAddress({ useFullAddress: true }),
+        address: faker.location.streetAddress({ useFullAddress: true })
     }))
 
     await prisma.place.createMany({
@@ -53,6 +111,42 @@ async function main() {
 
     const places = await prisma.place.findMany()
     console.log("Places in database:", places.length)
+
+    //PLACE_CATEGORY
+
+    const placeCategoryData = places.flatMap(place =>
+        faker.helpers
+            .arrayElements(
+                GOOGLE_PLACE_CATEGORIES,
+                faker.number.int({ min: 1, max: 3 })
+            )
+            .map(category => ({
+                category,
+                placeId: place.id == 1 ? faker.number.int({ min: 2, max: 20 }) : place.id,
+            }))
+    )
+
+    await prisma.place_Category.create({
+        data: {
+            category: "billiard_hall",
+            placeId: 1
+        }
+    })
+
+    await prisma.place_Category.create({
+        data: {
+            category: "beer_bar",
+            placeId: 1
+        }
+    })
+
+    await prisma.place_Category.createMany({
+        data: placeCategoryData,
+        skipDuplicates: true,
+    })
+
+    const placeCategories = await prisma.place_Category.findMany()
+    console.log("Place Categories in database:", placeCategories.length)
 
     //COMMENTS
 
@@ -105,7 +199,7 @@ async function main() {
     await prisma.photo.createMany({
         data: photoData,
         skipDuplicates: true,
-    })    
+    })
 
     const photos = await prisma.photo.findMany()
     console.log("Photos in database:", photos.length)

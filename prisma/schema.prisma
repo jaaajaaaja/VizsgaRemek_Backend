@@ -21,8 +21,17 @@ model User {
   email    String @unique
   password String
 
-  comments Comment[]
-  photos   Photo[]
+  comments      Comment[]
+  photos        Photo[]
+  userInterests User_Interest[]
+}
+
+model User_Interest {
+  id       Int    @id @default(autoincrement())
+  interest String
+  userId   Int?
+
+  user User? @relation(fields: [userId], references: [id])
 }
 
 model Place {
@@ -31,8 +40,17 @@ model Place {
   name          String
   address       String
 
-  comments Comment[]
-  photos   Photo[]
+  comments        Comment[]
+  photos          Photo[]
+  placeCategories Place_Category[]
+}
+
+model Place_Category {
+  id       Int    @id @default(autoincrement())
+  category String
+  placeId  Int
+
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
 }
 
 model Comment {
