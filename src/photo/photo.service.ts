@@ -73,26 +73,24 @@ export class PhotoService {
     }
 
     async add(file: Express.Multer.File, placeID: number, loggedInUserId: number) {
-        const fileName = `${Date.now()}-${Math.floor(Math.random() * 10000)}`
-
         return this.prisma.photo.create({
             data: {
                 location: `/uploads/${file.filename}`,
                 type: file.mimetype,
                 userID: loggedInUserId,
                 placeID: placeID,
-            },
+            }
         })
     }
 
     async remove(id: number, loggedInUserId: number) {
-        const photo = await this.prisma.photo.findUnique({ where: { id } })        
+        const photo = await this.prisma.photo.findUnique({ where: { id } })
 
-        if(!photo) {
+        if (!photo) {
             throw new NotFoundException("Photo not found!")
         }
 
-        if(photo.id != loggedInUserId) {
+        if (photo.id != loggedInUserId) {
             throw new UnauthorizedException("You can only delete your own photos")
         }
 

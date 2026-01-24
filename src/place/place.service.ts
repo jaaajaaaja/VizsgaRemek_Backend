@@ -7,11 +7,11 @@ import { CreatePlaceDto } from './dto/create-place.dto';
 export class PlaceService {
     constructor(private prisma: PrismaService) { }
 
-    async getAll() {
-        const places = await this.prisma.place.findMany()
+    // async getAll() {
+    //     const places = await this.prisma.place.findMany()
 
-        return places
-    }
+    //     return places
+    // }
 
     async getOne(id: number) {
         const place = await this.prisma.place.findUnique({ where: { id } })
@@ -33,27 +33,27 @@ export class PlaceService {
         return place
     }
 
-    async add(data: CreatePlaceDto) {
-        return this.prisma.place.create({ data })
-    }
+    // async add(data: CreatePlaceDto) {
+    //     return this.prisma.place.create({ data })
+    // }
 
-    async remove(id: number) {
-        const place = await this.prisma.place.findUnique({ where: { id } })
+    // async remove(id: number) {
+    //     const place = await this.prisma.place.findUnique({ where: { id } })
 
-        if (!place) {
-            throw new NotFoundException("Place not found!")
-        }
+    //     if (!place) {
+    //         throw new NotFoundException("Place not found!")
+    //     }
 
-        return this.prisma.place.delete({ where: { id } })
-    }
+    //     return this.prisma.place.delete({ where: { id } })
+    // }
 
-    async update(id: number, data: UpdatePlaceDto) {
-        const place = await this.prisma.place.findUnique({ where: { id } })
+    // async update(id: number, data: UpdatePlaceDto) {
+    //     const place = await this.prisma.place.findUnique({ where: { id } })
 
-        if (!place) {
-            throw new NotFoundException("Place not found!")
-        }
+    //     if (!place) {
+    //         throw new NotFoundException("Place not found!")
+    //     }
 
-        return this.prisma.place.update({ where: { id }, data })
-    }
+    //     return this.prisma.place.update({ where: { id }, data })
+    // }
 }

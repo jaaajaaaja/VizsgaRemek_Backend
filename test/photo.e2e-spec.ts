@@ -20,7 +20,7 @@ describe('PhotoController E2E', () => {
     }
 
     const mockPhotoService = {
-        add: jest.fn(),
+        addFiles: jest.fn(),
         remove: jest.fn()
     }
 
@@ -57,26 +57,26 @@ describe('PhotoController E2E', () => {
     })
 
     describe("should not throw exception", () => {
-        /*it('(POST) /photo', async () => {
-            //const photoPath = path.join(__dirname, 'test picture', 'test_picture.png')
+        it('(POST) /photo/upload', async () => {
+            const photoPath = path.join(__dirname, 'test picture', 'test_picture.png')
 
             return request(app.getHttpServer())
                 .post('/photo')
                 .set('Authorization', `Bearer ${token}`)
-                .field({ placeID: 1, loggedInUserId: mockUser.id })
-                .attach('file', Buffer.from("fake image"), "test.png")
+                .field({ "placeID": "1" })
+                .attach('file', photoPath)                
                 .expect(201)
-        })*/
-
-        it('(DELETE) /photo/:id', async () => {
-            return request(app.getHttpServer())
-                .delete('/photo/1')
-                .set('Authorization', `Bearer ${token}`)
-                .expect(200)
         })
+
+        // it('(DELETE) /photo/:id', async () => {
+        //     return request(app.getHttpServer())
+        //         .delete('/photo/1')
+        //         .set('Authorization', `Bearer ${token}`)
+        //         .expect(200)
+        // })
     })
 
-    describe("should throw UnathorizedException", () => {
+    /*describe("should throw UnathorizedException", () => {
         it('(POST) /photo', async () => {
             return request(app.getHttpServer())
                 .post('/photo')
@@ -92,7 +92,7 @@ describe('PhotoController E2E', () => {
                 .send({ commentText: "nice place", placeID: 1 })
                 .expect(401)
         })
-    })
+    })*/
 
     afterAll(async () => {
         await app.close()

@@ -9,11 +9,11 @@ import { SkipThrottle, Throttle } from '@nestjs/throttler';
 export class PlaceController {
     constructor(private placeService: PlaceService) { }
 
-    @Get()
-    @SkipThrottle({postput: true, place: true, login: true})
-    async getAll() {
-        return this.placeService.getAll()
-    }
+    // @Get()
+    // @SkipThrottle({postput: true, place: true, login: true})
+    // async getAll() {
+    //     return this.placeService.getAll()
+    // }
 
     @Get(':id')
     @SkipThrottle({ postput: true, place: true, login: true })
@@ -27,26 +27,26 @@ export class PlaceController {
         return this.placeService.getOneByGoogleplaceID(googleplaceID)
     }
 
-    @Post()
-    @UseGuards(AuthGuard)
-    @SkipThrottle({ basic: true, place: true, login: true })
-    @Throttle({ place: { ttl: 60000, limit: 10 } })
-    async add(@Body() body: CreatePlaceDto) {
-        return this.placeService.add(body)
-    }
+    // @Post()
+    // @UseGuards(AuthGuard)
+    // @SkipThrottle({ basic: true, place: true, login: true })
+    // @Throttle({ place: { ttl: 60000, limit: 10 } })
+    // async add(@Body() body: CreatePlaceDto) {
+    //     return this.placeService.add(body)
+    // }
 
-    @Delete(':id')
-    @UseGuards(AuthGuard)
-    @SkipThrottle({ postput: true, place: true, login: true })
-    @Throttle({ place: { ttl: 60000, limit: 3 } })
-    async remove(@Param('id', ParseIntPipe) id: number) {
-        return this.placeService.remove(id)
-    }
+    // @Delete(':id')
+    // @UseGuards(AuthGuard)
+    // @SkipThrottle({ postput: true, place: true, login: true })
+    // @Throttle({ place: { ttl: 60000, limit: 3 } })
+    // async remove(@Param('id', ParseIntPipe) id: number) {
+    //     return this.placeService.remove(id)
+    // }
 
-    @Put(':id')
-    @UseGuards(AuthGuard)
-    @SkipThrottle({ basic: true, place: true, login: true })
-    async update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdatePlaceDto) {
-        return this.placeService.update(id, body)
-    }
+    // @Put(':id')
+    // @UseGuards(AuthGuard)
+    // @SkipThrottle({ basic: true, place: true, login: true })
+    // async update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdatePlaceDto) {
+    //     return this.placeService.update(id, body)
+    // }
 }
