@@ -42,6 +42,12 @@ describe('PhotoService', () => {
       findUnique: jest.fn(),
       create: jest.fn(),
       delete: jest.fn()
+    },
+    user: {
+      findUnique: jest.fn()
+    },
+    place: {
+      findUnique: jest.fn()
     }
   }
 
@@ -185,29 +191,33 @@ describe('PhotoService', () => {
 
       const userID = 1
       const placeID = 2
+      const loggedInUserId = 1
 
       mockPrismaService.photo.create.mockResolvedValue({
-        id: 10,
-        location: '/uploads/test.jpg',
+        id: 1,
+        location: 'uploads/test.jpg',
         type: 'image/jpeg',
-        userID,
+        userID: loggedInUserId,
         placeID,
       })
 
-      const result = await service.add(file, placeID, userID)
+      mockPrismaService.user.findUnique.mockResolvedValue({ id: userID })
+      mockPrismaService.place.findUnique.mockResolvedValue({ id: placeID })
+      
+      const result = await service.add(file, userID, placeID, loggedInUserId)
 
       expect(mockPrismaService.photo.create).toHaveBeenCalledWith({
         data: {
-          location: '/uploads/test.jpg',
+          location: 'uploads/test.jpg',
           type: 'image/jpeg',
-          userID,
+          userID: loggedInUserId,
           placeID,
         },
       })
 
       expect(result).toEqual(
         expect.objectContaining({
-          location: '/uploads/test.jpg',
+          location: 'uploads/test.jpg',
           type: 'image/jpeg',
         }),
       )

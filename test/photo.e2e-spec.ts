@@ -4,9 +4,10 @@ import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { JwtService } from '@nestjs/jwt';
 import { PhotoService } from 'src/photo/photo.service';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import path from 'path';
-import * as multer from 'multer'
-import { FileInterceptor } from '@nestjs/platform-express';
+import * as fs from 'fs';
+import { APP_GUARD } from '@nestjs/core';
 
 describe('PhotoController E2E', () => {
     let app: INestApplication
@@ -28,12 +29,26 @@ describe('PhotoController E2E', () => {
 
     const invalid_token = "invalid_token"
 
+    function deleteTestImage() {
+        const dir = path.join(process.cwd(), './uploads')
+        const files = fs.readdirSync(dir).sort()
+
+        if (files.length === 0) return
+
+        fs.unlinkSync(path.join(dir, files[files.length - 1]))
+    }
+
+
     beforeAll(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [AppModule],
         })
             .overrideProvider(PhotoService)
             .useValue(mockPhotoService)
+            // .overrideProvider(APP_GUARD)
+            // .useValue({
+            //     canActivate: () => true,
+            // })
             .compile()
 
         app = moduleFixture.createNestApplication()
@@ -58,12 +73,15 @@ describe('PhotoController E2E', () => {
 
     describe("should not throw exception", () => {
         it('(POST) /photo/upload', async () => {
-            return request(app.getHttpServer())
+            const result = await request(app.getHttpServer())
                 .post('/photo/upload')
                 .set('Authorization', `Bearer ${token}`)
                 .field({ userID: 1, placeID: 1 })
                 .attach('file', photoPath)
                 .expect(201)
+
+            deleteTestImage()
+            return result
         })
 
         it('(DELETE) /photo/:id', async () => {
@@ -88,6 +106,34 @@ describe('PhotoController E2E', () => {
                 .delete('/photo/1')
                 .set('Authorization', `Bearer ${invalid_token}`)
                 .expect(401)
+        })
+    })
+
+    describe("should throw BadRequestException", () => {
+        it('(POST) /photo/upload - userID missing', async () => {
+            return request(app.getHttpServer())
+                .post('/photo/upload')
+                .set('Authorization', `Bearer ${token}`)
+                .field({ placeID: 1 })
+                .attach('file', photoPath)
+                .expect(400)
+        })
+
+        it('(POST) /photo/upload - placeID missing', async () => {
+            return request(app.getHttpServer())
+                .post('/photo/upload')
+                .set('Authorization', `Bearer ${token}`)
+                .field({ userID: 1 })
+                .attach('file', photoPath)
+                .expect(400)
+        })
+
+        it('(POST) /photo/upload - zero files', async () => {
+            return request(app.getHttpServer())
+                .post('/photo/upload')
+                .set('Authorization', `Bearer ${token}`)
+                .field({ placeID: 1, userID: 1 })
+                .expect(400)
         })
     })
 

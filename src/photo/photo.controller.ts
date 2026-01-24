@@ -4,7 +4,8 @@ import { diskStorage } from 'multer';
 import { PhotoService } from './photo.service';
 import { extname } from 'path';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { SkipThrottle } from '@nestjs/throttler';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
+import { CreatePhotoDto } from './dto/create-photo.dto';
 
 @Controller('photo')
 export class PhotoController {
@@ -45,7 +46,8 @@ export class PhotoController {
 
     @Post('/upload')
     @UseGuards(AuthGuard)
-    @SkipThrottle({ basic: true, place: true, postput: true })
+    @SkipThrottle({ basic: true, place: true, login: true })
+    @Throttle({postput: { ttl: 60000, limit: 5 }})
     @UseInterceptors(FilesInterceptor("file", 3, {
         storage: diskStorage({
             destination: "./uploads",
@@ -56,23 +58,24 @@ export class PhotoController {
         }),
         limits: { fileSize: 2 * 1024 * 1024 }, // 2 MB
         fileFilter: (req, file, callback) => {
+            const body = req.body
+            if (!body.userID || !body.placeID) {
+                return callback(new BadRequestException("userID and placeID are required!"), false)
+            }
+
             if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
                 return callback(new BadRequestException("Only allowed file types are accepted!"), false)
             }
             callback(null, true)
         }
     }))
-    async uploadFile(@UploadedFiles() files: Express.Multer.File[], @Body() body: { userID: string, placeID: string }, @Req() request: Request) {
+    async uploadFile(@UploadedFiles() files: Express.Multer.File[], @Body() body: CreatePhotoDto, @Req() request: Request) {
         if (!files || files.length === 0) {
             throw new BadRequestException("No files were uploaded!")
         }
 
-        if (!body.placeID) {
-            throw new BadRequestException("placeID is required!")
-        }
-
         for (const file of files) {
-            await this.photoService.add(file, Number(body.userID), Number(body.placeID), request["user"].sub)
+            await this.photoService.add(file, body.userID, body.placeID, request["user"].sub)
         }
 
         return 201
