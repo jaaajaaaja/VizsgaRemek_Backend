@@ -72,13 +72,30 @@ export class PhotoService {
         return allByPlace
     }
 
-    async add(file: Express.Multer.File, placeID: number, loggedInUserId: number) {
-        return this.prisma.photo.create({
+    async add(file: Express.Multer.File, userID: number, placeID: number, loggedInUserId: number) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userID }
+        })
+
+        if (user?.id != loggedInUserId) {
+            throw new UnauthorizedException("You can not post as another user!")
+        }
+
+        const place = await this.prisma.place.findUnique({
+            where: { id: placeID }
+        })
+
+        if (!place) {
+            throw new NotFoundException(`Place with ID ${placeID} not found`)
+        }
+
+
+        return await this.prisma.photo.create({
             data: {
-                location: `/uploads/${file.filename}`,
+                location: `uploads/${file.filename}`,
                 type: file.mimetype,
                 userID: loggedInUserId,
-                placeID: placeID,
+                placeID: placeID
             }
         })
     }
@@ -90,7 +107,7 @@ export class PhotoService {
             throw new NotFoundException("Photo not found!")
         }
 
-        if (photo.id != loggedInUserId) {
+        if (photo.userID != loggedInUserId) {
             throw new UnauthorizedException("You can only delete your own photos")
         }
 

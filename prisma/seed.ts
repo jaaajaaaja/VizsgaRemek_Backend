@@ -88,7 +88,7 @@ async function main() {
     const imageTypes = ['jpg', 'jpeg', 'png', 'gif']
     const photoData = Array.from({ length: photoCount }, () => ({
         location: `uploads/${faker.string.alphanumeric(10)}.${faker.helpers.arrayElement(imageTypes)}`,
-        type: faker.helpers.arrayElement(imageTypes),
+        type: `image/${faker.helpers.arrayElement(imageTypes)}`,
         userID: faker.helpers.arrayElement(users).id,
         placeID: faker.helpers.arrayElement(places).id,
     }))
@@ -96,7 +96,7 @@ async function main() {
     await prisma.photo.create({
         data: {
             location: "uploads/test-photo.jpg",
-            type: "jpg",
+            type: "image/jpg",
             userID: testUser ? testUser.id : 1,
             placeID: testPlace.id,
         },

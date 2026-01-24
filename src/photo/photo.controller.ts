@@ -3,7 +3,6 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { PhotoService } from './photo.service';
 import { extname } from 'path';
-import { Photo } from 'generated/prisma/client';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { SkipThrottle } from '@nestjs/throttler';
 
@@ -44,14 +43,13 @@ export class PhotoController {
         return this.photoService.remove(id, request["user"].sub)
     }
 
-    @Post()
+    @Post('/upload')
     @UseGuards(AuthGuard)
-    @SkipThrottle({ basic: true, place: true, login: true })
-    @UseInterceptors(FilesInterceptor('file', 3, {
+    @SkipThrottle({ basic: true, place: true, postput: true })
+    @UseInterceptors(FilesInterceptor("file", 3, {
         storage: diskStorage({
-            destination: './uploads',
+            destination: "./uploads",
             filename: (req, file, callback) => {
-                //const randomName = Date.now() + extname(file.originalname);
                 const randomName = `${Date.now()}-${Math.floor(Math.random() * 10000)}` + extname(file.originalname)
                 callback(null, randomName)
             }
@@ -59,22 +57,24 @@ export class PhotoController {
         limits: { fileSize: 2 * 1024 * 1024 }, // 2 MB
         fileFilter: (req, file, callback) => {
             if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
-                return callback(new BadRequestException('Only image files are allowed!'), false);
+                return callback(new BadRequestException("Only allowed file types are accepted!"), false)
             }
-            callback(null, true);
+            callback(null, true)
         }
     }))
-    async uploadFile(@UploadedFiles() files: Express.Multer.File[], @Body() body: { placeID: number }, @Req() request: Request) {
-        const createdPhotos: Photo[] = []
+    async uploadFile(@UploadedFiles() files: Express.Multer.File[], @Body() body: { userID: string, placeID: string }, @Req() request: Request) {
+        if (!files || files.length === 0) {
+            throw new BadRequestException("No files were uploaded!")
+        }
+
+        if (!body.placeID) {
+            throw new BadRequestException("placeID is required!")
+        }
 
         for (const file of files) {
-            const newPhoto = await this.photoService.add(file, body.placeID, request["user"].sub)
-            createdPhotos.push(newPhoto)
+            await this.photoService.add(file, Number(body.userID), Number(body.placeID), request["user"].sub)
         }
 
-        return {
-            message: 'File uploaded successfully',
-            images: createdPhotos
-        }
+        return 201
     }
 }
