@@ -1,3 +1,5 @@
+
+
 # BarSonar Backend
 
 ## Tartalomjegyzék
@@ -25,6 +27,7 @@
 - **Jelszó titkosítás:** [bcrypt](https://www.npmjs.com/package/bcrypt)
 - **Fájlfeltöltés:** [Multer](https://www.npmjs.com/package/multer)
 - **Validáció:** [class-validator, class-transformer](https://docs.nestjs.com/techniques/validation)
+- **Kérések maximalizálása:** [Trottler](https://github.com/nestjs/throttler)
 - **Tesztelés:** [Jest](https://www.npmjs.com/package/jest), [Supertest](https://www.npmjs.com/package/supertest)
 - **Kód formázás:** [Prettier](https://prettier.io/), [ESLint](https://eslint.org/)
 - **Teszt adatok generálása:** [Faker](https://fakerjs.dev/)
@@ -36,7 +39,7 @@
 A projekt futtatásához szükséges:
 
 - **Node.js**
-- **npm** vagy **yarn**
+- **npm**
 - **MySQL** adatbázis
 
 ---
@@ -91,40 +94,59 @@ Az adatbázis a következő táblákat tartalmazza:
 
 ```ts
 User {
-  id: string
+  id: number
   userName: string
   email: string
   password: string
 }
 
+User_Interest {
+  id: number
+  interest: string
+  userID: number
+}
+
 Place {
-  id: string
+  id: number
   googlePlaceID: string
   name: string
   address: string
 }
 
+Place_Category {
+  id: number
+  category: string
+  placeID: number
+}
+
 Comment {
-  id: string
+  id: number
   commentText: string
   rating: number
   createdAt: Date
   updatedAt: Date
+  userID: number
+  placeID: number
 }
 
 Photo {
-  id: string
+  id: number
   location: string
   type: string
+  userID: number
+  placeID: number
 }
 ```
 
 ### Kapcsolatok
 
 - Egy felhasználó több kommentet és fotót hozhat létre
-- Egy helyhez több komment és fotó tartozhat
-- Kommentek és fotók törlésekor a kapcsolódó felhasználó és hely nem törlődik
+  - opcionálisan állíthat be hely kategóriákat, ami érdekli, hogy később kaphasson hely ajánlásokat
+- Egy helyhez több kategória, komment és fotó tartozhat
+- Kommentek vagy fotók törlésekor a kapcsolódó felhasználó és hely nem törlődik
 - Ha törlünk egy felhasználót vagy egy helyet, akkor törlődik az összes hozzá tartozó fotó és komment
+  - felhasználó törlése esetén törlődnek a hozzá tartozó érdekeltségek is
+  - hely törlése esetén törlődnek a hozzá tartozó kategóriák is
 
 ---
 
@@ -167,7 +189,7 @@ Az API a következő HTTP státusz kódokat használja:
 
 - `200 OK` - Sikeres kérés
 - `201 Created` - Sikeres létrehozás
-- `400 Bad Request` - Hibás kérés (validációs hiba)
+- `400 Bad Request` - Hibás kérés
 - `401 Unauthorized` - Nincs jogosultság (hiányzó vagy érvénytelen token)
 - `404 Not Found` - Erőforrás nem található
 - `500 Internal Server Error` - Szerver hiba
@@ -395,7 +417,7 @@ Content-Type: application/json
 
 #### Hely frissítése
 
-```http
+```json
 PUT /place/:id
 Content-Type: application/json
 
@@ -681,7 +703,7 @@ placeID: 1
 
 **Korlátok:**
 - Maximum 3 fájl tölthető fel egyszerre
-- Engedélyezett formátumok: JPEG, PNG, GIF
+- Csak engedéjezett formátum
 - Maximum fájlméret: 2 MB
 - A feltöltött fájlok az `uploads/` mappában kerülnek tárolásra
 
@@ -693,7 +715,7 @@ placeID: 1
     {
       "id": 1,
       "location": "uploads/1234567890.jpg",
-      "type": "jpg",
+      "type": "image/jpg",
       "userID": 1,
       "placeID": 1
     }
@@ -763,6 +785,10 @@ npm run test
 
 # Vagy:
 npm test
+
+#Lásd hány százalékban van tesztelve az összes sor 
+#(azt nem mondja meg ha valamit többféleképpen teszteltél):
+npm run test:cov
 ```
 
 ### E2E tesztek
@@ -772,10 +798,9 @@ npm test
 npm run test:e2e
 ```
 
-### Tesztelési best practice-ek
+### Tesztek helyileg
 
-- Minden service és controller modulhoz tartozik teszt fájl
-- A tesztek az `src/` mappában találhatók `*.spec.ts` kiterjesztéssel
+- A service és controller tesztek az `src/` mappában találhatók `*.spec.ts` kiterjesztéssel
 - E2E tesztek a `test/` mappában találhatók
 
 ---
@@ -786,12 +811,9 @@ npm run test:e2e
 
 1. **Fájlfeltöltés:** 
    - A fájlméret korlátozva van (2 MB)
-   - Csak bizonyos fájltípusok engedélyezettek (JPEG, PNG, GIF)
+   - Csak bizonyos fájltípusok engedélyezettek
    - Érdemes vírusellenőrzést is implementálni
    - Használj cloud storage-t `/uploads` mappa helyett nagyobb projekteknél
-
-2. **Rate Limiting:**  
-   - Fontold meg a rate limiting implementálását, hogy megelőzd a DDoS támadásokat és az API visszaélést.
 
 ---
 

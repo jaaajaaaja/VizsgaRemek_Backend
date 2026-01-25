@@ -29,9 +29,9 @@ model User {
 model User_Interest {
   id       Int    @id @default(autoincrement())
   interest String
-  userId   Int?
+  userID   Int
 
-  user User? @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userID], references: [id])
 }
 
 model Place {
@@ -48,9 +48,9 @@ model Place {
 model Place_Category {
   id       Int    @id @default(autoincrement())
   category String
-  placeId  Int
+  placeID  Int
 
-  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  place Place @relation(fields: [placeID], references: [id], onDelete: Cascade)
 }
 
 model Comment {
