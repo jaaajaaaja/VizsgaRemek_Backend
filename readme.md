@@ -1,6 +1,5 @@
+![Barsonar Backend](https://github.com/user-attachments/assets/1a878232-55f6-40bb-94ba-2e5be3fd6647)
 
-
-# BarSonar Backend
 
 ## Tartalomjegyzék
 
@@ -831,4 +830,5 @@ A projekt fejlesztése során kérjük, hogy:
 
 **Készítette:** BarSonar fejlesztői csapat  
 **Verzió:** 0.0.67  
+
 **Utolsó frissítés:** 2026
