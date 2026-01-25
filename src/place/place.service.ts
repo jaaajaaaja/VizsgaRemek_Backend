@@ -33,9 +33,9 @@ export class PlaceService {
         return place
     }
 
-    // async add(data: CreatePlaceDto) {
-    //     return this.prisma.place.create({ data })
-    // }
+    async add(data: CreatePlaceDto) {
+        return this.prisma.place.create({ data })
+    }
 
     // async remove(id: number) {
     //     const place = await this.prisma.place.findUnique({ where: { id } })

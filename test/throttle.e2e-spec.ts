@@ -13,11 +13,11 @@ jest.setTimeout(30000)
 describe('Throttle E2E', () => {
     let app: INestApplication
 
-    let mockAuthService = {
+    const mockAuthService = {
         signIn: jest.fn()
     }
 
-    let mockCommentService = {
+    const mockCommentService = {
         findAll: jest.fn(),
         findOne: jest.fn(),
         findAllByUser: jest.fn(),
@@ -27,7 +27,7 @@ describe('Throttle E2E', () => {
         update: jest.fn()
     }
 
-    let mockPhotoService = {
+    const mockPhotoService = {
         getAll: jest.fn(),
         getOne: jest.fn(),
         getAllByUser: jest.fn(),
@@ -36,7 +36,7 @@ describe('Throttle E2E', () => {
         remove: jest.fn()
     }
 
-    let mockPlaceService = {
+    const mockPlaceService = {
         // getAll: jest.fn(),
         getOne: jest.fn(),
         getOneByGoogleplaceID: jest.fn(),
@@ -45,7 +45,7 @@ describe('Throttle E2E', () => {
         // update: jest.fn()
     }
 
-    let mockUserService = {
+    const mockUserService = {
         findAll: jest.fn(),
         findOne: jest.fn(),
         add: jest.fn(),
@@ -68,11 +68,15 @@ describe('Throttle E2E', () => {
             .overrideProvider(UserService)
             .useValue(mockUserService)
             .overrideGuard(AuthGuard)
-            .useValue({ canActivate: () => { sub: 1 } })
+            .useValue({ canActivate: () => { 1 } })
             .compile()
 
         app = moduleFixture.createNestApplication();
         await app.init()
+    })
+    
+    afterAll(async () => {
+        await app.close()
     })
 
     describe("/auth", () => {
@@ -387,24 +391,24 @@ describe('Throttle E2E', () => {
             // })
         })
 
-        // describe("60 REQUESTS MAXIMUM", () => {
-        //     it("POST", async () => {
-        //         const endpoint = "/place"
-        //         const agent = request(app.getHttpServer())
+        describe("60 REQUESTS MAXIMUM", () => {
+            it("POST", async () => {
+                const endpoint = "/place"
+                const agent = request(app.getHttpServer())
 
-        //         const limit = 60
+                const limit = 60
 
-        //         const payload = { name: "test name", address: "test address" }
+                const payload = { name: "test name", address: "test address" }
 
-        //         for (let i = 0; i < limit; i++) {
-        //             const googlePlaceID = `test${i}`
-        //             const response = await agent.post(endpoint).send({ ...payload, googlePlaceID })
-        //             expect(response.status).toBeLessThan(429)
-        //         }
+                for (let i = 0; i < limit; i++) {
+                    const googlePlaceID = `test${i}`
+                    const response = await agent.post(endpoint).send({ ...payload, googlePlaceID })
+                    expect(response.status).toBeLessThan(429)
+                }
 
-        //         const lastResponse = await agent.post(endpoint).send(payload)
-        //         expect(lastResponse.status).toBe(429)
-        //     })
+                const lastResponse = await agent.post(endpoint).send(payload)
+                expect(lastResponse.status).toBe(429)
+            })
 
         //     it("PUT", async () => {
         //         const endpoint = "/place/1"
@@ -422,40 +426,40 @@ describe('Throttle E2E', () => {
         //         const lastResponse = await agent.put(endpoint).send(payload)
         //         expect(lastResponse.status).toBe(429)
         //     })
-        // })
+        })
     })
 
     describe("/user", () => {
         describe("120 REQUESTS MAXIMUM", () => {
-            it("GET ALL", async () => {
-                const endpoint = "/user"
-                const agent = request(app.getHttpServer())
+            // it("GET ALL", async () => {
+            //     const endpoint = "/user"
+            //     const agent = request(app.getHttpServer())
 
-                const limit = 120
+            //     const limit = 120
 
-                for (let i = 0; i < limit; i++) {
-                    const response = await agent.get(endpoint)
-                    expect(response.status).toBeLessThan(429)
-                }
+            //     for (let i = 0; i < limit; i++) {
+            //         const response = await agent.get(endpoint)
+            //         expect(response.status).toBeLessThan(429)
+            //     }
 
-                const lastResponse = await agent.get(endpoint)
-                expect(lastResponse.status).toBe(429)
-            })
+            //     const lastResponse = await agent.get(endpoint)
+            //     expect(lastResponse.status).toBe(429)
+            // })
 
-            it("GET BY ID", async () => {
-                const agent = request(app.getHttpServer())
+            // it("GET BY ID", async () => {
+            //     const agent = request(app.getHttpServer())
 
-                const endpoint = "/user/1"
-                const limit = 120
+            //     const endpoint = "/user/1"
+            //     const limit = 120
 
-                for (let i = 0; i < limit; i++) {
-                    const response = await agent.get(endpoint)
-                    expect(response.status).toBeLessThan(429)
-                }
+            //     for (let i = 0; i < limit; i++) {
+            //         const response = await agent.get(endpoint)
+            //         expect(response.status).toBeLessThan(429)
+            //     }
 
-                const lastResponse = await agent.get(endpoint)
-                expect(lastResponse.status).toBe(429)
-            })
+            //     const lastResponse = await agent.get(endpoint)
+            //     expect(lastResponse.status).toBe(429)                
+            // })
 
             it("DELETE", async () => {
                 const endpoint = "/user/1"
@@ -508,9 +512,5 @@ describe('Throttle E2E', () => {
                 expect(lastResponse.status).toBe(429)
             })
         })
-    })
-
-    afterAll(async () => {
-        await app.close()
-    })
+    })    
 })

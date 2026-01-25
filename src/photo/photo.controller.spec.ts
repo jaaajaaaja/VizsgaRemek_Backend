@@ -56,7 +56,7 @@ describe('PhotoController', () => {
         }
       ]
     }).overrideGuard(AuthGuard)
-      .useValue(() => { canActivate: { sub: 1 } })
+      .useValue(() => { { 1 } })
       .compile()
 
     controller = module.get<PhotoController>(PhotoController)

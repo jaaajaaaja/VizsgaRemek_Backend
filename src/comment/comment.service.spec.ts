@@ -59,6 +59,8 @@ describe('CommentService', () => {
     },
     place: {
       findFirst: jest.fn(),
+      findUnique: jest.fn(),
+      add: jest.fn(),
     }
   }
 
@@ -73,7 +75,7 @@ describe('CommentService', () => {
       ],
     })
       .overrideProvider(AuthGuard)
-      .useValue(() => { canActivate: { sub: 1 } })
+      .useValue(() => { { 1 } })
       .compile()
 
     service = module.get<CommentService>(CommentService)
@@ -179,11 +181,22 @@ describe('CommentService', () => {
         updatedAt: new Date(),
       }
 
+      const createPlace = {
+        id: 1,
+        googleplaceID: "id",
+        name: "name",
+        address: "address"
+      }
+
+      mockPrismaService.place.findUnique.mockResolvedValue(createPlace)
       mockPrismaService.comment.create.mockResolvedValue(mockCreatedComment)
 
       const result = await service.add(createCommentDto, 1)
 
       expect(result).toEqual(mockCreatedComment)
+      expect(mockPrismaService.place.findUnique).toHaveBeenCalledWith({
+        where: { id: 1 }
+      })
       expect(mockPrismaService.comment.create).toHaveBeenCalledWith({
         data: { ...createCommentDto, userID: 1 }
       })

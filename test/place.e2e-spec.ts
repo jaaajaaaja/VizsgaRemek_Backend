@@ -28,7 +28,7 @@ describe("Places", () => {
         getOne: jest.fn(),
         getOneByGoogleplaceID: jest.fn(),
         // remove: jest.fn(),
-        // add: jest.fn(),
+        add: jest.fn(),
         // update: jest.fn()
     }
 
@@ -45,6 +45,10 @@ describe("Places", () => {
 
         app = moduleRef.createNestApplication()
         await app.init()
+    })
+    
+    afterAll(async () => {
+        await app.close()
     })
 
     describe("/GET", () => {
@@ -156,18 +160,14 @@ describe("Places", () => {
     //     })
     // })
 
-    // describe("/POST", () => {
-    //     it("/POST place", () => {
-    //         mockPlaceService.add.mockResolvedValue(mockPlace[0])
+    describe("/POST", () => {
+        it("/POST place", () => {
+            mockPlaceService.add.mockResolvedValue(mockPlace[0])
 
-    //         request(app.getHttpServer())
-    //             .post("/place")
-    //             .expect(200)
-    //             .expect(mockPlace[0])
-    //     })
-    // })
-
-    afterAll(async () => {
-        await app.close()
+            request(app.getHttpServer())
+                .post("/place")
+                .expect(200)
+                .expect(mockPlace[0])
+        })
     })
 })

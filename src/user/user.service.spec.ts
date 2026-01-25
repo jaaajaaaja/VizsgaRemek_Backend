@@ -24,13 +24,44 @@ describe('UserService', () => {
     }
   ]
 
+  const mockInterests = [
+    {
+      id: 1,
+      interest: "kocsma",
+      userID: 1
+    },
+    {
+      id: 2,
+      interest: "bulihely",
+      userID: 1
+    }
+  ]
+
+  const mockRecommendedPlaces = [
+    {
+      id: 1,
+      category: "kocsma",
+      placeID: 1
+    },
+    {
+      id: 2,
+      category: "bulihely",
+      placeID: 2
+    }
+  ]
+
   const mockPrismaService = {
     user: {
-      findMany: jest.fn(),
       findUnique: jest.fn(),
       create: jest.fn(),
       delete: jest.fn(),
       update: jest.fn()
+    },
+    place_Category: {
+      findMany: jest.fn(),
+    },
+    user_Interest: {
+      findMany: jest.fn()
     }
   }
 
@@ -55,17 +86,6 @@ describe('UserService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined()
-  })
-
-  describe("findAll", () => {
-    it("should return all users", async () => {
-      mockPrismaService.user.findMany.mockResolvedValue(mockUsers)
-
-      const result = await service.findAll()
-
-      expect(result).toEqual(mockUsers)
-      expect(mockPrismaService.user.findMany).toHaveBeenCalledTimes(1)
-    })
   })
 
   describe("findOne", () => {
@@ -148,6 +168,41 @@ describe('UserService', () => {
 
       await expect(service.update(1, mockUser, 1)).rejects.toThrow(NotFoundException)
       expect(mockPrismaService.user.update).toHaveBeenCalledTimes(0)
+    })
+  })
+
+  describe("recommendations", () => {
+    it("should return recommended places", async () => {
+      mockPrismaService.user_Interest.findMany.mockResolvedValue(mockInterests)
+      mockPrismaService.place_Category.findMany.mockResolvedValue(mockRecommendedPlaces)
+
+      const result = await service.recommendations(1)
+
+      expect(result).toEqual(mockRecommendedPlaces)
+      expect(mockPrismaService.user_Interest.findMany).toHaveBeenCalledTimes(1)
+      expect(mockPrismaService.user_Interest.findMany).toHaveBeenCalledWith({
+        where: { id: 1 }
+      })
+      expect(mockPrismaService.place_Category.findMany).toHaveBeenCalledTimes(1)
+      expect(mockPrismaService.place_Category.findMany).toHaveBeenCalledWith({
+        where: { category: { in: ["kocsma", "bulihely"] } }
+      })
+    })
+
+    it("should throw NotFoundException when user has no interests", async () => {
+      mockPrismaService.user_Interest.findMany.mockResolvedValue([])
+
+      await expect(service.recommendations(1)).rejects.toThrow(NotFoundException)
+      expect(mockPrismaService.place_Category.findMany).toHaveBeenCalledTimes(0)
+    })
+
+    it("should throw NotFoundException when no places match user interests", async () => {
+      mockPrismaService.user_Interest.findMany.mockResolvedValue(mockInterests)
+      mockPrismaService.place_Category.findMany.mockResolvedValue([])
+
+      await expect(service.recommendations(1)).rejects.toThrow(NotFoundException)
+      expect(mockPrismaService.user_Interest.findMany).toHaveBeenCalledTimes(1)
+      expect(mockPrismaService.place_Category.findMany).toHaveBeenCalledTimes(1)
     })
   })
 })

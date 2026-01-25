@@ -24,12 +24,25 @@ describe('UserController', () => {
     }
   ]
 
+  const mockRecommendedPlaces = [
+    {
+      id: 1,
+      category: "kocsma",
+      placeID: 1
+    },
+    {
+      id: 2,
+      category: "bulihely",
+      placeID: 2
+    }
+  ]
+
   const mockUserService = {
-    findAll: jest.fn(),
-    findOne: jest.fn(),
+    //findOne: jest.fn(),
     add: jest.fn(),
     remove: jest.fn(),
-    update: jest.fn()
+    update: jest.fn(),
+    recommendations: jest.fn()
   }
 
   beforeEach(async () => {
@@ -43,7 +56,7 @@ describe('UserController', () => {
       ]
     })
       .overrideGuard(AuthGuard)
-      .useValue(() => { canActivate: { sub: 1 } })
+      .useValue(() => { { 1 } })
       .compile()
 
     controller = module.get<UserController>(UserController)
@@ -56,29 +69,18 @@ describe('UserController', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
-  })
+  })  
 
-  describe("getAll", () => {
-    it("should return all users", async () => {
-      mockUserService.findAll.mockResolvedValue(mockUsers)
+  // describe("getOne", () => {
+  //   it("should get a user by email", async () => {
+  //     mockUserService.findOne.mockResolvedValue(mockUser)
 
-      const result = await controller.getAll()
+  //     const result = await controller.getOne("test@test.com")
 
-      expect(result).toEqual(mockUsers)
-      expect(service.findAll).toHaveBeenCalledTimes(1)
-    })
-  })
-
-  describe("getOne", () => {
-    it("should get a user by email", async () => {
-      mockUserService.findOne.mockResolvedValue(mockUser)
-
-      const result = await controller.getOne("test@test.com")
-
-      expect(result).toEqual(mockUser)
-      expect(service.findOne).toHaveBeenCalledWith("test@test.com")
-    })
-  })
+  //     expect(result).toEqual(mockUser)
+  //     expect(service.findOne).toHaveBeenCalledWith("test@test.com")
+  //   })
+  // })
 
   describe("add", () => {
     it("should add a user", async () => {
@@ -122,6 +124,18 @@ describe('UserController', () => {
 
       expect(result).toEqual(mockUser)
       expect(service.update).toHaveBeenCalledWith(1, data, 1)
+    })
+  })
+
+  describe("recommendations", () => {
+    it("should return recommended places", async () => {
+      mockUserService.recommendations.mockResolvedValue(mockRecommendedPlaces)
+
+      const result = await controller.recommendations({ user: { sub: 1 } } as any)
+
+      expect(result).toEqual(mockRecommendedPlaces)
+      expect(service.recommendations).toHaveBeenCalledWith(1)
+      expect(service.recommendations).toHaveBeenCalledTimes(1)
     })
   })
 })

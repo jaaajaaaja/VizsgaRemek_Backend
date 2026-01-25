@@ -33,7 +33,7 @@ describe('AuthController', () => {
       ],
     })
       .overrideGuard(AuthGuard)      
-      .useValue(() => { canActivate: { sub: 1 } })
+      .useValue(() => { { 1 } })
       .compile()
 
     controller = module.get<AuthController>(AuthController)

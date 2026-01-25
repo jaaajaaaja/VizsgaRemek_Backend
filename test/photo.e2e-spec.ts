@@ -66,9 +66,9 @@ describe('PhotoController E2E', () => {
             }
         )
     })
-
+    
     afterAll(async () => {
-        await app.close();
+        await app.close()
     })
 
     describe("should not throw exception", () => {
@@ -135,9 +135,5 @@ describe('PhotoController E2E', () => {
                 .field({ placeID: 1, userID: 1 })
                 .expect(400)
         })
-    })
-
-    afterAll(async () => {
-        await app.close()
     })
 })

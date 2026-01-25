@@ -19,6 +19,7 @@ describe('CommentController E2E', () => {
     const mockUserService = {
         remove: jest.fn(),
         update: jest.fn(),
+        recommendations: jest.fn(),
     }
 
     const invalid_token = "invalid_token"
@@ -48,7 +49,7 @@ describe('CommentController E2E', () => {
     })
 
     afterAll(async () => {
-        await app.close();
+        await app.close()
     })
 
     describe("should not throw exception", () => {
@@ -63,6 +64,13 @@ describe('CommentController E2E', () => {
         it('(DELETE) /user/:id', async () => {
             return request(app.getHttpServer())
                 .delete('/user/1')
+                .set('Authorization', `Bearer ${token}`)
+                .expect(200)
+        })
+
+        it('(GET) /user/recommendation', async () => {
+            return request(app.getHttpServer())
+                .get('/user/recommendation')
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200)
         })
@@ -83,9 +91,13 @@ describe('CommentController E2E', () => {
                 .set('Authorization', `Bearer ${invalid_token}`)
                 .expect(401)
         })
-    })
 
-    afterAll(async () => {
-        await app.close()
-    })
+        it('(GET) /user/recommendation', async () => {
+            return request(app.getHttpServer())
+                .put('/user/recommendation')
+                .set('Authorization', `Bearer ${invalid_token}`)
+                .send({})
+                .expect(401)
+        })
+    })    
 })

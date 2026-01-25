@@ -53,7 +53,7 @@ describe('CommentController', () => {
       ]
     })
       .overrideGuard(AuthGuard)
-      .useValue(() => { canActivate: { sub: 1 } })
+      .useValue(() => { { 1 } })
       .compile()
 
     controller = module.get<CommentController>(CommentController)

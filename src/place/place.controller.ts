@@ -27,13 +27,13 @@ export class PlaceController {
         return this.placeService.getOneByGoogleplaceID(googleplaceID)
     }
 
-    // @Post()
-    // @UseGuards(AuthGuard)
-    // @SkipThrottle({ basic: true, place: true, login: true })
-    // @Throttle({ place: { ttl: 60000, limit: 10 } })
-    // async add(@Body() body: CreatePlaceDto) {
-    //     return this.placeService.add(body)
-    // }
+    @Post()
+    @UseGuards(AuthGuard)
+    @SkipThrottle({ basic: true, place: true, login: true })
+    @Throttle({ place: { ttl: 60000, limit: 10 } })
+    async add(@Body() body: CreatePlaceDto) {
+        return this.placeService.add(body)
+    }
 
     // @Delete(':id')
     // @UseGuards(AuthGuard)

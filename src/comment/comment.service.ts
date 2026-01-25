@@ -47,6 +47,12 @@ export class CommentService {
 
   async add(data: CreateCommentDto, loggedInUserId: number) {
 
+    const place = await this.prisma.place.findUnique({ where: {id: data.placeID}})
+
+    if(!place) {
+      throw new NotFoundException("Place not found!")
+    }
+
     const fullData = {
       commentText: data.commentText,
       rating: data.rating,

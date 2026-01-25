@@ -49,7 +49,7 @@ describe('CommentController E2E', () => {
     })
 
     afterAll(async () => {
-        await app.close();
+        await app.close()
     })
 
     describe("should not throw exception", () => {
@@ -100,9 +100,5 @@ describe('CommentController E2E', () => {
                 .set('Authorization', `Bearer ${invalid_token}`)
                 .expect(401)
         })
-    })
-
-    afterAll(async () => {
-        await app.close()
-    })
+    })    
 })

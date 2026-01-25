@@ -10,20 +10,21 @@ import { SkipThrottle } from '@nestjs/throttler';
 export class UserController {
     constructor(private userService: UserService) { }
 
-    @Get()
-    @SkipThrottle({postput: true, place: true, login: true})
-    async getAll() {
-        return this.userService.findAll()
+    @Get('/recommendation')
+    @UseGuards(AuthGuard)
+    @SkipThrottle({ postput: true, place: true, login: true })
+    async recommendations(@Req() request: Request) {
+        return this.userService.recommendations(request["user"].sub)
     }
 
-    @Get(':email')
-    @SkipThrottle({postput: true, place: true, login: true})
-    async getOne(@Param('email') email: string) {
-        return this.userService.findOne(email)
-    }
+    // @Get(':email')
+    // @SkipThrottle({ postput: true, place: true, login: true })
+    // async getOne(@Param('email') email: string) {
+    //     return this.userService.findOne(email)
+    // }
 
     @Post()
-    @SkipThrottle({basic: true, place: true, login: true})
+    @SkipThrottle({ basic: true, place: true, login: true })
     async add(@Body() body: CreateUserDto) {
         const salt = await bcrypt.genSalt(10)
         const hash = await bcrypt.hash(body.password, salt)
@@ -37,15 +38,15 @@ export class UserController {
 
     @Delete(':id')
     @UseGuards(AuthGuard)
-    @SkipThrottle({postput: true, place: true, login: true})
-    async remove(@Param('id', ParseIntPipe) id:number, @Req() request: Request) {
+    @SkipThrottle({ postput: true, place: true, login: true })
+    async remove(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
         return this.userService.remove(id, request["user"].sub)
     }
 
     @Put(':id')
     @UseGuards(AuthGuard)
-    @SkipThrottle({basic: true, place: true, login: true})
-    async update(@Param('id', ParseIntPipe) id:number, @Body() body: UpdateUserDto, @Req() request: Request) {
+    @SkipThrottle({ basic: true, place: true, login: true })
+    async update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateUserDto, @Req() request: Request) {
         return this.userService.update(id, body, request["user"].sub)
     }
 }
