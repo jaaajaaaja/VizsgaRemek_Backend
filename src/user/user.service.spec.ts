@@ -62,6 +62,14 @@ describe('UserService', () => {
     user_Interest: {
       findMany: jest.fn(),
       create: jest.fn()
+    },
+    user_Friend: {
+      create: jest.fn(),
+    },
+    pending_Friend_Request: {
+      create: jest.fn(),
+      delete: jest.fn(),
+      findFirst: jest.fn(),
     }
   }
 
@@ -214,6 +222,55 @@ describe('UserService', () => {
       await expect(service.recommendations(1)).rejects.toThrow(NotFoundException)
       expect(mockPrismaService.user_Interest.findMany).toHaveBeenCalledTimes(1)
       expect(mockPrismaService.place_Category.findMany).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe("addFriend", () => {
+    it("should create a pending friend request", async () => {
+      const mockRequest = { userID: 1, friendID: 2 }
+      mockPrismaService.pending_Friend_Request.create.mockResolvedValue(mockRequest)
+
+      const result = await service.addFriend(2, 1)
+
+      expect(result).toEqual(mockRequest)
+      expect(mockPrismaService.pending_Friend_Request.create).toHaveBeenCalledWith({
+        data: { userID: 1, friendID: 2 }
+      })
+    })
+
+    it("should throw ConflictException if request already exists", async () => {
+      mockPrismaService.pending_Friend_Request.create.mockRejectedValueOnce(new ConflictException("You already sent a request to this user!"))
+
+      await expect(service.addFriend(2, 1)).rejects.toThrow(ConflictException)
+    })
+  })
+
+  describe("dealWithFriendRequest", () => {
+    it("should accept friend request and create friendship", async () => {
+      const mockRequest = { id: 1, userID: 2, friendID: 1 }
+      mockPrismaService.pending_Friend_Request.findFirst.mockResolvedValue(mockRequest)
+      mockPrismaService.user_Friend.create.mockResolvedValue({ id: 1, userID: 2, friendID: 1 })
+      mockPrismaService.pending_Friend_Request.delete.mockResolvedValue(mockRequest)
+
+      await service.dealWithFriendRequest(2, 1, true)
+
+      expect(mockPrismaService.pending_Friend_Request.findFirst).toHaveBeenCalledWith({
+        where: { userID: 2, friendID: 1 }
+      })
+      expect(mockPrismaService.user_Friend.create).toHaveBeenCalledWith({ data: mockRequest })
+      expect(mockPrismaService.pending_Friend_Request.delete).toHaveBeenCalledWith({ where: mockRequest })
+    })
+
+    it("should reject friend request and delete it", async () => {
+      const mockRequest = { id: 1, userID: 2, friendID: 1 }
+      mockPrismaService.pending_Friend_Request.findFirst.mockResolvedValue(mockRequest)
+      mockPrismaService.pending_Friend_Request.delete.mockResolvedValue(mockRequest)
+
+      const result = await service.dealWithFriendRequest(2, 1, false)
+
+      expect(result).toEqual({ message: "Friend request rejected" })
+      expect(mockPrismaService.user_Friend.create).not.toHaveBeenCalled()
+      expect(mockPrismaService.pending_Friend_Request.delete).toHaveBeenCalledWith({ where: mockRequest })
     })
   })
 })

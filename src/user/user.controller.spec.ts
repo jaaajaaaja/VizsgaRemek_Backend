@@ -45,6 +45,8 @@ describe('UserController', () => {
     update: jest.fn(),
     recommendations: jest.fn(),
     addUserInterest: jest.fn(),
+    addFriend: jest.fn(),
+    dealWithFriendRequest: jest.fn(),
   }
 
   beforeEach(async () => {
@@ -163,6 +165,50 @@ describe('UserController', () => {
       expect(result).toEqual(mockRecommendedPlaces)
       expect(service.recommendations).toHaveBeenCalledWith(1)
       expect(service.recommendations).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe("addFriend", () => {
+    it("should add a friend by id", async () => {
+      const mockRequest = { id: 1, userID: 1, friendID: 2 }
+      mockUserService.addFriend.mockResolvedValue(mockRequest)
+
+      const result = await controller.addFriend(2, { user: { sub: 1 } } as any)
+
+      expect(result).toEqual(mockRequest)
+      expect(service.addFriend).toHaveBeenCalledWith(2, 1)
+    })
+
+    it("should throw error if friend request already exists", async () => {
+      mockUserService.addFriend.mockRejectedValueOnce(new Error("Friend request exists"))
+
+      await expect(controller.addFriend(2, { user: { sub: 1 } } as any)).rejects.toThrow()
+    })
+  })
+
+  describe("dealWithFriendRequest", () => {
+    it("should accept a friend request", async () => {
+      mockUserService.dealWithFriendRequest.mockResolvedValue({ message: "Friend request accepted" })
+
+      const result = await controller.dealWithFriendRequest(
+        { user: { sub: 1 } } as any,
+        { recievedFromUserId: 2, accepted: true }
+      )
+
+      expect(result).toEqual({ message: "Friend request accepted" })
+      expect(service.dealWithFriendRequest).toHaveBeenCalledWith(2, 1, true)
+    })
+
+    it("should reject a friend request", async () => {
+      mockUserService.dealWithFriendRequest.mockResolvedValue({ message: "Friend request rejected" })
+
+      const result = await controller.dealWithFriendRequest(
+        { user: { sub: 1 } } as any,
+        { recievedFromUserId: 2, accepted: false }
+      )
+
+      expect(result).toEqual({ message: "Friend request rejected" })
+      expect(service.dealWithFriendRequest).toHaveBeenCalledWith(2, 1, false)
     })
   })
 })

@@ -16,13 +16,18 @@ datasource db {
 }
 
 model User {
-  id            Int             @id @default(autoincrement())
-  userName      String
-  email         String          @unique
-  password      String
-  comments      Comment[]
-  photos        Photo[]
-  userInterests User_Interest[]
+  id                    Int                      @id @default(autoincrement())
+  userName              String
+  email                 String                   @unique
+  password              String
+  comments              Comment[]
+  photos                Photo[]
+  userInterests         User_Interest[]
+  news                  News[]
+  requestSent           User_Friend[]            @relation("requestSent")
+  requestRecieved       User_Friend[]            @relation("requestRecieved")
+  sentRequests          Pending_Friend_Request[] @relation("sentRequests")
+  receivedRequests      Pending_Friend_Request[] @relation("receivedRequests")
 }
 
 model User_Interest {
@@ -34,6 +39,26 @@ model User_Interest {
   @@unique([userID, interest])
 }
 
+model User_Friend {
+  id       Int  @id @default(autoincrement())
+  userID   Int
+  friendID Int
+  user     User @relation("requestSent", fields: [userID], references: [id], onDelete: Cascade)
+  friend   User @relation("requestRecieved", fields: [friendID], references: [id], onDelete: Cascade)
+
+  @@unique([userID, friendID])
+}
+
+model Pending_Friend_Request {
+  id       Int  @id @default(autoincrement())
+  userID   Int
+  friendID Int
+  user     User @relation("sentRequests", fields: [userID], references: [id], onDelete: Cascade)
+  friend   User @relation("receivedRequests", fields: [friendID], references: [id], onDelete: Cascade)
+
+  @@unique([userID, friendID])
+}
+
 model Place {
   id              Int              @id @default(autoincrement())
   googleplaceID   String           @unique
@@ -42,6 +67,7 @@ model Place {
   comments        Comment[]
   photos          Photo[]
   placeCategories Place_Category[]
+  news            News[]
 }
 
 model Place_Category {
@@ -61,16 +87,31 @@ model Comment {
   updatedAt   DateTime @updatedAt
   userID      Int
   placeID     Int
+  pending     Boolean  @default(true)
+  approved    Boolean  @default(false)
   user        User     @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: Cascade)
   place       Place    @relation(fields: [placeID], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Photo {
-  id       Int    @id @default(autoincrement())
+  id       Int     @id @default(autoincrement())
   location String
   type     String
   userID   Int
   placeID  Int
-  user     User   @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  place    Place  @relation(fields: [placeID], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  pending  Boolean @default(true)
+  approved Boolean @default(false)
+  user     User    @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  place    Place   @relation(fields: [placeID], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model News {
+  id       Int     @id @default(autoincrement())
+  text     String  @db.LongText
+  placeID  Int
+  userID   Int
+  pending  Boolean @default(true)
+  approved Boolean @default(false)
+  place    Place   @relation(fields: [placeID], references: [id])
+  user     User    @relation(fields: [userID], references: [id])
 }

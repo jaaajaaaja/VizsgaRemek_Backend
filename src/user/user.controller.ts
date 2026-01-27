@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt'
 import { AuthGuard } from 'src/auth/auth.guard';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CreateUserInterestDto } from './dto/create-user-interest.dto';
+import { FriendRequestDto } from './dto/friend-request.dto';
 
 @Controller('user')
 export class UserController {
@@ -49,5 +50,23 @@ export class UserController {
     @SkipThrottle({ basic: true, place: true, login: true })
     async update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateUserDto, @Req() request: Request) {
         return this.userService.update(id, body, request["user"].sub)
+    }
+
+    @Post('/addFriend/:id')
+    @UseGuards(AuthGuard)
+    @SkipThrottle({ basic: true, place: true, login: true })
+    async addFriend(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
+        return this.userService.addFriend(id, request["user"].sub)
+    }
+
+    @Post('/dealWithFriendRequest')
+    @UseGuards(AuthGuard)
+    @SkipThrottle({ basic: true, place: true, login: true })
+    async dealWithFriendRequest(@Req() request: Request, @Body() body: FriendRequestDto) {
+        return this.userService.dealWithFriendRequest(
+            body.recievedFromUserId,
+            request["user"].sub,
+            body.accepted
+        )
     }
 }

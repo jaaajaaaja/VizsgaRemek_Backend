@@ -103,4 +103,41 @@ export class UserService {
 
         return recommendations
     }
+
+    async addFriend(sentToUserId: number, loggedInUserId: number) {
+        try {
+            return this.prisma.pending_Friend_Request.create({
+                data: {
+                    userID: loggedInUserId,
+                    friendID: sentToUserId
+                }
+            })
+        } catch (e) {
+            throw new ConflictException("You already sent a request to this user!")
+        }
+    }
+
+    async dealWithFriendRequest(recievedFromUserId: number, loggedInUserId: number, accepted: boolean) {
+        const request = await this.prisma.pending_Friend_Request.findFirst({
+            where: {
+                userID: recievedFromUserId,
+                friendID: loggedInUserId
+            }
+        })
+
+        if (!request) {
+            throw new NotFoundException("You do not have a pending friend request from this user!")
+        }
+
+        if (accepted) {
+            await this.prisma.user_Friend.create({ data: request })
+            await this.prisma.pending_Friend_Request.delete({ where: request })
+            return { message: "Friend request accepted" }
+        }
+
+        if(!accepted) {
+            await this.prisma.pending_Friend_Request.delete({ where: request })
+            return { message: "Friend request rejected" }
+        }
+    }
 }

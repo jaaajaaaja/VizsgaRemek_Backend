@@ -21,6 +21,8 @@ describe('CommentController E2E', () => {
         update: jest.fn(),
         recommendations: jest.fn(),
         addUserInterest: jest.fn(),
+        addFriend: jest.fn(),
+        dealWithFriendRequest: jest.fn(),
     }
 
     const invalid_token = "invalid_token"
@@ -81,6 +83,25 @@ describe('CommentController E2E', () => {
                 .post('/user/addInterest')
                 .set('Authorization', `Bearer ${token}`)
                 .send("bar")
+                .expect(201)
+        })
+
+        it('(POST) /user/addFriend/:id', async () => {
+            mockUserService.addFriend.mockResolvedValue({ id: 1, userID: 1, friendID: 2 })
+
+            return request(app.getHttpServer())
+                .post('/user/addFriend/2')
+                .set('Authorization', `Bearer ${token}`)
+                .expect(201)
+        })
+
+        it('(POST) /user/dealWithFriendRequest', async () => {
+            mockUserService.dealWithFriendRequest.mockResolvedValue({ message: "Friend request accepted" })
+
+            return request(app.getHttpServer())
+                .post('/user/dealWithFriendRequest')
+                .set('Authorization', `Bearer ${token}`)
+                .send({ recievedFromUserId: 2, accepted: true })
                 .expect(201)
         })
     })
