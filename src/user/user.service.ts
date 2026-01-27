@@ -1,4 +1,4 @@
-import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -135,9 +135,37 @@ export class UserService {
             return { message: "Friend request accepted" }
         }
 
-        if(!accepted) {
+        if (!accepted) {
             await this.prisma.pending_Friend_Request.delete({ where: request })
-            return { message: "Friend request rejected" }
+            return { message: "Friend request rejected!" }
         }
+    }
+
+    async searchByUsername(username: string) {
+        return this.prisma.user.findMany({
+            where: { userName: username },
+            select: { id: true, userName: true }
+        })
+    }
+
+    async friendlist(loggedInUserId: number) {
+        if (!loggedInUserId) {
+            throw new UnauthorizedException("Log in to see your friendlist!")
+        }
+
+        const friends = await this.prisma.user_Friend.findMany({
+            where: { userID: loggedInUserId },
+            include: {
+                friend: {
+                    select: { id: true, userName: true }
+                }
+            }
+        })
+
+        if(!friends || friends.length === 0) {
+            throw new NotFoundException("You do not have any friends yet!")
+        }
+
+        return friends.map(f => f.friend)
     }
 }

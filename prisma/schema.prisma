@@ -16,18 +16,19 @@ datasource db {
 }
 
 model User {
-  id                    Int                      @id @default(autoincrement())
-  userName              String
-  email                 String                   @unique
-  password              String
-  comments              Comment[]
-  photos                Photo[]
-  userInterests         User_Interest[]
-  news                  News[]
-  requestSent           User_Friend[]            @relation("requestSent")
-  requestRecieved       User_Friend[]            @relation("requestRecieved")
-  sentRequests          Pending_Friend_Request[] @relation("sentRequests")
-  receivedRequests      Pending_Friend_Request[] @relation("receivedRequests")
+  id               Int                      @id @default(autoincrement())
+  userName         String
+  email            String                   @unique
+  password         String
+  age              Int?
+  comments         Comment[]
+  photos           Photo[]
+  userInterests    User_Interest[]
+  news             News[]
+  requestSent      User_Friend[]            @relation("requestSent")
+  requestRecieved  User_Friend[]            @relation("requestRecieved")
+  sentRequests     Pending_Friend_Request[] @relation("sentRequests")
+  receivedRequests Pending_Friend_Request[] @relation("receivedRequests")
 }
 
 model User_Interest {
@@ -87,7 +88,6 @@ model Comment {
   updatedAt   DateTime @updatedAt
   userID      Int
   placeID     Int
-  pending     Boolean  @default(true)
   approved    Boolean  @default(false)
   user        User     @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: Cascade)
   place       Place    @relation(fields: [placeID], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -99,7 +99,6 @@ model Photo {
   type     String
   userID   Int
   placeID  Int
-  pending  Boolean @default(true)
   approved Boolean @default(false)
   user     User    @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: Cascade)
   place    Place   @relation(fields: [placeID], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -110,7 +109,6 @@ model News {
   text     String  @db.LongText
   placeID  Int
   userID   Int
-  pending  Boolean @default(true)
   approved Boolean @default(false)
   place    Place   @relation(fields: [placeID], references: [id])
   user     User    @relation(fields: [userID], references: [id])

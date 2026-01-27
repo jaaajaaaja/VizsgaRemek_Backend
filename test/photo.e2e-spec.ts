@@ -4,10 +4,8 @@ import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { JwtService } from '@nestjs/jwt';
 import { PhotoService } from 'src/photo/photo.service';
-import { ThrottlerGuard } from '@nestjs/throttler';
 import path from 'path';
 import * as fs from 'fs';
-import { APP_GUARD } from '@nestjs/core';
 
 describe('PhotoController E2E', () => {
     let app: INestApplication
@@ -37,7 +35,6 @@ describe('PhotoController E2E', () => {
 
         fs.unlinkSync(path.join(dir, files[files.length - 1]))
     }
-
 
     beforeAll(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({

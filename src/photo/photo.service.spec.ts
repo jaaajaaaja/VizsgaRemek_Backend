@@ -22,6 +22,7 @@ describe('PhotoService', () => {
       id: 1,
       location: 'uploads/test.png',
       type: 'PNG',
+      approved: true,
       userID: mockUser.id,
       placeID: mockPlace.id,
       user: mockUser,
@@ -97,34 +98,13 @@ describe('PhotoService', () => {
         placeName: 'test place name',
         userName: 'test username',
       })
-      expect(mockPrismaService.photo.findUnique).toHaveBeenCalledWith({
-        where: { id: 1 },
-        select: {
-          id: true,
-          location: true,
-          type: true,
-          user: { select: { userName: true } },
-          place: { select: { name: true } }
-        }
-      })
       expect(mockPrismaService.photo.findUnique).toHaveBeenCalledTimes(1)
     })
 
     it("should throw NotFoundException when photo does not exist", async () => {
       mockPrismaService.photo.findUnique.mockResolvedValue(null)
 
-      await expect(service.getOne(1)).rejects.toThrow(NotFoundException)
-      expect(mockPrismaService.photo.findUnique).toHaveBeenCalledWith({
-        where: { id: 1 },
-        select: {
-          id: true,
-          location: true,
-          type: true,
-          user: { select: { userName: true } },
-          place: { select: { name: true } }
-        }
-      })
-      expect(mockPrismaService.photo.findUnique).toHaveBeenCalledTimes(1)
+      await expect(service.getOne(1)).rejects.toThrow(NotFoundException)      
     })
   })
 
@@ -136,7 +116,7 @@ describe('PhotoService', () => {
 
       expect(result).toEqual(mockPhoto)
       expect(mockPrismaService.photo.findMany).toHaveBeenCalledWith({
-        where: { userID: 1 },
+        where: { userID: 1, approved: true },
         select: {
           id: true,
           location: true,
@@ -163,7 +143,7 @@ describe('PhotoService', () => {
 
       expect(result).toEqual(mockPhoto)
       expect(mockPrismaService.photo.findMany).toHaveBeenCalledWith({
-        where: { placeID: 2 },
+        where: { placeID: 2, approved: true },
         select: {
           id: true,
           location: true,

@@ -16,6 +16,7 @@ export class PhotoService {
                 id: true,
                 location: true,
                 type: true,
+                approved: true,
                 user: { select: { userName: true } },
                 place: { select: { name: true } }
             }
@@ -23,6 +24,10 @@ export class PhotoService {
 
         if (!photo) {
             throw new NotFoundException("Photo not found!")
+        }
+
+        if (!photo.approved) {
+            return "This image is waiting for approval!"
         }
 
         return {
@@ -36,7 +41,7 @@ export class PhotoService {
 
     async getAllByUser(userID: number) {
         const allByUser = await this.prisma.photo.findMany({
-            where: { userID: userID },
+            where: { userID: userID, approved: true },
             select: {
                 id: true,
                 location: true,
@@ -55,7 +60,7 @@ export class PhotoService {
 
     async getAllByPlace(placeID: number) {
         const allByPlace = await this.prisma.photo.findMany({
-            where: { placeID: placeID },
+            where: { placeID: placeID, approved: true },
             select: {
                 id: true,
                 location: true,
@@ -108,7 +113,7 @@ export class PhotoService {
         }
 
         if (photo.userID != loggedInUserId) {
-            throw new UnauthorizedException("You can only delete your own photos")
+            throw new UnauthorizedException("You can only delete your own photos!")
         }
 
         return this.prisma.photo.delete({ where: { id } })

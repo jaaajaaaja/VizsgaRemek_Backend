@@ -5,6 +5,8 @@ import { UpdatePlaceDto } from './dto/update-place.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { CreatePlaceCategoryDto } from './dto/create-place-category.dto';
+import { CreateNewsDto } from './dto/create-news.dto';
+import { UpdateNewsDto } from './dto/update-news.dto';
 
 @Controller('place')
 export class PlaceController {
@@ -37,10 +39,27 @@ export class PlaceController {
     }
 
     @Post(':placeID/category')
-    @UseGuards(AuthGuard)
     @SkipThrottle({ basic: true, place: true, login: true })
     async addPlaceCategory(@Param('placeID', ParseIntPipe) placeID: number, @Body() body: CreatePlaceCategoryDto) {
         return this.placeService.addPlaceCategory(body, placeID)
+    }
+
+    @Post(':id/news')
+    @UseGuards(AuthGuard)
+    @SkipThrottle({ basic: true, place: true, login: true })
+    async addNews(@Req() request: Request, @Body() body: CreateNewsDto) {
+        return this.placeService.addNews(body, request["user"].sub)
+    }
+
+    @Put('/news/:id')
+    @UseGuards(AuthGuard)
+    @SkipThrottle({ basic: true, place: true, login: true })
+    async updateNews(
+        @Param('id', ParseIntPipe) id: number,
+        @Req() request: Request,
+        @Body() body: UpdateNewsDto
+    ) {
+        return this.placeService.updateNews(id, body, request["user"].sub)
     }
 
     // @Delete(':id')

@@ -1,8 +1,10 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdatePlaceDto } from './dto/update-place.dto';
 import { CreatePlaceDto } from './dto/create-place.dto';
 import { CreatePlaceCategoryDto } from './dto/create-place-category.dto';
+import { CreateNewsDto } from './dto/create-news.dto';
+import { UpdateNewsDto } from './dto/update-news.dto';
 
 @Injectable()
 export class PlaceService {
@@ -49,6 +51,49 @@ export class PlaceService {
         } catch (e) {
             throw new ForbiddenException("Place already has this category")
         }
+    }
+
+    async addNews(data: CreateNewsDto, loggedInUserId: number) {
+        if (!loggedInUserId) {
+            throw new UnauthorizedException("Log in to post news!")
+        }
+
+        const place = await this.prisma.place.findFirst({ where: { id: data.placeID } })
+
+        if (!place) {
+            throw new NotFoundException("Place not found")
+        }
+
+        const fullData = {
+            text: data.text,
+            placeID: data.placeID,
+            userID: loggedInUserId
+        }
+
+        return this.prisma.news.create({ data: fullData })
+    }
+
+    async updateNews(id: number, body: UpdateNewsDto, loggedInUserId: number) {
+        const news = await this.prisma.news.findFirst({ where: { id } })
+
+        if(!news) {
+            throw new NotFoundException("News not found!")
+        }
+
+        if(news.userID != loggedInUserId) {
+            throw new UnauthorizedException("You can only edit your own news!")
+        }
+
+        if (!loggedInUserId) {
+            throw new UnauthorizedException("You can not edit this news!")
+        }
+
+        const fullData = {
+            ...body,
+            approved: false
+        }
+
+        this.prisma.news.update({ where: { id }, data: fullData })
     }
 
     // async remove(id: number) {

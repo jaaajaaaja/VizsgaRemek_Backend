@@ -1,12 +1,21 @@
 import request from 'supertest';
 import { Test } from '@nestjs/testing';
-import { PlaceModule } from '../src/place/place.module';
+import { AppModule } from '../src/app.module';
 import { INestApplication, NotFoundException } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { PlaceService } from 'src/place/place.service';
+import { JwtService } from '@nestjs/jwt';
 
 describe("Places", () => {
     let app: INestApplication
+    let jwtService: JwtService
+    let token: string
+
+    const mockUser = {
+        id: 1,
+        email: 'test@test.test',
+        userName: 'test',
+    }
 
     const mockPlace = [
         {
@@ -30,24 +39,36 @@ describe("Places", () => {
         // remove: jest.fn(),
         add: jest.fn(),
         addPlaceCategory: jest.fn(),
+        addNews: jest.fn(),
+        updateNews: jest.fn(),
         // update: jest.fn()
     }
 
 
     beforeAll(async () => {
-        const moduleRef = await Test.createTestingModule({
-            imports: [PlaceModule]
+        const moduleFixture = await Test.createTestingModule({
+            imports: [AppModule]
         })
             .overrideProvider(PlaceService)
             .useValue(mockPlaceService)
-            .overrideGuard(AuthGuard)
-            .useValue({ canActivate: () => true })
             .compile()
 
-        app = moduleRef.createNestApplication()
+        app = moduleFixture.createNestApplication()
         await app.init()
+
+        jwtService = moduleFixture.get(JwtService)
+
+        token = jwtService.sign(
+            {
+                sub: mockUser.id,
+                email: mockUser.email,
+            },
+            {
+                secret: process.env.JWT_SECRET
+            }
+        )
     })
-    
+
     afterAll(async () => {
         await app.close()
     })
@@ -107,10 +128,25 @@ describe("Places", () => {
 
     describe("addPlaceCategory", () => {
         it("/POST should create a place category", async () => {
+            mockPlaceService.add.mockResolvedValue(mockPlace[0])
+
             return request(app.getHttpServer())
                 .post("/place/1/category")
+                // .set('Authorization', `Bearer ${token}`)
                 .send("bar")
                 .expect(201)
+        })
+    })
+
+    describe("/POST", () => {
+        it("/POST place", () => {
+            mockPlaceService.add.mockResolvedValue(mockPlace[0])
+
+            request(app.getHttpServer())
+                .post("/place")
+                .set('Authorization', `Bearer ${token}`)
+                .expect(200)
+                .expect(mockPlace[0])
         })
     })
 
@@ -169,15 +205,4 @@ describe("Places", () => {
     //             .expect(400)
     //     })
     // })
-
-    describe("/POST", () => {
-        it("/POST place", () => {
-            mockPlaceService.add.mockResolvedValue(mockPlace[0])
-
-            request(app.getHttpServer())
-                .post("/place")
-                .expect(200)
-                .expect(mockPlace[0])
-        })
-    })
 })

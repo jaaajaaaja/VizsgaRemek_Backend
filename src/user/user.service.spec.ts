@@ -54,7 +54,8 @@ describe('UserService', () => {
       findUnique: jest.fn(),
       create: jest.fn(),
       delete: jest.fn(),
-      update: jest.fn()
+      update: jest.fn(),
+      findMany: jest.fn()
     },
     place_Category: {
       findMany: jest.fn(),
@@ -65,6 +66,7 @@ describe('UserService', () => {
     },
     user_Friend: {
       create: jest.fn(),
+      findMany: jest.fn()
     },
     pending_Friend_Request: {
       create: jest.fn(),
@@ -268,9 +270,70 @@ describe('UserService', () => {
 
       const result = await service.dealWithFriendRequest(2, 1, false)
 
-      expect(result).toEqual({ message: "Friend request rejected" })
+      expect(result).toEqual({ message: "Friend request rejected!" })
       expect(mockPrismaService.user_Friend.create).not.toHaveBeenCalled()
       expect(mockPrismaService.pending_Friend_Request.delete).toHaveBeenCalledWith({ where: mockRequest })
+    })
+  })
+
+  describe("searchByUsername", () => {
+    it("should return users matching the username", async () => {
+      const searchResult = [
+        { id: 1, userName: "testUsername" },
+        { id: 2, userName: "testUsername" }
+      ]
+
+      mockPrismaService.user.findMany.mockResolvedValue(searchResult)
+
+      const result = await service.searchByUsername("testUsername")
+
+      expect(result).toEqual(searchResult)
+      expect(mockPrismaService.user.findMany).toHaveBeenCalledWith({
+        where: { userName: "testUsername" },
+        select: { id: true, userName: true }
+      })
+    })
+
+    it("should return empty array when no users found", async () => {
+      mockPrismaService.user.findMany.mockResolvedValue([])
+
+      const result = await service.searchByUsername("notfound")
+
+      expect(result).toEqual([])
+      expect(mockPrismaService.user.findMany).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe("friendlist", () => {
+    it("should return list of friends with id and userName", async () => {
+      const friendsData = [
+        { friendID: 2, friend: { id: 2, userName: "friend1" } },
+        { friendID: 3, friend: { id: 3, userName: "friend2" } }
+      ]
+
+      mockPrismaService.user_Friend.findMany.mockResolvedValue(friendsData)
+
+      const result = await service.friendlist(1)
+
+      expect(result).toEqual([
+        { id: 2, userName: "friend1" },
+        { id: 3, userName: "friend2" }
+      ])
+      expect(mockPrismaService.user_Friend.findMany).toHaveBeenCalledWith({
+        where: { userID: 1 },
+        include: {
+          friend: {
+            select: { id: true, userName: true }
+          }
+        }
+      })
+    })
+
+    it("should throw NotFoundException when user has no friends", async () => {
+      mockPrismaService.user_Friend.findMany.mockResolvedValue([])
+
+      await expect(service.friendlist(1)).rejects.toThrow(NotFoundException)
+      expect(mockPrismaService.user_Friend.findMany).toHaveBeenCalledTimes(1)
     })
   })
 })

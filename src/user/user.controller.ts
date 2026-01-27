@@ -69,4 +69,17 @@ export class UserController {
             body.accepted
         )
     }
+
+    @Get('/searchByName/:userName')
+    @SkipThrottle({ basic: true, place: true, login: true })
+    async searchByUsername(@Param('userName') username: string) {
+        return this.userService.searchByUsername(username)
+    }
+
+    @Get('/friends')
+    @UseGuards(AuthGuard)
+    @SkipThrottle({ basic: true, place: true, login: true })
+    async friendlist(@Req() request: Request) {
+        return this.userService.friendlist(request["user"].sub)
+    }
 }

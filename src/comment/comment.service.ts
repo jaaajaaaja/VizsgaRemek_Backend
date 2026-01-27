@@ -17,14 +17,20 @@ export class CommentService {
     const comment = await this.prisma.comment.findUnique({ where: { id } })
 
     if (!comment) {
-      throw new NotFoundException()
+      throw new NotFoundException("Comment not found!")
+    }
+
+    if (!comment.approved) {
+      return "This comment is waiting for approval!"
     }
 
     return comment
   }
 
   async findAllByUser(userID: number) {
-    const comments = await this.prisma.comment.findMany({ where: { userID } })
+    const comments = await this.prisma.comment.findMany({
+      where: { id: userID, approved: true }
+    })
 
     if (comments.length === 0) {
       throw new NotFoundException("User did not post any comments!")
@@ -35,7 +41,7 @@ export class CommentService {
 
   async findAllByPlace(placeID: number) {
     const comments = await this.prisma.comment.findMany({
-      where: { placeID: placeID },
+      where: { placeID: placeID, approved: true },
     })
 
     if (comments.length === 0) {
@@ -47,9 +53,9 @@ export class CommentService {
 
   async add(data: CreateCommentDto, loggedInUserId: number) {
 
-    const place = await this.prisma.place.findUnique({ where: {id: data.placeID}})
+    const place = await this.prisma.place.findUnique({ where: { id: data.placeID } })
 
-    if(!place) {
+    if (!place) {
       throw new NotFoundException("Place not found!")
     }
 
@@ -88,6 +94,11 @@ export class CommentService {
       throw new UnauthorizedException("You can only edit your own comments!")
     }
 
-    return this.prisma.comment.update({ where: { id }, data })
+    const fullData = {
+      ...data,
+      approved: false
+    }
+
+    return this.prisma.comment.update({ where: { id }, data: fullData })
   }
 }

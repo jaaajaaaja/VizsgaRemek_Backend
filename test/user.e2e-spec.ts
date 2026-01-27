@@ -4,6 +4,7 @@ import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 describe('CommentController E2E', () => {
     let app: INestApplication
@@ -23,14 +24,24 @@ describe('CommentController E2E', () => {
         addUserInterest: jest.fn(),
         addFriend: jest.fn(),
         dealWithFriendRequest: jest.fn(),
+        searchByUsername: jest.fn(),
+        friendlist: jest.fn(),
+    }
+
+    const mockPrismaService = {
+        user: {
+            findUnique: jest.fn().mockResolvedValue(mockUser),
+        },
     }
 
     const invalid_token = "invalid_token"
 
     beforeAll(async () => {
-        const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [AppModule],
+        const moduleFixture = await Test.createTestingModule({
+            imports: [AppModule]
         })
+            .overrideProvider(PrismaService)
+            .useValue(mockPrismaService)
             .overrideProvider(UserService)
             .useValue(mockUserService)
             .compile()
@@ -127,6 +138,47 @@ describe('CommentController E2E', () => {
                 .put('/user/recommendation')
                 .set('Authorization', `Bearer ${invalid_token}`)
                 .send({})
+                .expect(401)
+        })
+    })
+
+    describe("searchByUsername", () => {
+        it('(GET) /user/searchByName/:userName should return users', async () => {
+            mockUserService.searchByUsername.mockResolvedValue([
+                { id: 1, userName: "testuser" }
+            ])
+
+            return request(app.getHttpServer())
+                .get('/user/searchByName/testuser')
+                .expect(200)
+        })
+
+        it('(GET) /user/searchByName/:userName should return empty array', async () => {
+            mockUserService.searchByUsername.mockResolvedValue([])
+
+            return request(app.getHttpServer())
+                .get('/user/searchByName/nonexistent')
+                .expect(200)
+        })
+    })
+
+    describe("friendlist", () => {
+        it('(GET) /user/friends should return friends list', async () => {
+            mockUserService.friendlist.mockResolvedValue([
+                { id: 2, userName: "friend1" },
+                { id: 3, userName: "friend2" }
+            ])
+
+            return request(app.getHttpServer())
+                .get('/user/friends')
+                .set('Authorization', `Bearer ${token}`)
+                .expect(200)
+        })
+
+        it('(GET) /user/friends should throw UnauthorizedException without token', async () => {
+            return request(app.getHttpServer())
+                .get('/user/friends')
+                .set('Authorization', `Bearer ${invalid_token}`)
                 .expect(401)
         })
     })

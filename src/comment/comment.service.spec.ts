@@ -16,6 +16,7 @@ describe('CommentService', () => {
     rating: 5,
     userID: 1,
     placeID: 1,
+    approved: true,
     createdAt: new Date(),
     updatedAt: new Date(),
   }
@@ -27,6 +28,7 @@ describe('CommentService', () => {
       rating: 5,
       userID: 1,
       placeID: 1,
+      approved: false,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -36,6 +38,7 @@ describe('CommentService', () => {
       rating: 4,
       userID: 2,
       placeID: 1,
+      approved: true,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -119,6 +122,16 @@ describe('CommentService', () => {
         where: { id: 999 },
       })
     })
+
+    it('should return approval message when comment is not approved', async () => {
+      const unapprovedComment = { ...mockComment, approved: false }
+      mockPrismaService.comment.findUnique.mockResolvedValue(unapprovedComment)
+
+      const result = await service.findOne(1)
+
+      expect(result).toBe("This comment is waiting for approval!")
+      expect(mockPrismaService.comment.findUnique).toHaveBeenCalledWith({ where: { id: 1 } })
+    })
   })
 
   describe('findAllByUser', () => {
@@ -129,7 +142,7 @@ describe('CommentService', () => {
 
       expect(result).toEqual([mockComment])
       expect(mockPrismaService.comment.findMany).toHaveBeenCalledWith({
-        where: { userID: 1 },
+        where: { id: 1, approved: true },
       })
     })
 
@@ -138,7 +151,7 @@ describe('CommentService', () => {
 
       await expect(service.findAllByUser(1)).rejects.toThrow(NotFoundException)
       expect(mockPrismaService.comment.findMany).toHaveBeenCalledWith({
-        where: { userID: 1 },
+        where: { id: 1, approved: true },
       })
     })
   })
@@ -151,7 +164,7 @@ describe('CommentService', () => {
 
       expect(result).toEqual([mockComment])
       expect(mockPrismaService.comment.findMany).toHaveBeenCalledWith({
-        where: { placeID: 1 },
+        where: { placeID: 1, approved: true },
       })
     })
 
@@ -160,7 +173,7 @@ describe('CommentService', () => {
 
       await expect(service.findAllByPlace(1)).rejects.toThrow(NotFoundException)
       expect(mockPrismaService.comment.findMany).toHaveBeenCalledWith({
-        where: { placeID: 1 },
+        where: { placeID: 1, approved: true },
       })
     })
   })
@@ -257,7 +270,7 @@ describe('CommentService', () => {
       expect(result).toEqual(mockUpdatedComment)
       expect(mockPrismaService.comment.update).toHaveBeenCalledWith({
         where: { id: 1 },
-        data: updateCommentDto,
+        data: { ...updateCommentDto, approved: false },
       })
     })
 
@@ -287,7 +300,8 @@ describe('CommentService', () => {
       expect(result).toEqual(mockUpdatedComment)
       expect(mockPrismaService.comment.update).toHaveBeenCalledWith({
         where: { id: 1 },
-        data: { commentText: 'Updated comment text' },
+        data: { approved: false, commentText: 'Updated comment text' },
+
       })
     })
   })
