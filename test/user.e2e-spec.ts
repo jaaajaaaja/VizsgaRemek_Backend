@@ -20,6 +20,7 @@ describe('CommentController E2E', () => {
         remove: jest.fn(),
         update: jest.fn(),
         recommendations: jest.fn(),
+        addUserInterest: jest.fn(),
     }
 
     const invalid_token = "invalid_token"
@@ -74,6 +75,14 @@ describe('CommentController E2E', () => {
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200)
         })
+
+        it('(POST) /user/addInterest', async () => {
+            return request(app.getHttpServer())
+                .post('/user/addInterest')
+                .set('Authorization', `Bearer ${token}`)
+                .send("bar")
+                .expect(201)
+        })
     })
 
     describe("should throw UnathorizedException", () => {
@@ -99,5 +108,5 @@ describe('CommentController E2E', () => {
                 .send({})
                 .expect(401)
         })
-    })    
+    })
 })

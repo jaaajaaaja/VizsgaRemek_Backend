@@ -4,6 +4,7 @@ import { CreatePlaceDto } from './dto/create-place.dto';
 import { UpdatePlaceDto } from './dto/update-place.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
+import { CreatePlaceCategoryDto } from './dto/create-place-category.dto';
 
 @Controller('place')
 export class PlaceController {
@@ -33,6 +34,13 @@ export class PlaceController {
     @Throttle({ place: { ttl: 60000, limit: 10 } })
     async add(@Body() body: CreatePlaceDto) {
         return this.placeService.add(body)
+    }
+
+    @Post(':placeID/category')
+    @UseGuards(AuthGuard)
+    @SkipThrottle({ basic: true, place: true, login: true })
+    async addPlaceCategory(@Param('placeID', ParseIntPipe) placeID: number, @Body() body: CreatePlaceCategoryDto) {
+        return this.placeService.addPlaceCategory(body, placeID)
     }
 
     // @Delete(':id')

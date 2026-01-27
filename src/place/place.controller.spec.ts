@@ -3,6 +3,7 @@ import { PlaceController } from './place.controller';
 import { PlaceService } from './place.service';
 import { UpdatePlaceDto } from './dto/update-place.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { CreatePlaceCategoryDto } from './dto/create-place-category.dto';
 
 describe('PlaceController', () => {
   let controller: PlaceController
@@ -19,6 +20,7 @@ describe('PlaceController', () => {
     // getAll: jest.fn(),
     getOne: jest.fn(),
     getOneByGoogleplaceID: jest.fn(),
+    addPlaceCategory: jest.fn(),
     // add: jest.fn(),
     // remove: jest.fn(),
     // update: jest.fn()
@@ -79,6 +81,19 @@ describe('PlaceController', () => {
 
       expect(result).toEqual(mockPlace)
       expect(service.getOneByGoogleplaceID).toHaveBeenCalledWith(mockPlace.googleplaceID)
+    })
+  })
+
+  describe("addPlaceCategory", () => {
+    it("should add a place category", async () => {
+      const category: CreatePlaceCategoryDto = { category: "test" }
+      const returnCategory = { category: category, placeID: 1 }
+
+      mockPlaceService.addPlaceCategory.mockResolvedValue(returnCategory)
+
+      const result = await controller.addPlaceCategory(1, "test" as any)
+
+      expect(result).toEqual(returnCategory)
     })
   })
 

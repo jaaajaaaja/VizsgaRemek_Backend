@@ -90,16 +90,16 @@ describe('CommentService', () => {
     expect(service).toBeDefined()
   })
 
-  describe('findAll', () => {
-    it('should return all comments when comments exist', async () => {
-      mockPrismaService.comment.findMany.mockResolvedValue(mockComments)
+  // describe('findAll', () => {
+  //   it('should return all comments when comments exist', async () => {
+  //     mockPrismaService.comment.findMany.mockResolvedValue(mockComments)
 
-      const result = await service.findAll()
+  //     const result = await service.findAll()
 
-      expect(result).toEqual(mockComments)
-      expect(mockPrismaService.comment.findMany).toHaveBeenCalledTimes(1)
-    })
-  })
+  //     expect(result).toEqual(mockComments)
+  //     expect(mockPrismaService.comment.findMany).toHaveBeenCalledTimes(1)
+  //   })
+  // })
 
   describe('findOne', () => {
     it('should return a comment by id', async () => {

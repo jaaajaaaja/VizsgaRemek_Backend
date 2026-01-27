@@ -73,16 +73,16 @@ describe('PhotoService', () => {
     expect(service).toBeDefined();
   })
 
-  describe("getAll", () => {
-    it("should return all photos", async () => {
-      mockPrismaService.photo.findMany.mockResolvedValue(mockPhoto)
+  // describe("getAll", () => {
+  //   it("should return all photos", async () => {
+  //     mockPrismaService.photo.findMany.mockResolvedValue(mockPhoto)
 
-      const result = await service.getAll()
+  //     const result = await service.getAll()
 
-      expect(result).toEqual(mockPhoto)
-      expect(mockPrismaService.photo.findMany).toHaveBeenCalledTimes(1)
-    })
-  })
+  //     expect(result).toEqual(mockPhoto)
+  //     expect(mockPrismaService.photo.findMany).toHaveBeenCalledTimes(1)
+  //   })
+  // })
 
   describe("getOne", () => {
     it("should return a photo by id", async () => {

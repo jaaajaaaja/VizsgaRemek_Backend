@@ -11,11 +11,11 @@ import { CreatePhotoDto } from './dto/create-photo.dto';
 export class PhotoController {
     constructor(private photoService: PhotoService) { }
 
-    @Get()
-    @SkipThrottle({ postput: true, place: true, login: true })
-    async getAll() {
-        return this.photoService.getAll()
-    }
+    // @Get()
+    // @SkipThrottle({ postput: true, place: true, login: true })
+    // async getAll() {
+    //     return this.photoService.getAll()
+    // }
 
     @Get(':id')
     @SkipThrottle({ postput: true, place: true, login: true })

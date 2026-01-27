@@ -9,11 +9,11 @@ import { SkipThrottle } from '@nestjs/throttler';
 export class CommentController {
   constructor(private commentService: CommentService) { }
 
-  @Get()
-  @SkipThrottle({ postput: true, place: true, login: true })
-  async getAll() {
-    return this.commentService.findAll()
-  }
+  // @Get()
+  // @SkipThrottle({ postput: true, place: true, login: true })
+  // async getAll() {
+  //   return this.commentService.findAll()
+  // }
 
   @Get(':id')
   @SkipThrottle({ postput: true, place: true, login: true })

@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdatePlaceDto } from './dto/update-place.dto';
 import { CreatePlaceDto } from './dto/create-place.dto';
+import { CreatePlaceCategoryDto } from './dto/create-place-category.dto';
 
 @Injectable()
 export class PlaceService {
@@ -19,7 +20,7 @@ export class PlaceService {
         if (!place) {
             throw new NotFoundException("Place not found!")
         }
-        
+
         return place
     }
 
@@ -29,12 +30,25 @@ export class PlaceService {
         if (!place) {
             throw new NotFoundException("Place not found!")
         }
-        
+
         return place
     }
 
     async add(data: CreatePlaceDto) {
         return this.prisma.place.create({ data })
+    }
+
+    async addPlaceCategory(data: CreatePlaceCategoryDto, placeID: number) {
+        try {
+            const fullData = {
+                category: data.category,
+                placeID: placeID
+            }
+
+            return this.prisma.place_Category.create({ data: fullData })
+        } catch (e) {
+            throw new ForbiddenException("Place already has this category")
+        }
     }
 
     // async remove(id: number) {

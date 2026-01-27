@@ -71,16 +71,16 @@ describe('PhotoController', () => {
     expect(controller).toBeDefined()
   })
 
-  describe("getAll", () => {
-    it("should return all photos", async () => {
-      mockPhotoService.getAll.mockResolvedValue(mockPhoto)
+  // describe("getAll", () => {
+  //   it("should return all photos", async () => {
+  //     mockPhotoService.getAll.mockResolvedValue(mockPhoto)
 
-      const result = await controller.getAll()
+  //     const result = await controller.getAll()
 
-      expect(result).toEqual(mockPhoto)
-      expect(mockPhotoService.getAll).toHaveBeenCalledTimes(1)
-    })
-  })
+  //     expect(result).toEqual(mockPhoto)
+  //     expect(mockPhotoService.getAll).toHaveBeenCalledTimes(1)
+  //   })
+  // })
 
   describe("getOne", () => {
     it("should return a photo by id", async () => {

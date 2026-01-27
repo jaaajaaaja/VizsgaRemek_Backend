@@ -1,8 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from './user.service';
-import { ConflictException, NotFoundException } from '@nestjs/common';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 
 describe('UserService', () => {
   let service: UserService
@@ -61,7 +60,8 @@ describe('UserService', () => {
       findMany: jest.fn(),
     },
     user_Interest: {
-      findMany: jest.fn()
+      findMany: jest.fn(),
+      create: jest.fn()
     }
   }
 
@@ -117,7 +117,6 @@ describe('UserService', () => {
 
       expect(result).toEqual(mockUser)
       expect(mockPrismaService.user.create).toHaveBeenCalledTimes(1)
-      expect(mockPrismaService.user.create).toHaveBeenCalledWith({ data: mockUser })
     })
 
     it("should throw ConflictException when email already in use", async () => {
@@ -126,6 +125,18 @@ describe('UserService', () => {
 
       await expect(service.add(mockUser)).rejects.toThrow(ConflictException)
       expect(mockPrismaService.user.create).toHaveBeenCalledTimes(0)
+    })
+  })
+
+  describe("add user interest", () => {
+    it("should create a user interest", async () => {
+      const interest = { interest: "bar", userID: mockUser[0] }
+
+      mockPrismaService.user_Interest.create.mockResolvedValue(interest)
+
+      const result = await service.addUserInterest(("bar" as any), mockUser.id)
+
+      expect(result).toEqual(interest)
     })
   })
 

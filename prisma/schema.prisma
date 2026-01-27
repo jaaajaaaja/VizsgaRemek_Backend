@@ -16,11 +16,10 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  userName String
-  email    String @unique
-  password String
-
+  id            Int             @id @default(autoincrement())
+  userName      String
+  email         String          @unique
+  password      String
   comments      Comment[]
   photos        Photo[]
   userInterests User_Interest[]
@@ -30,16 +29,16 @@ model User_Interest {
   id       Int    @id @default(autoincrement())
   interest String
   userID   Int
+  user     User   @relation(fields: [userID], references: [id])
 
-  user User @relation(fields: [userID], references: [id])
+  @@unique([userID, interest])
 }
 
 model Place {
-  id            Int    @id @default(autoincrement())
-  googleplaceID String @unique
-  name          String
-  address       String
-
+  id              Int              @id @default(autoincrement())
+  googleplaceID   String           @unique
+  name            String
+  address         String
   comments        Comment[]
   photos          Photo[]
   placeCategories Place_Category[]
@@ -49,8 +48,9 @@ model Place_Category {
   id       Int    @id @default(autoincrement())
   category String
   placeID  Int
+  place    Place  @relation(fields: [placeID], references: [id], onDelete: Cascade)
 
-  place Place @relation(fields: [placeID], references: [id], onDelete: Cascade)
+  @@unique([category, placeID])
 }
 
 model Comment {
@@ -59,22 +59,18 @@ model Comment {
   rating      Int?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  userID  Int
-  placeID Int
-
-  user  User  @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  place Place @relation(fields: [placeID], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userID      Int
+  placeID     Int
+  user        User     @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  place       Place    @relation(fields: [placeID], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Photo {
   id       Int    @id @default(autoincrement())
   location String
   type     String
-
-  userID  Int
-  placeID Int
-
-  user  User  @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  place Place @relation(fields: [placeID], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userID   Int
+  placeID  Int
+  user     User   @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  place    Place  @relation(fields: [placeID], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }

@@ -1,7 +1,9 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserInterestDto } from './dto/create-user-interest.dto';
+import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class UserService {
@@ -18,6 +20,9 @@ export class UserService {
     }
 
     async add(data: CreateUserDto) {
+        const salt = await bcrypt.genSalt(10)
+        const hash = await bcrypt.hash(data.password, salt)
+
         const email = data.email
         const user = await this.prisma.user.findUnique({ where: { email } })
 
@@ -25,7 +30,26 @@ export class UserService {
             throw new ConflictException("Email already in use!")
         }
 
-        return this.prisma.user.create({ data })
+        return this.prisma.user.create({
+            data: {
+                userName: data.userName,
+                email: data.email,
+                password: hash
+            }
+        })
+    }
+
+    async addUserInterest(data: CreateUserInterestDto, loggedInUserId: number) {
+        try {
+            const fullData = {
+                interest: data.interest,
+                userID: loggedInUserId
+            }
+
+            return this.prisma.user_Interest.create({ data: fullData })
+        } catch (e) {
+            throw new ForbiddenException("You already have this interest!")
+        }
     }
 
     async remove(id: number, loggedInUserId: number) {

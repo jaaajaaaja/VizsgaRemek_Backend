@@ -117,20 +117,20 @@ describe('Throttle E2E', () => {
 
     describe("/photo", () => {
         describe("120 REQUESTS MAX", () => {
-            it("GET ALL", async () => {
-                const endpoint = "/photo"
-                const agent = request(app.getHttpServer())
+            // it("GET ALL", async () => {
+            //     const endpoint = "/photo"
+            //     const agent = request(app.getHttpServer())
 
-                const limit = 120
+            //     const limit = 120
 
-                for (let i = 0; i < limit; i++) {
-                    const response = await agent.get(endpoint)
-                    expect(response.status).toBeLessThan(429)
-                }
+            //     for (let i = 0; i < limit; i++) {
+            //         const response = await agent.get(endpoint)
+            //         expect(response.status).toBeLessThan(429)
+            //     }
 
-                const lastResponse = await agent.get(endpoint)
-                expect(lastResponse.status).toBe(429)
-            })
+            //     const lastResponse = await agent.get(endpoint)
+            //     expect(lastResponse.status).toBe(429)
+            // })
 
             it("GET BY ID", async () => {
                 const agent = request(app.getHttpServer())
@@ -215,20 +215,20 @@ describe('Throttle E2E', () => {
 
     describe("/comment", () => {
         describe("120 REQUESTS MAX", () => {
-            it("GET ALL", async () => {
-                const endpoint = "/comment"
-                const agent = request(app.getHttpServer())
+            // it("GET ALL", async () => {
+            //     const endpoint = "/comment"
+            //     const agent = request(app.getHttpServer())
 
-                const limit = 120
+            //     const limit = 120
 
-                for (let i = 0; i < limit; i++) {
-                    const response = await agent.get(endpoint)
-                    expect(response.status).toBeLessThan(429)
-                }
+            //     for (let i = 0; i < limit; i++) {
+            //         const response = await agent.get(endpoint)
+            //         expect(response.status).toBeLessThan(429)
+            //     }
 
-                const lastResponse = await agent.get(endpoint)
-                expect(lastResponse.status).toBe(429)
-            })
+            //     const lastResponse = await agent.get(endpoint)
+            //     expect(lastResponse.status).toBe(429)
+            // })
 
             it("GET BY ID", async () => {
                 const agent = request(app.getHttpServer())

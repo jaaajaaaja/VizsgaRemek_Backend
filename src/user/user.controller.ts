@@ -5,6 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt'
 import { AuthGuard } from 'src/auth/auth.guard';
 import { SkipThrottle } from '@nestjs/throttler';
+import { CreateUserInterestDto } from './dto/create-user-interest.dto';
 
 @Controller('user')
 export class UserController {
@@ -26,14 +27,14 @@ export class UserController {
     @Post()
     @SkipThrottle({ basic: true, place: true, login: true })
     async add(@Body() body: CreateUserDto) {
-        const salt = await bcrypt.genSalt(10)
-        const hash = await bcrypt.hash(body.password, salt)
+        return this.userService.add(body)
+    }
 
-        return this.userService.add({
-            userName: body.userName,
-            email: body.email,
-            password: hash
-        })
+    @Post('/addInterest')
+    @UseGuards(AuthGuard)
+    @SkipThrottle({ basic: true, place: true, login: true })
+    async addUserInterest(@Body() body: CreateUserInterestDto, @Req() request: Request) {
+        return this.userService.addUserInterest(body, request["user"].sub)
     }
 
     @Delete(':id')

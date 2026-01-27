@@ -29,6 +29,7 @@ describe("Places", () => {
         getOneByGoogleplaceID: jest.fn(),
         // remove: jest.fn(),
         add: jest.fn(),
+        addPlaceCategory: jest.fn(),
         // update: jest.fn()
     }
 
@@ -101,6 +102,15 @@ describe("Places", () => {
             return request(app.getHttpServer())
                 .get("/place/getByGooglePlaceId/noID")
                 .expect(404)
+        })
+    })
+
+    describe("addPlaceCategory", () => {
+        it("/POST should create a place category", async () => {
+            return request(app.getHttpServer())
+                .post("/place/1/category")
+                .send("bar")
+                .expect(201)
         })
     })
 

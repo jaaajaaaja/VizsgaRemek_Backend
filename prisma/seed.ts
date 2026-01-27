@@ -8,21 +8,21 @@ const GOOGLE_PLACE_CATEGORIES = [
     'bar',
     'pub',
     'nightclub',
-    'cocktail_bar',
+    //'cocktail_bar',
     'dance_club',
-    'beer_bar',
+    //'beer_bar',
     'wine_bar',
     'karaoke',
-    'lounge',
-    'sports_bar',
-    'dive_bar',
-    'beer_garden',
-    'tavern',
-    'live_music_venue',
+    //'lounge',
+    //'sports_bar',
+    //'dive_bar',
+    //'beer_garden',
+    //'tavern',
+    //'live_music_venue',
     'bowling_alley',
-    'billiard_hall',
-    'brewery',
-    'distillery'
+    //'billiard_hall',
+    //'brewery',
+    //'distillery'
 ]
 
 async function main() {
@@ -60,21 +60,21 @@ async function main() {
     const userInterestData = users.flatMap(user =>
         faker.helpers.arrayElements(GOOGLE_PLACE_CATEGORIES, { min: 0, max: 3 }).map(interest => ({
             interest,
-            userId: user.id == 1 ? faker.number.int({ min: 2, max: 20 }) : user.id
+            userID: user.id == 1 ? faker.number.int({ min: 2, max: 20 }) : user.id
         }))
     )
 
     await prisma.user_Interest.create({
         data: {
             interest: "billiard_hall",
-            userId: 1
+            userID: 1
         }
     })
 
     await prisma.user_Interest.create({
         data: {
             interest: "beer_bar",
-            userId: 1
+            userID: 1
         }
     })
 
@@ -122,21 +122,21 @@ async function main() {
             )
             .map(category => ({
                 category,
-                placeId: place.id == 1 ? faker.number.int({ min: 2, max: 20 }) : place.id,
+                placeID: place.id == 1 ? faker.number.int({ min: 2, max: 20 }) : place.id,
             }))
     )
 
     await prisma.place_Category.create({
         data: {
             category: "billiard_hall",
-            placeId: 1
+            placeID: 1
         }
     })
 
     await prisma.place_Category.create({
         data: {
             category: "beer_bar",
-            placeId: 1
+            placeID: 1
         }
     })
 

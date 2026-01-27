@@ -3,6 +3,7 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { CreateUserInterestDto } from './dto/create-user-interest.dto';
 
 describe('UserController', () => {
   let controller: UserController
@@ -42,7 +43,8 @@ describe('UserController', () => {
     add: jest.fn(),
     remove: jest.fn(),
     update: jest.fn(),
-    recommendations: jest.fn()
+    recommendations: jest.fn(),
+    addUserInterest: jest.fn(),
   }
 
   beforeEach(async () => {
@@ -69,7 +71,7 @@ describe('UserController', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
-  })  
+  })
 
   // describe("getOne", () => {
   //   it("should get a user by email", async () => {
@@ -97,6 +99,31 @@ describe('UserController', () => {
         })
       )
       expect(service.add).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe("addUserInterest", () => {
+    // it("should add a user interest", async () => {
+    //   const mockInterest: CreateUserInterestDto = { interest: "bar" }
+
+    //   mockUserService.addUserInterest.mockResolvedValue(mockInterest)
+
+    //   const result = await controller.addUserInterest(mockInterest, { user: { sub: 1 } } as any)
+
+    //   expect(result).toEqual({interest: "bar"})
+    // })
+
+    it("should add a user interest", async () => {
+      const mockInterest: CreateUserInterestDto = { interest: "bar" }
+      const mockReturn = { id: 1, interest: "bar", userID: 1 }
+
+      mockUserService.addUserInterest.mockResolvedValue(mockReturn)
+
+      const result = await controller.addUserInterest(mockInterest, { user: { sub: 1 } } as any)
+
+      expect(result).toEqual(mockReturn)
+      expect(service.addUserInterest).toHaveBeenCalledWith(mockInterest, 1)
+      expect(service.addUserInterest).toHaveBeenCalledTimes(1)
     })
   })
 

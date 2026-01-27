@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PlaceService } from './place.service';
 import { NotFoundException } from '@nestjs/common';
+import { CreatePlaceCategoryDto } from './dto/create-place-category.dto';
 
 describe('PlaceService', () => {
   let service: PlaceService
@@ -24,11 +25,15 @@ describe('PlaceService', () => {
 
   const mockPrismaService = {
     place: {
-      findMany: jest.fn(),
+      // findMany: jest.fn(),
       findUnique: jest.fn(),
+      // create: jest.fn(),
+      addPlaceCategory: jest.fn(),
+      // delete: jest.fn(),
+      // update: jest.fn()
+    },
+    place_Category: {
       create: jest.fn(),
-      delete: jest.fn(),
-      update: jest.fn()
     }
   }
 
@@ -101,6 +106,19 @@ describe('PlaceService', () => {
 
       await expect(service.getOne(1)).rejects.toThrow(NotFoundException)
       expect(mockPrismaService.place.findUnique).toHaveBeenCalledWith({ where: { id: 1 } })
+    })
+  })
+
+  describe("addPlaceCategory", () => {
+    it("should add a place category", async () => {
+      const category: CreatePlaceCategoryDto = { category: "test" }
+      const returnCategory = { category: category, placeID: 1 }
+
+      mockPrismaService.place_Category.create.mockResolvedValue(returnCategory)
+
+      const result = await service.addPlaceCategory(category, 1)
+
+      expect(result).toEqual(returnCategory)
     })
   })
 
