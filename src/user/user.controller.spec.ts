@@ -75,17 +75,6 @@ describe('UserController', () => {
     expect(controller).toBeDefined();
   })
 
-  // describe("getOne", () => {
-  //   it("should get a user by email", async () => {
-  //     mockUserService.findOne.mockResolvedValue(mockUser)
-
-  //     const result = await controller.getOne("test@test.com")
-
-  //     expect(result).toEqual(mockUser)
-  //     expect(service.findOne).toHaveBeenCalledWith("test@test.com")
-  //   })
-  // })
-
   describe("add", () => {
     it("should add a user", async () => {
       mockUserService.add.mockResolvedValue(mockUser)
@@ -105,15 +94,6 @@ describe('UserController', () => {
   })
 
   describe("addUserInterest", () => {
-    // it("should add a user interest", async () => {
-    //   const mockInterest: CreateUserInterestDto = { interest: "bar" }
-
-    //   mockUserService.addUserInterest.mockResolvedValue(mockInterest)
-
-    //   const result = await controller.addUserInterest(mockInterest, { user: { sub: 1 } } as any)
-
-    //   expect(result).toEqual({interest: "bar"})
-    // })
 
     it("should add a user interest", async () => {
       const mockInterest: CreateUserInterestDto = { interest: "bar" }

@@ -19,12 +19,6 @@ export class UserController {
         return this.userService.recommendations(request["user"].sub)
     }
 
-    // @Get(':email')
-    // @SkipThrottle({ postput: true, place: true, login: true })
-    // async getOne(@Param('email') email: string) {
-    //     return this.userService.findOne(email)
-    // }
-
     @Post()
     @SkipThrottle({ basic: true, place: true, login: true })
     async add(@Body() body: CreateUserDto) {

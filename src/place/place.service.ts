@@ -10,12 +10,6 @@ import { UpdateNewsDto } from './dto/update-news.dto';
 export class PlaceService {
     constructor(private prisma: PrismaService) { }
 
-    // async getAll() {
-    //     const places = await this.prisma.place.findMany()
-
-    //     return places
-    // }
-
     async getOne(id: number) {
         const place = await this.prisma.place.findUnique({ where: { id } })
 
@@ -95,24 +89,4 @@ export class PlaceService {
 
         this.prisma.news.update({ where: { id }, data: fullData })
     }
-
-    // async remove(id: number) {
-    //     const place = await this.prisma.place.findUnique({ where: { id } })
-
-    //     if (!place) {
-    //         throw new NotFoundException("Place not found!")
-    //     }
-
-    //     return this.prisma.place.delete({ where: { id } })
-    // }
-
-    // async update(id: number, data: UpdatePlaceDto) {
-    //     const place = await this.prisma.place.findUnique({ where: { id } })
-
-    //     if (!place) {
-    //         throw new NotFoundException("Place not found!")
-    //     }
-
-    //     return this.prisma.place.update({ where: { id }, data })
-    // }
 }

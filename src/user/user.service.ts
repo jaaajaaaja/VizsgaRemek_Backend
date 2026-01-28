@@ -90,11 +90,7 @@ export class UserService {
         const interest = interests.map(i => i.interest)
 
         const recommendations = await this.prisma.place_Category.findMany({
-            where: { category: { in: interest } },
-            // include: {
-            //     placeCategories: true,
-            //     comments: true
-            // }
+            where: { category: { in: interest } }
         })
 
         if (recommendations.length === 0) {

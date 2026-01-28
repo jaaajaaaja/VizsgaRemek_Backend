@@ -117,21 +117,6 @@ describe('Throttle E2E', () => {
 
     describe("/photo", () => {
         describe("120 REQUESTS MAX", () => {
-            // it("GET ALL", async () => {
-            //     const endpoint = "/photo"
-            //     const agent = request(app.getHttpServer())
-
-            //     const limit = 120
-
-            //     for (let i = 0; i < limit; i++) {
-            //         const response = await agent.get(endpoint)
-            //         expect(response.status).toBeLessThan(429)
-            //     }
-
-            //     const lastResponse = await agent.get(endpoint)
-            //     expect(lastResponse.status).toBe(429)
-            // })
-
             it("GET BY ID", async () => {
                 const agent = request(app.getHttpServer())
 
@@ -215,21 +200,6 @@ describe('Throttle E2E', () => {
 
     describe("/comment", () => {
         describe("120 REQUESTS MAX", () => {
-            // it("GET ALL", async () => {
-            //     const endpoint = "/comment"
-            //     const agent = request(app.getHttpServer())
-
-            //     const limit = 120
-
-            //     for (let i = 0; i < limit; i++) {
-            //         const response = await agent.get(endpoint)
-            //         expect(response.status).toBeLessThan(429)
-            //     }
-
-            //     const lastResponse = await agent.get(endpoint)
-            //     expect(lastResponse.status).toBe(429)
-            // })
-
             it("GET BY ID", async () => {
                 const agent = request(app.getHttpServer())
 
@@ -330,21 +300,6 @@ describe('Throttle E2E', () => {
 
     describe("/place", () => {
         describe("120 REQUESTS MAXIMUM", () => {
-            // it("GET ALL", async () => {
-            //     const endpoint = "/place"
-            //     const agent = request(app.getHttpServer())
-
-            //     const limit = 120
-
-            //     for (let i = 0; i < limit; i++) {
-            //         const response = await agent.get(endpoint)
-            //         expect(response.status).toBeLessThan(429)
-            //     }
-
-            //     const lastResponse = await agent.get(endpoint)
-            //     expect(lastResponse.status).toBe(429)
-            // })
-
             it("GET BY ID", async () => {
                 const agent = request(app.getHttpServer())
 
@@ -374,21 +329,6 @@ describe('Throttle E2E', () => {
                 const lastResponse = await agent.get(endpoint)
                 expect(lastResponse.status).toBe(429)
             })
-
-            // it("DELETE", async () => {
-            //     const endpoint = "/place/1"
-            //     const agent = request(app.getHttpServer())
-
-            //     const limit = 120
-
-            //     for (let i = 0; i < limit; i++) {
-            //         const response = await agent.delete(endpoint)
-            //         expect(response.status).toBeLessThan(429)
-            //     }
-
-            //     const lastResponse = await agent.delete(endpoint)
-            //     expect(lastResponse.status).toBe(429)
-            // })
         })
 
         describe("60 REQUESTS MAXIMUM", () => {
@@ -409,58 +349,11 @@ describe('Throttle E2E', () => {
                 const lastResponse = await agent.post(endpoint).send(payload)
                 expect(lastResponse.status).toBe(429)
             })
-
-        //     it("PUT", async () => {
-        //         const endpoint = "/place/1"
-        //         const agent = request(app.getHttpServer())
-
-        //         const limit = 60
-
-        //         const payload = { name: "test name" }
-
-        //         for (let i = 0; i < limit; i++) {
-        //             const response = await agent.put(endpoint).send(payload)
-        //             expect(response.status).toBeLessThan(429)
-        //         }
-
-        //         const lastResponse = await agent.put(endpoint).send(payload)
-        //         expect(lastResponse.status).toBe(429)
-        //     })
         })
     })
 
     describe("/user", () => {
         describe("120 REQUESTS MAXIMUM", () => {
-            // it("GET ALL", async () => {
-            //     const endpoint = "/user"
-            //     const agent = request(app.getHttpServer())
-
-            //     const limit = 120
-
-            //     for (let i = 0; i < limit; i++) {
-            //         const response = await agent.get(endpoint)
-            //         expect(response.status).toBeLessThan(429)
-            //     }
-
-            //     const lastResponse = await agent.get(endpoint)
-            //     expect(lastResponse.status).toBe(429)
-            // })
-
-            // it("GET BY ID", async () => {
-            //     const agent = request(app.getHttpServer())
-
-            //     const endpoint = "/user/1"
-            //     const limit = 120
-
-            //     for (let i = 0; i < limit; i++) {
-            //         const response = await agent.get(endpoint)
-            //         expect(response.status).toBeLessThan(429)
-            //     }
-
-            //     const lastResponse = await agent.get(endpoint)
-            //     expect(lastResponse.status).toBe(429)                
-            // })
-
             it("DELETE", async () => {
                 const endpoint = "/user/1"
                 const agent = request(app.getHttpServer())

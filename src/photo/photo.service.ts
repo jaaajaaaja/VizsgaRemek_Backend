@@ -5,10 +5,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class PhotoService {
     constructor(private prisma: PrismaService) { }
 
-    // async getAll() {
-    //     return this.prisma.photo.findMany()
-    // }
-
     async getOne(id: number) {
         const photo = await this.prisma.photo.findUnique({
             where: { id },

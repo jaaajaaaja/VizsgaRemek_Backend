@@ -7,12 +7,6 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 export class CommentService {
   constructor(private prisma: PrismaService) { }
 
-  // async findAll() {
-  //   const comments = await this.prisma.comment.findMany()
-
-  //   return comments
-  // }
-
   async findOne(id: number) {
     const comment = await this.prisma.comment.findUnique({ where: { id } })
 

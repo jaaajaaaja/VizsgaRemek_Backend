@@ -66,17 +66,6 @@ describe('PlaceService', () => {
     expect(service).toBeDefined();
   })
 
-  // describe("getAll", () => {
-  //   it("should return all places", async () => {
-  //     mockPrismaService.place.findMany.mockResolvedValue(mockPlaces)
-
-  //     const result = await service.getAll()
-
-  //     expect(result).toEqual(mockPlaces)
-  //     expect(mockPrismaService.place.findMany).toHaveBeenCalledTimes(1)
-  //   })
-  // })
-
   describe("getOne", () => {
     it("should return a place by id", async () => {
       mockPrismaService.place.findUnique.mockResolvedValue(mockPlaces[0])
@@ -127,58 +116,6 @@ describe('PlaceService', () => {
       expect(result).toEqual(returnCategory)
     })
   })
-
-  // describe("add", () => {
-  //   it("should add a place", async () => {
-  //     mockPrismaService.place.create.mockResolvedValue(mockPlace)
-
-  //     const result = await service.add(mockPlace)
-
-  //     expect(result).toEqual(mockPlace)
-  //     expect(mockPrismaService.place.create).toHaveBeenCalledWith({ data: mockPlace })
-  //     expect(mockPrismaService.place.create).toHaveBeenCalledTimes(1)
-  //   })
-  // })
-
-  // describe("remove", () => {
-  //   it("should delete a place by id", async () => {
-  //     mockPrismaService.place.findUnique.mockResolvedValue(mockPlace)
-  //     mockPrismaService.place.delete.mockResolvedValue(mockPlace)
-
-  //     const result = await service.remove(1)
-
-  //     expect(result).toEqual(mockPlace)
-  //     expect(mockPrismaService.place.delete).toHaveBeenCalledWith({ where: { id: 1 } })
-  //   })
-
-  //   it("should throw NotFoundException when place does not exist", async () => {
-  //     mockPrismaService.place.findUnique.mockResolvedValue(null)
-  //     mockPrismaService.place.delete.mockResolvedValue(null)
-
-  //     await expect(service.remove(1)).rejects.toThrow(NotFoundException)
-  //     expect(mockPrismaService.place.delete).toHaveBeenCalledTimes(0)
-  //   })
-  // })
-
-  // describe("update", () => {
-  //   it("should update a place by id", async () => {
-  //     mockPrismaService.place.findUnique.mockResolvedValue(mockPlace)
-  //     mockPrismaService.place.update.mockResolvedValue(mockPlace)
-
-  //     const result = await service.update(1, mockPlace)
-
-  //     expect(result).toEqual(mockPlace)
-  //     expect(mockPrismaService.place.update).toHaveBeenCalledWith({ where: { id: 1 }, data: mockPlace })
-  //   })
-
-  //   it("should throw NotFoundException when place does not exist", async () => {
-  //     mockPrismaService.place.findUnique.mockResolvedValue(null)
-  //     mockPrismaService.place.update.mockResolvedValue(mockPlace)
-
-  //     await expect(service.update(1, mockPlace)).rejects.toThrow(NotFoundException)
-  //     expect(mockPrismaService.place.update).toHaveBeenCalledTimes(0)
-  //   })
-  // })
 
   describe("addNews", () => {
     it("should create a news post for a place", async () => {

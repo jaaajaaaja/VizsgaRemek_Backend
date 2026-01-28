@@ -68,17 +68,6 @@ describe('CommentController', () => {
     expect(controller).toBeDefined()
   })
 
-  // describe('getAll', () => {
-  //   it('should return all comments', async () => {
-  //     mockCommentService.findAll.mockResolvedValue(mockComments)
-
-  //     const result = await controller.getAll()
-
-  //     expect(result).toEqual(mockComments)
-  //     expect(service.findAll).toHaveBeenCalledTimes(1)
-  //   })
-  // })
-
   describe('getOne', () => {
     it('should return a comment by id', async () => {
       mockCommentService.findOne.mockResolvedValue(mockComment)

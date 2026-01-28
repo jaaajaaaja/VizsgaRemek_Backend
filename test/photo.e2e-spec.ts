@@ -42,10 +42,6 @@ describe('PhotoController E2E', () => {
         })
             .overrideProvider(PhotoService)
             .useValue(mockPhotoService)
-            // .overrideProvider(APP_GUARD)
-            // .useValue({
-            //     canActivate: () => true,
-            // })
             .compile()
 
         app = moduleFixture.createNestApplication()

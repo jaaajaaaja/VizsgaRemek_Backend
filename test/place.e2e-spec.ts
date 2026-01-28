@@ -33,15 +33,12 @@ describe("Places", () => {
     ]
 
     const mockPlaceService = {
-        // getAll: jest.fn(),
         getOne: jest.fn(),
         getOneByGoogleplaceID: jest.fn(),
-        // remove: jest.fn(),
         add: jest.fn(),
         addPlaceCategory: jest.fn(),
         addNews: jest.fn(),
         updateNews: jest.fn(),
-        // update: jest.fn()
     }
 
 
@@ -74,14 +71,6 @@ describe("Places", () => {
     })
 
     describe("/GET", () => {
-        // it("/GET all place", () => {
-        //     mockPlaceService.getAll.mockResolvedValue(mockPlace)
-
-        //     return request(app.getHttpServer())
-        //         .get("/place")
-        //         .expect(200)
-        //         .expect(mockPlace)
-        // })
 
         it("/GET place by id", () => {
             mockPlaceService.getOne.mockResolvedValue(mockPlace[0])
@@ -132,7 +121,6 @@ describe("Places", () => {
 
             return request(app.getHttpServer())
                 .post("/place/1/category")
-                // .set('Authorization', `Bearer ${token}`)
                 .send("bar")
                 .expect(201)
         })
@@ -149,60 +137,4 @@ describe("Places", () => {
                 .expect(mockPlace[0])
         })
     })
-
-    // describe("/DELETE", () => {
-    //     it("/DELETE place", () => {
-    //         mockPlaceService.remove.mockResolvedValue(mockPlace[0])
-
-    //         request(app.getHttpServer())
-    //             .delete("/place/1")
-    //             .expect(200)
-    //             .expect(mockPlace[0])
-
-    //         request(app.getHttpServer())
-    //             .get("/place/1")
-    //             .expect(404)
-    //     })
-
-    //     it("/DELETE place by not existing id", () => {
-    //         mockPlaceService.remove.mockRejectedValueOnce(NotFoundException)
-
-    //         request(app.getHttpServer())
-    //             .delete("/place/1")
-    //             .expect(200)
-    //             .expect(mockPlace[0])
-
-    //         request(app.getHttpServer())
-    //             .get("/place/1")
-    //             .expect(404)
-    //     })
-    // })
-
-    // describe("/PUT", () => {
-    //     it("/PUT place", () => {
-    //         mockPlaceService.update.mockResolvedValue(mockPlace[0])
-
-    //         request(app.getHttpServer())
-    //             .put("/place")
-    //             .expect(200)
-    //             .expect(mockPlace[0])
-    //     })
-
-    //     it("/PUT place by not existing id", () => {
-    //         mockPlaceService.update.mockRejectedValueOnce(NotFoundException)
-
-    //         request(app.getHttpServer())
-    //             .put("/place")
-    //             .expect(200)
-    //             .expect(mockPlace[0])
-    //     })
-
-    //     it("/PUT place by not acceptable value", () => {
-    //         mockPlaceService.update.mockRejectedValueOnce({"test": "test"})
-
-    //         request(app.getHttpServer())
-    //             .put("/place/1")
-    //             .expect(400)
-    //     })
-    // })
 })
