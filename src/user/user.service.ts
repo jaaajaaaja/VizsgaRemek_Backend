@@ -100,6 +100,64 @@ export class UserService {
         return recommendations
     }
 
+    async recommendByAge(loggedInUserId: number) {
+        if (!loggedInUserId) {
+            throw new UnauthorizedException('Log in first!');
+        }
+
+        const user = await this.prisma.user.findUnique({
+            where: { id: loggedInUserId },
+            select: { age: true }
+        })
+
+        if (!user) {
+            throw new NotFoundException('User not found!')
+        }
+
+        if (user.age == null) {
+            throw new NotFoundException('Please set your age!')
+        }
+
+        const places = await this.prisma.place.findMany({
+            where: {
+                comments: {
+                    some: {
+                        userID: { not: loggedInUserId },
+                        user: { age: { not: null } }
+                    }
+                }
+            },
+            include: {
+                comments: {
+                    where: {
+                        userID: { not: loggedInUserId },
+                        user: { age: { not: null } }
+                    },
+                    select: {
+                        user: { select: { age: true } }
+                    }
+                }
+            },
+            take: 5
+        })
+
+        if (!places.length) {
+            throw new NotFoundException('Not enough comments to recommend!')
+        }
+
+        places.sort((place1, place2) => {
+            const diffA = Math.min(
+                ...place1.comments.map(comment => Math.abs(comment.user.age! - user.age!))
+            )
+            const diffB = Math.min(
+                ...place2.comments.map(comment => Math.abs(comment.user.age! - user.age!))
+            )
+            return diffA - diffB
+        })
+
+        return places.map(({ comments, ...place }) => place)
+    }
+
     async addFriend(sentToUserId: number, loggedInUserId: number) {
         try {
             return this.prisma.pending_Friend_Request.create({
@@ -158,7 +216,7 @@ export class UserService {
             }
         })
 
-        if(!friends || friends.length === 0) {
+        if (!friends || friends.length === 0) {
             throw new NotFoundException("You do not have any friends yet!")
         }
 

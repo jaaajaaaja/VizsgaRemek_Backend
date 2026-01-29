@@ -19,6 +19,13 @@ export class UserController {
         return this.userService.recommendations(request["user"].sub)
     }
 
+    @Get('/recommendation/age')
+    @UseGuards(AuthGuard)
+    @SkipThrottle({ postput: true, place: true, login: true })
+    async recommendByAge(@Req() request: Request) {
+        return this.userService.recommendByAge(request["user"].sub)
+    }
+
     @Post()
     @SkipThrottle({ basic: true, place: true, login: true })
     async add(@Body() body: CreateUserDto) {

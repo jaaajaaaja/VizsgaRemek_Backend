@@ -55,7 +55,8 @@ describe('UserService', () => {
       create: jest.fn(),
       delete: jest.fn(),
       update: jest.fn(),
-      findMany: jest.fn()
+      findMany: jest.fn(),
+      findFirst: jest.fn(),
     },
     place_Category: {
       findMany: jest.fn(),
@@ -72,6 +73,9 @@ describe('UserService', () => {
       create: jest.fn(),
       delete: jest.fn(),
       findFirst: jest.fn(),
+    },
+    place: {
+      findMany: jest.fn(),
     }
   }
 
@@ -334,6 +338,41 @@ describe('UserService', () => {
 
       await expect(service.friendlist(1)).rejects.toThrow(NotFoundException)
       expect(mockPrismaService.user_Friend.findMany).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('recommendByAge', () => {
+    it("should return places sorted by closest commenter age", async () => {
+      const mockUserWithAge = { id: 1, age: 30 }
+      const mockPlaces = [
+        {
+          id: 1,
+          googleplaceID: "place1",
+          name: "Place 1",
+          address: "Address 1",
+          comments: [
+            { user: { age: 50 } },
+            { user: { age: 28 } }
+          ]
+        },
+        {
+          id: 2,
+          googleplaceID: "place2",
+          name: "Place 2",
+          address: "Address 2",
+          comments: [
+            { user: { age: 31 } }
+          ]
+        }
+      ]
+
+      mockPrismaService.user.findFirst.mockResolvedValue(mockUserWithAge)
+      mockPrismaService.place.findMany.mockResolvedValue(mockPlaces)
+
+      const result = await service.recommendByAge(1)
+
+      expect(result[0].id).toBe(2)
+      expect(result[1].id).toBe(1)
     })
   })
 })

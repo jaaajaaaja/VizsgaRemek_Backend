@@ -8,21 +8,10 @@ const GOOGLE_PLACE_CATEGORIES = [
     'bar',
     'pub',
     'nightclub',
-    //'cocktail_bar',
     'dance_club',
-    //'beer_bar',
     'wine_bar',
     'karaoke',
-    //'lounge',
-    //'sports_bar',
-    //'dive_bar',
-    //'beer_garden',
-    //'tavern',
-    //'live_music_venue',
     'bowling_alley',
-    //'billiard_hall',
-    //'brewery',
-    //'distillery'
 ]
 
 async function main() {
@@ -37,6 +26,7 @@ async function main() {
         userName: faker.internet.username(),
         email: faker.internet.email(),
         password: defaultPassword,
+        age: faker.number.int({ min: 18, max: 80 }),
     }))
 
     await prisma.user.create({
@@ -44,6 +34,7 @@ async function main() {
             userName: "test",
             email: "test@test.test",
             password: defaultPassword,
+            age: 25,
         }
     })
 
@@ -57,12 +48,21 @@ async function main() {
 
     //USER_INTEREST
 
-    const userInterestData = users.flatMap(user =>
-        faker.helpers.arrayElements(GOOGLE_PLACE_CATEGORIES, { min: 0, max: 3 }).map(interest => ({
-            interest,
-            userID: user.id == 1 ? faker.number.int({ min: 2, max: 20 }) : user.id
-        }))
-    )
+    const userInterestData: any = []
+
+    for (const user of users) {
+        const interests = faker.helpers.arrayElements(
+            GOOGLE_PLACE_CATEGORIES,
+            { min: 0, max: 3 }
+        )
+
+        for (const interest of interests) {
+            userInterestData.push({
+                interest,
+                userID: user.id
+            })
+        }
+    }
 
     await prisma.user_Interest.create({
         data: {
@@ -114,17 +114,24 @@ async function main() {
 
     //PLACE_CATEGORY
 
-    const placeCategoryData = places.flatMap(place =>
-        faker.helpers
-            .arrayElements(
-                GOOGLE_PLACE_CATEGORIES,
-                faker.number.int({ min: 1, max: 3 })
-            )
-            .map(category => ({
+    const placeCategoryData: any[] = []
+
+    for (const place of places) {
+        const categories = faker.helpers.arrayElements(
+            GOOGLE_PLACE_CATEGORIES,
+            faker.number.int({ min: 1, max: 3 })
+        )
+
+        for (const category of categories) {
+            placeCategoryData.push({
                 category,
-                placeID: place.id == 1 ? faker.number.int({ min: 2, max: 20 }) : place.id,
-            }))
-    )
+                placeID:
+                    place.id === 1
+                        ? faker.number.int({ min: 2, max: 20 })
+                        : place.id
+            })
+        }
+    }
 
     await prisma.place_Category.create({
         data: {
@@ -203,6 +210,72 @@ async function main() {
 
     const photos = await prisma.photo.findMany()
     console.log("Photos in database:", photos.length)
+
+    //USER_FRIEND
+
+    const userFriendData: any = []
+
+    for (let i = 0; i < users.length - 1; i++) {
+        const user = users[i]
+        const nextUser = users[i + 1]
+
+        userFriendData.push({
+            userID: user.id,
+            friendID: nextUser.id
+        })
+    }
+
+    await prisma.user_Friend.createMany({
+        data: userFriendData,
+        skipDuplicates: true,
+    })
+
+    const userFriends = await prisma.user_Friend.findMany()
+    console.log("User Friends in database:", userFriends.length)
+
+    //PENDING_FRIEND_REQUEST
+
+    const pendingFriendRequestData: any = []
+
+    const sliceEnd = Math.min(6, users.length - 3)
+    for (let i = 1; i < sliceEnd; i++) {
+        const user = users[i]
+        const friend = users[i + 2]
+
+        if (user.id !== friend.id) {
+            pendingFriendRequestData.push({
+                userID: user.id,
+                friendID: friend.id
+            })
+        }
+    }
+
+    const pendingFriendRequests = await prisma.pending_Friend_Request.findMany()
+    console.log("Pending Friend Requests in database:", pendingFriendRequests.length)
+
+    //NEWS
+
+    const newsData = Array.from({ length: 30 }, () => ({
+        text: faker.lorem.paragraphs({ min: 1, max: 3 }),
+        placeID: faker.helpers.arrayElement(places).id,
+        userID: faker.helpers.arrayElement(users).id,
+    }))
+
+    const testNews = await prisma.news.create({
+        data: {
+            text: "This is a test news post for a place.",
+            placeID: testPlace.id,
+            userID: testUser ? testUser.id : 1,
+        },
+    })
+
+    await prisma.news.createMany({
+        data: newsData,
+        skipDuplicates: true,
+    })
+
+    const news = await prisma.news.findMany()
+    console.log("News in database:", news.length)
 
     console.log("\nSeed complete!\n")
 }
