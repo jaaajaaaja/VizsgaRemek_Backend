@@ -1,5 +1,5 @@
 import { Transform, TransformFnParams } from "class-transformer";
-import { IsNotEmpty, IsNumber, IsOptional, IsString, Max, MaxLength, Min, MinLength } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Max, MaxLength, Min, MinLength, NotContains } from "class-validator";
 import sanitizeHtml from 'sanitize-html';
 
 export class CreateCommentDto {
@@ -7,16 +7,21 @@ export class CreateCommentDto {
     @IsString()
     @MinLength(1)
     @MaxLength(200)
-    @Transform((params: TransformFnParams) => sanitizeHtml(params.value))
-    commentText:string
+    @Transform((params: TransformFnParams) =>
+        sanitizeHtml(
+            params.value,
+            { allowedAttributes: {}, allowedTags: [] }
+        )
+    )
+    commentText: string
 
     @IsOptional()
     @IsNumber()
     @Min(1)
     @Max(5)
-    rating:number
+    rating: number
 
     @IsNotEmpty()
     @IsNumber()
-    placeID:number
+    placeID: number
 }

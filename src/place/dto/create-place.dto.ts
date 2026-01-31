@@ -4,16 +4,31 @@ import sanitizeHtml from 'sanitize-html'
 
 export class CreatePlaceDto {
     @IsString()
-    @Transform((params: TransformFnParams) => sanitizeHtml(params.value))
-    googleplaceID:string
+    @Transform((params: TransformFnParams) =>
+        sanitizeHtml(
+            params.value,
+            { allowedAttributes: {}, allowedTags: [] }
+        )
+    )
+    googleplaceID: string
 
     @IsNotEmpty()
     @IsString()
-    @Transform((params: TransformFnParams) => sanitizeHtml(params.value))
-    name:string
+    @Transform((params: TransformFnParams) =>
+        sanitizeHtml(
+            params.value,
+            { allowedAttributes: {}, allowedTags: [] }
+        )
+    )
+    name: string
 
     @IsNotEmpty()
     @IsString()
-    @Transform((params: TransformFnParams) => sanitizeHtml(params.value))
-    address:string
+    @Transform((params: TransformFnParams) =>
+        sanitizeHtml(
+            params.value,
+            { allowedAttributes: {}, allowedTags: [] }
+        )
+    )
+    address: string
 }

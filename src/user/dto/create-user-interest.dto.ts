@@ -5,7 +5,12 @@ import sanitizeHtml from 'sanitize-html';
 export class CreateUserInterestDto {
     @IsNotEmpty()
     @IsString()
-    @IsIn( ['bar', 'pub', 'nightclub', 'dance_club', 'wine_bar', 'karaoke', 'bowling_alley'] )
-    @Transform((params: TransformFnParams) => sanitizeHtml(params.value))
+    @IsIn(['bar', 'pub', 'nightclub', 'dance_club', 'wine_bar', 'karaoke', 'bowling_alley'])
+    @Transform((params: TransformFnParams) =>
+        sanitizeHtml(
+            params.value,
+            { allowedAttributes: {}, allowedTags: [] }
+        )
+    )
     interest: string
 }

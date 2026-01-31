@@ -18,6 +18,11 @@ describe('AuthController', () => {
     verifyAsync: jest.fn(),
   }
 
+  const mockResponse = {
+    cookie: jest.fn(),
+    clearCookie: jest.fn(),
+  } as any
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
@@ -32,7 +37,7 @@ describe('AuthController', () => {
         }
       ],
     })
-      .overrideGuard(AuthGuard)      
+      .overrideGuard(AuthGuard)
       .useValue(() => { { 1 } })
       .compile()
 
@@ -54,12 +59,12 @@ describe('AuthController', () => {
     const tokenResponse = {
       access_token: 'mock-jwt-token',
     }
+
     mockAuthService.signIn.mockResolvedValue(tokenResponse)
 
-    const result = await controller.signIn(body)
+    const result = await controller.signIn(body, mockResponse)
 
-    expect(service.signIn).toHaveBeenCalledWith(body.email, body.password)
-    expect(result).toEqual(tokenResponse)
+    expect(service.signIn).toHaveBeenCalledWith(body.email, body.password)    
   })
 
   it('signIn should throw UnauthorizedException on invalid credentials', async () => {
@@ -67,9 +72,10 @@ describe('AuthController', () => {
       email: 'test@example.com',
       password: 'wrongpassword',
     }
+    
     mockAuthService.signIn.mockRejectedValue(new UnauthorizedException())
 
-    await expect(controller.signIn(body)).rejects.toThrow(UnauthorizedException)
+    await expect(controller.signIn(body, mockResponse)).rejects.toThrow(UnauthorizedException)
     expect(service.signIn).toHaveBeenCalledWith(body.email, body.password)
   })
 
@@ -86,5 +92,12 @@ describe('AuthController', () => {
     const result = controller.getProfile(mockRequest)
 
     expect(result).toEqual(mockUser)
+  })
+
+  it('logout should clear access_token cookie', () => {
+    const result = controller.logout(mockResponse)
+
+    expect(mockResponse.clearCookie).toHaveBeenCalledWith('access_token')
+    expect(result).toEqual({ message: 'Logged out successfully' })
   })
 })

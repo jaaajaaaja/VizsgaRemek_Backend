@@ -6,6 +6,11 @@ export class CreatePlaceCategoryDto {
     @IsNotEmpty()
     @IsString()
     @IsIn(['bar', 'pub', 'nightclub', 'dance_club', 'wine_bar', 'karaoke', 'bowling_alley'])
-    @Transform((params: TransformFnParams) => sanitizeHtml(params.value))
+    @Transform((params: TransformFnParams) =>
+        sanitizeHtml(
+            params.value,
+            { allowedAttributes: {}, allowedTags: [] }
+        )
+    )
     category: string
 }

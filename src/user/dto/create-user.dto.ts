@@ -5,18 +5,22 @@ import sanitizeHtml from 'sanitize-html';
 export class CreateUserDto {
     @IsNotEmpty()
     @IsString()
-    @Transform((params: TransformFnParams) => sanitizeHtml(params.value))
-    userName:string
+    @Transform((params: TransformFnParams) =>
+        sanitizeHtml(
+            params.value,
+            { allowedAttributes: {}, allowedTags: [] }
+        )
+    )
+    userName: string
 
     @IsNotEmpty()
     @IsEmail()
-    @Transform((params: TransformFnParams) => sanitizeHtml(params.value))
-    email:string
+    email: string
 
     @IsNotEmpty()
     @IsString()
     @MinLength(8)
-    password:string
+    password: string
 
     @IsOptional()
     @IsNumber()

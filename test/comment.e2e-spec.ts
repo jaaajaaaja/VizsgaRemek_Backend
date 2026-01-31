@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { JwtService } from '@nestjs/jwt';
@@ -33,6 +33,7 @@ describe('CommentController E2E', () => {
             .compile()
 
         app = moduleFixture.createNestApplication()
+        app.useGlobalPipes(new ValidationPipe({ transform: true }))
         await app.init()
 
         jwtService = moduleFixture.get(JwtService)
@@ -100,5 +101,16 @@ describe('CommentController E2E', () => {
                 .set('Authorization', `Bearer ${invalid_token}`)
                 .expect(401)
         })
-    })    
+    })
+
+    describe("sanitize", () => {
+        it("should throw bad request", async () => {
+            const response = await request(app.getHttpServer())
+                .post('/comment')
+                .set('Authorization', `Bearer ${token}`)
+                .send({ commentText: "<a><script> sdfsdf</script></a>", placeID: 1 })
+
+            expect(response.status).toBe(400)
+        })
+    })
 })
