@@ -41,7 +41,7 @@ export class PhotoController {
     @Post('/upload')
     @UseGuards(AuthGuard)
     @SkipThrottle({ basic: true, place: true, login: true })
-    @Throttle({postput: { ttl: 60000, limit: 5 }})
+    @Throttle({ postput: { ttl: 60000, limit: 5 } })
     @UseInterceptors(FilesInterceptor("file", 3, {
         storage: diskStorage({
             destination: "./uploads",
@@ -57,9 +57,10 @@ export class PhotoController {
                 return callback(new BadRequestException("userID and placeID are required!"), false)
             }
 
-            if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+            if (!file.mimetype.startsWith("image")) {
                 return callback(new BadRequestException("Only allowed file types are accepted!"), false)
             }
+
             callback(null, true)
         }
     }))

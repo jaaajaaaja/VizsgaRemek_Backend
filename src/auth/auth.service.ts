@@ -11,7 +11,7 @@ export class AuthService {
         const user = await this.userService.findOne(email)
 
         if (!user) {
-            throw new NotFoundException()
+            throw new NotFoundException("Invalid email or password!")
         }
 
         const isPasswordValid = await bcrypt.compare(pass, user.password)
