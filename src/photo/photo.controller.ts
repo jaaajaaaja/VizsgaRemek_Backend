@@ -6,6 +6,7 @@ import { extname } from 'path';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { CreatePhotoDto } from './dto/create-photo.dto';
+import { fileTypeFromBuffer } from 'file-type';
 
 @Controller('photo')
 export class PhotoController {
@@ -51,13 +52,14 @@ export class PhotoController {
             }
         }),
         limits: { fileSize: 2 * 1024 * 1024 }, // 2 MB
-        fileFilter: (req, file, callback) => {
+        fileFilter: async (req, file, callback) => {
             const body = req.body
             if (!body.userID || !body.placeID) {
                 return callback(new BadRequestException("userID and placeID are required!"), false)
             }
 
-            if (!file.mimetype.startsWith("image")) {
+            const fileType = await fileTypeFromBuffer(file.buffer)
+            if (!fileType || !fileType.mime.startsWith("image")) {
                 return callback(new BadRequestException("Only allowed file types are accepted!"), false)
             }
 

@@ -8,8 +8,6 @@ import { CommentService } from 'src/comment/comment.service';
 import { PhotoService } from 'src/photo/photo.service';
 import { UserService } from 'src/user/user.service';
 
-jest.setTimeout(30000)
-
 describe('Throttle E2E', () => {
     let app: INestApplication
 
@@ -80,7 +78,7 @@ describe('Throttle E2E', () => {
     })
 
     describe("/auth", () => {
-        describe("3 REQUESTS MAXIMUM", () => {
+        describe("3 REQUESTS MAX", () => {
             it("POST LOGIN", async () => {
                 const endpoint = "/auth/login"
                 const agent = request(app.getHttpServer())
@@ -261,7 +259,7 @@ describe('Throttle E2E', () => {
             })
         })
 
-        describe("60 REQUESTS MAXIMUM", () => {
+        describe("60 REQUESTS MAX", () => {
             it("POST", async () => {
                 const endpoint = "/comment"
                 const agent = request(app.getHttpServer())
@@ -299,7 +297,7 @@ describe('Throttle E2E', () => {
     })
 
     describe("/place", () => {
-        describe("120 REQUESTS MAXIMUM", () => {
+        describe("120 REQUESTS MAX", () => {
             it("GET BY ID", async () => {
                 const agent = request(app.getHttpServer())
 
@@ -331,7 +329,7 @@ describe('Throttle E2E', () => {
             })
         })
 
-        describe("60 REQUESTS MAXIMUM", () => {
+        describe("60 REQUESTS MAX", () => {
             it("POST", async () => {
                 const endpoint = "/place"
                 const agent = request(app.getHttpServer())
@@ -353,7 +351,7 @@ describe('Throttle E2E', () => {
     })
 
     describe("/user", () => {
-        describe("120 REQUESTS MAXIMUM", () => {
+        describe("120 REQUESTS MAX", () => {
             it("DELETE", async () => {
                 const endpoint = "/user/1"
                 const agent = request(app.getHttpServer())
@@ -370,7 +368,7 @@ describe('Throttle E2E', () => {
             })
         })
 
-        describe("60 REQUESTS MAXIMUM", () => {
+        describe("60 REQUESTS MAX", () => {
             it("POST", async () => {
                 const endpoint = "/user"
                 const agent = request(app.getHttpServer())
