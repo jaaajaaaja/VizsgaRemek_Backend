@@ -10,6 +10,10 @@ import { UpdateNewsDto } from './dto/update-news.dto';
 export class PlaceService {
     constructor(private prisma: PrismaService) { }
 
+    async getAll() {
+        return this.prisma.place.findMany()
+    }
+
     async getOne(id: number) {
         const place = await this.prisma.place.findUnique({ where: { id } })
 
