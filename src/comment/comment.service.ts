@@ -15,7 +15,7 @@ export class CommentService {
     }
 
     if (!comment.approved) {
-      return "This comment is waiting for approval!"
+      throw new ForbiddenException("This comment is waiting for approval!")
     }
 
     return comment
@@ -23,7 +23,16 @@ export class CommentService {
 
   async findAllByUser(userID: number) {
     const comments = await this.prisma.comment.findMany({
-      where: { id: userID, approved: true }
+      where: { userID: userID, approved: true },
+      select: {
+        id: true,
+        commentText: true,
+        rating: true,
+        createdAt: true,
+        updatedAt: true,
+        userID: true,
+        placeID: true,
+      }
     })
 
     if (comments.length === 0) {
@@ -34,6 +43,12 @@ export class CommentService {
   }
 
   async findAllByPlace(placeID: number) {
+    const place = await this.prisma.place.findFirst({ where: { id: placeID } })
+
+    if (!place) {
+      throw new ForbiddenException("Place not found!")
+    }
+
     const comments = await this.prisma.comment.findMany({
       where: { placeID: placeID, approved: true },
     })
@@ -46,7 +61,6 @@ export class CommentService {
   }
 
   async add(data: CreateCommentDto, loggedInUserId: number) {
-
     const place = await this.prisma.place.findUnique({ where: { id: data.placeID } })
 
     if (!place) {
@@ -85,7 +99,7 @@ export class CommentService {
     }
 
     if (comment.userID != loggedInUserId) {
-      throw new UnauthorizedException("You can only edit your own comments!")
+      throw new ForbiddenException("You can only edit your own comments!")
     }
 
     const fullData = {

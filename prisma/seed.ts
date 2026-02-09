@@ -163,6 +163,7 @@ async function main() {
         rating: faker.number.int({ min: 1, max: 5 }),
         userID: faker.helpers.arrayElement(users).id,
         placeID: faker.helpers.arrayElement(places).id,
+        
     }))
 
     const testUser = await prisma.user.findUnique({ where: { email: "test@test.test" } })
@@ -172,6 +173,17 @@ async function main() {
             rating: 5,
             userID: testUser ? testUser.id : 1,
             placeID: testPlace.id,
+            approved: true
+        },
+    })
+
+    await prisma.comment.create({
+        data: {
+            commentText: "This is another test comment.",
+            rating: 5,
+            userID: testUser ? testUser.id : 1,
+            placeID: testPlace.id,
+            approved: true
         },
     })
 

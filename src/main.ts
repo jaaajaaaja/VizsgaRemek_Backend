@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { ValidationPipe } from '@nestjs/common';
 import * as express from 'express';
 import cookieParser from 'cookie-parser';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(
@@ -20,6 +21,20 @@ async function bootstrap() {
     optionsSuccessStatus: 204,
     credentials: true,
   })
+
+  const config = new DocumentBuilder()
+    .setTitle("Barsonar API")
+    .setDescription("Barsonar Backend NestJS + Prisma + Swagger")
+    .setVersion("1.0.0")
+    // .addTag("comment")
+    // .addTag("photo")
+    // .addTag("place")
+    // .addTag("user")
+    // .addCookieAuth("cookie auth")
+    .build()
+
+  const document = SwaggerModule.createDocument(app, config)
+  SwaggerModule.setup("api", app, document)
 
   app.useGlobalPipes(new ValidationPipe());
 
