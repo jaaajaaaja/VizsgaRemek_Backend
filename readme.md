@@ -76,7 +76,8 @@ Nevezd át a projekt gyökerében lévő `.env.example` fájlt `.env`-re és ál
 
 ```env
 DATABASE_URL="mysql://felhasznalonev:jelszo@localhost:3306/adatbazis_neve"
-JWT_SECRET="titkos_kulcs_ide"
+JWT_SECRET=titkos_kulcs_ide
+COOKIE_SECRET=másik_titkos_kulcs_ide
 PORT=[számmal add meg a portot amelyen szeretnéd hogy fusson a backend]
 ```
 
@@ -84,7 +85,7 @@ Megjegyzés:
 
 Ha nem állítottál be külön felhasználót és annak egy jelszót az adatbázisban, akkor a felhasználó `root` lesz, a jelszót pedig üresen kell hagyni és a kettőspontot kitörölni.
 
-A `JWT_SECRET` pedig egy erős, véletlenszerű karakterlánc legyen ha publikálni akarod a weboldalt. Éles környezetben használj legalább 32 karakter hosszú stringet.
+A `JWT_SECRET` és a `COOKIE_SECRET` pedig erős, véletlenszerű karakterláncok legyenek ha publikálni akarod a weboldalt. Éles környezetben használj legalább 32 karakter hosszú stringet.
 
 ### 3. Adatbázis beállítása
 
@@ -102,15 +103,15 @@ Az adatbázis a következő táblákat tartalmazza:
 
 ```ts
 User {
-  id: number
-  userName: string
-  email: string
+  id: number,
+  userName: string,
+  email: string,
   password: string
 }
 
 User_Interest {
-  id: number
-  interest: string
+  id: number,
+  interest: string,
   userID: number
 }
 
@@ -127,25 +128,25 @@ Pending_Friend_Request {
 }
 
 Place {
-  id: number
-  googlePlaceID: string
-  name: string
+  id: number,
+  googlePlaceID: string,
+  name: string,
   address: string
 }
 
 Place_Category {
-  id: number
-  category: string
+  id: number,
+  category: string,
   placeID: number
 }
 
 Comment {
-  id: number
-  commentText: string
-  rating: number
-  createdAt: Date
-  updatedAt: Date
-  userID: number
+  id: number,
+  commentText: string,
+  rating: number,
+  createdAt: Date,
+  updatedAt: Date,
+  userID: number,
   placeID: number
 }
 
@@ -158,10 +159,10 @@ News {
 }
 
 Photo {
-  id: number
-  location: string
-  type: string
-  userID: number
+  id: number,
+  location: string,
+  type: string,
+  userID: number,
   placeID: number
 }
 ```
