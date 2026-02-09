@@ -14,7 +14,7 @@
   - [Kapcsolatok](#kapcsolatok)
 - [Adatbázis seedelése](#adatbázis-seedelése)
 - [Futtatás](#futtatás)
-  - [A feltöltött képek elérése:](#a-feltöltött-képek-elérése)
+  - [A feltöltött képek elérése](#a-feltöltött-képek-elérése)
 - [Tesztelés](#tesztelés)
   - [Unit tesztek](#unit-tesztek)
   - [E2E tesztek](#e2e-tesztek)
@@ -82,7 +82,7 @@ PORT=[számmal add meg a portot amelyen szeretnéd hogy fusson a backend]
 
 Megjegyzés:  
 
-Ha nem állítottál be külön felhasználót és annak egy jelszót az adatbázisban, akkor a felhasználó `root` lesz, a jelszót pedig üresen kell hagyni, de a kettőspontnak benne kell maradnia.
+Ha nem állítottál be külön felhasználót és annak egy jelszót az adatbázisban, akkor a felhasználó `root` lesz, a jelszót pedig üresen kell hagyni és a kettőspontot kitörölni.
 
 A `JWT_SECRET` pedig egy erős, véletlenszerű karakterlánc legyen ha publikálni akarod a weboldalt. Éles környezetben használj legalább 32 karakter hosszú stringet.
 
@@ -114,6 +114,18 @@ User_Interest {
   userID: number
 }
 
+User_Friend {
+  id: number,
+  userID: number,
+  friendID: number
+}
+
+Pending_Friend_Request {
+  id: number,
+  userID: number,
+  friendID: number
+}
+
 Place {
   id: number
   googlePlaceID: string
@@ -137,6 +149,14 @@ Comment {
   placeID: number
 }
 
+News {
+  id: number,
+  text: string,
+  placeID: number,
+  userID: number,
+  approved: boolean
+}
+
 Photo {
   id: number
   location: string
@@ -148,12 +168,13 @@ Photo {
 
 ### Kapcsolatok
 
-- Egy felhasználó több kommentet és fotót hozhat létre
+- Egy felhasználó több kommentet, hírt és fotót hozhat létre
   - opcionálisan állíthat be hely kategóriákat, ami érdekli, hogy később kaphasson hely ajánlásokat
-- Egy helyhez több kategória, komment és fotó tartozhat
-- Kommentek vagy fotók törlésekor a kapcsolódó felhasználó és hely nem törlődik
-- Ha törlünk egy felhasználót vagy egy helyet, akkor törlődik az összes hozzá tartozó fotó és komment
-  - felhasználó törlése esetén törlődnek a hozzá tartozó érdekeltségek is
+- Egy felhasználónak több barátja lehet
+- Egy helyhez több kategória, komment, hír és fotó tartozhat
+- Kommentek, hírek vagy fotók törlésekor a kapcsolódó felhasználó és hely nem törlődik
+- Ha törlünk egy felhasználót vagy egy helyet, akkor törlődik az összes hozzá tartozó fotó, hír, és komment
+  - felhasználó törlése esetén törlődnek a hozzá tartozó érdekeltségek és kitörli barátlistából is
   - hely törlése esetén törlődnek a hozzá tartozó kategóriák is
 
 ---
@@ -179,7 +200,7 @@ A szerver a `http://localhost:3000` címen lesz elérhető (vagy a `PORT` körny
 
 ---
 
-### A feltöltött képek elérése:
+### A feltöltött képek elérése
 
 ```
 http://localhost:3000/uploads/<fájlnév>
