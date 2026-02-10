@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -19,11 +19,11 @@ export class PhotoService {
         })
 
         if (!photo) {
-            throw new NotFoundException("Photo not found!")
+            throw new NotFoundException("Image not found!")
         }
 
         if (!photo.approved) {
-            return "This image is waiting for approval!"
+            throw new ForbiddenException("This image is waiting for approval!")
         }
 
         return {
@@ -48,7 +48,7 @@ export class PhotoService {
         })
 
         if (!allByUser) {
-            throw new NotFoundException("User did not upload any photos!")
+            throw new NotFoundException("User did not upload any images!")
         }
 
         return allByUser
@@ -67,7 +67,7 @@ export class PhotoService {
         })
 
         if (!allByPlace) {
-            throw new NotFoundException("Place does not have any photos!")
+            throw new NotFoundException("Place does not have any images!")
         }
 
         return allByPlace
@@ -105,11 +105,11 @@ export class PhotoService {
         const photo = await this.prisma.photo.findUnique({ where: { id } })
 
         if (!photo) {
-            throw new NotFoundException("Photo not found!")
+            throw new NotFoundException("Image not found!")
         }
 
         if (photo.userID != loggedInUserId) {
-            throw new UnauthorizedException("You can only delete your own photos!")
+            throw new ForbiddenException("You can only delete your own photos!")
         }
 
         return this.prisma.photo.delete({ where: { id } })
