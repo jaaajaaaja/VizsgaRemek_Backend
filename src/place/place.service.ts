@@ -11,7 +11,13 @@ export class PlaceService {
     constructor(private prisma: PrismaService) { }
 
     async getAll() {
-        return this.prisma.place.findMany()
+        const places = await this.prisma.place.findMany()
+
+        if (!places) {
+            throw new NotFoundException("No places in database!")
+        }
+
+        return places
     }
 
     async getOne(id: number) {
@@ -47,7 +53,7 @@ export class PlaceService {
 
             return this.prisma.place_Category.create({ data: fullData })
         } catch (e) {
-            throw new ForbiddenException("Place already has this category")
+            throw new ForbiddenException("Place already has this category!")
         }
     }
 
@@ -74,12 +80,12 @@ export class PlaceService {
     async updateNews(id: number, body: UpdateNewsDto, loggedInUserId: number) {
         const news = await this.prisma.news.findFirst({ where: { id } })
 
-        if(!news) {
+        if (!news) {
             throw new NotFoundException("News not found!")
         }
 
-        if(news.userID != loggedInUserId) {
-            throw new UnauthorizedException("You can only edit your own news!")
+        if (news.userID != loggedInUserId) {
+            throw new ForbiddenException("You can only edit your own news!")
         }
 
         if (!loggedInUserId) {
@@ -91,6 +97,6 @@ export class PlaceService {
             approved: false
         }
 
-        this.prisma.news.update({ where: { id }, data: fullData })
+        return this.prisma.news.update({ where: { id }, data: fullData })
     }
 }

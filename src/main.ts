@@ -26,11 +26,6 @@ async function bootstrap() {
     .setTitle("Barsonar API")
     .setDescription("Barsonar Backend NestJS + Prisma + Swagger")
     .setVersion("1.0.0")
-    // .addTag("comment")
-    // .addTag("photo")
-    // .addTag("place")
-    // .addTag("user")
-    // .addCookieAuth("cookie auth")
     .build()
 
   const document = SwaggerModule.createDocument(app, config)

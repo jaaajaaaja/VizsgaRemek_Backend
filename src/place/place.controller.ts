@@ -18,28 +18,114 @@ import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { CreatePlaceCategoryDto } from './dto/create-place-category.dto';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
+import { ApiCookieAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 @Controller('place')
 export class PlaceController {
-  constructor(private placeService: PlaceService) {}
+  constructor(private placeService: PlaceService) { }
 
+  @ApiOperation({ summary: "Visszaadja az összes helyet" })
+  @ApiOkResponse({
+    description: "Visszaadja az összes helyet az adatbázisban, ha van",
+    schema: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          id: { type: "number", example: 1 },
+          googleplaceID: { type: "string", example: "PELDA123ID" },
+          name: { type: "string", example: "Hely neve" },
+          address: { type: "string", example: "Példa u. 123" }
+        }
+      }
+    }
+  })
+  @ApiNotFoundResponse({
+    description: "Nincs hely felvéve az adatbázisba",
+    schema: {
+      type: "object",
+      properties: {
+        message: { type: "string", example: "No places in database!" }
+      }
+    }
+  })
   @Get()
   findAll() {
     return this.placeService.getAll();
   }
 
+  @ApiOperation({ summary: "Visszad egy helyet id alapján" })
+  @ApiParam({ name: "id", description: "place id" })
+  @ApiOkResponse({
+    description: "Visszad egy helyet",
+    schema: {
+      type: "object",
+      properties: {
+        id: { type: "number", example: 1 },
+        googleplaceID: { type: "string", example: "PELDA123ID" },
+        name: { type: "string", example: "Hely neve" },
+        address: { type: "string", example: "Példa u. 123" }
+      }
+    }
+  })
+  @ApiNotFoundResponse({
+    description: "Nem létezik a hely amit le akarunk kérni",
+    schema: {
+      type: "object",
+      properties: {
+        message: { type: "string", example: "Place not found!" }
+      }
+    }
+  })
   @Get(':id')
   @SkipThrottle({ postput: true, place: true, login: true })
   async getOne(@Param('id', ParseIntPipe) id: number) {
     return this.placeService.getOne(id);
   }
 
+  @ApiOperation({ summary: "Visszad egy helyet google place id alapján" })
+  @ApiParam({ name: "googleplaceID", description: "googleplace id" })
+  @ApiOkResponse({
+    description: "Visszad egy helyet",
+    schema: {
+      type: "object",
+      properties: {
+        id: { type: "number", example: 1 },
+        googleplaceID: { type: "string", example: "PELDA123ID" },
+        name: { type: "string", example: "Hely neve" },
+        address: { type: "string", example: "Példa u. 123" }
+      }
+    }
+  })
+  @ApiNotFoundResponse({
+    description: "Nem létezik a hely amit le akarunk kérni",
+    schema: {
+      type: "object",
+      properties: {
+        message: { type: "string", example: "Place not found!" }
+      }
+    }
+  })
   @Get('/getByGooglePlaceId/:googleplaceID')
   @SkipThrottle({ postput: true, place: true, login: true })
   async getOneByGooglePlaceId(@Param('googleplaceID') googleplaceID: string) {
     return this.placeService.getOneByGoogleplaceID(googleplaceID);
   }
 
+  @ApiOperation({ summary: "Létrehoz egy helyet" })
+  @ApiCookieAuth()
+  @ApiCreatedResponse({
+    description: "Létrehozza a helyet",
+    schema: {
+      type: "object",
+      properties: {
+        id: { type: "number", example: 1 },
+        googleplaceID: { type: "string", example: "PELDA123ID" },
+        name: { type: "string", example: "Hely neve" },
+        address: { type: "string", example: "Példa u. 123" }
+      }
+    }
+  })
   @Post()
   @UseGuards(AuthGuard)
   @SkipThrottle({ basic: true, place: true, login: true })
@@ -48,6 +134,29 @@ export class PlaceController {
     return this.placeService.add(body);
   }
 
+  @ApiOperation({ summary: "Létrehoz egy hely kategóriákat" })
+  @ApiCookieAuth()
+  @ApiParam({ name: "placeID", description: "place id" })
+  @ApiCreatedResponse({
+    description: "Létrehozza a helyhez tartozó kategóriákat",
+    schema: {
+      type: "object",
+      properties: {
+        id: { type: "number", example: 1 },
+        category: { type: "string", example: "bar" },
+        placeID: { type: "number", example: 1 }
+      }
+    }
+  })
+  @ApiForbiddenResponse({
+    description: "A helynek már fel van véve ez a kategória",
+    schema: {
+      type: "object",
+      properties: {
+        message: { type: "string", example: "Place already has this category!" }
+      }
+    }
+  })
   @Post(':placeID/category')
   @SkipThrottle({ basic: true, place: true, login: true })
   async addPlaceCategory(
@@ -57,6 +166,31 @@ export class PlaceController {
     return this.placeService.addPlaceCategory(body, placeID);
   }
 
+  @ApiOperation({ summary: "Hozzáad a helyhez egy hírt" })
+  @ApiCookieAuth()
+  @ApiParam({ name: "id", description: "place id" })
+  @ApiCreatedResponse({
+    description: "Sikeresen létrehozta a hírt",
+    schema: {
+      type: "object",
+      properties: {
+        id: { type: "number", example: 1 },
+        text: { type: "string", example: "Helyhez tartazó hír szövege" },
+        placeID: { type: "number", example: 1 },
+        userID: { type: "number", example: 1 },
+        approved: { type: "boolean", example: false }
+      }
+    }
+  })
+  @ApiForbiddenResponse({
+    description: "A helynek már van ilyen kategóriája",
+    schema: {
+      type: "object",
+      properties: {
+        message: { type: "string", example: "Place already has this category!" }
+      }
+    }
+  })
   @Post(':id/news')
   @UseGuards(AuthGuard)
   @SkipThrottle({ basic: true, place: true, login: true })
@@ -64,6 +198,40 @@ export class PlaceController {
     return this.placeService.addNews(body, request['user'].sub);
   }
 
+  @ApiOperation({ summary: "Módosít egy hírt id alapján" })
+  @ApiCookieAuth()
+  @ApiParam({ name: "id", description: "news id" })
+  @ApiOkResponse({
+    description: "Sikeresen módosítja a hírt",
+    schema: {
+      type: "object",
+      properties: {
+        id: { type: "number", example: 1 },
+        text: { type: "string", example: "Helyhez tartazó hír módosított szövege" },
+        placeID: { type: "number", example: 1 },
+        userID: { type: "number", example: 1 },
+        approved: { type: "boolean", example: false }
+      }
+    }
+  })
+  @ApiForbiddenResponse({
+    description: "A felhasználó csak a saját kommentjét módosíthatja",
+    schema: {
+      type: "object",
+      properties: {
+        message: { type: "string", example: "You can only edit your own news!" }
+      }
+    }
+  })
+  @ApiUnauthorizedResponse({
+    description: "Csak bejelentkezett felhasználó módosíthat híreket",
+    schema: {
+      type: "object",
+      properties: {
+        message: { type: "string", example: "You can not edit this news!" }
+      }
+    }
+  })
   @Put('/news/:id')
   @UseGuards(AuthGuard)
   @SkipThrottle({ basic: true, place: true, login: true })
