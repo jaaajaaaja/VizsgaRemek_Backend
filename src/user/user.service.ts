@@ -60,7 +60,7 @@ export class UserService {
         }
 
         if (user.id != loggedInUserId) {
-            throw new NotFoundException("You can only delete your own profile!")
+            throw new ForbiddenException("You can only delete your own profile!")
         }
 
         return this.prisma.user.delete({ where: { id } })
@@ -74,7 +74,7 @@ export class UserService {
         }
 
         if (user.id != loggedInUserId) {
-            throw new NotFoundException("You can only edit your own profile!")
+            throw new ForbiddenException("You can only edit your own profile!")
         }
 
         return this.prisma.user.update({ where: { id }, data })
@@ -94,7 +94,7 @@ export class UserService {
         })
 
         if (recommendations.length === 0) {
-            throw new NotFoundException("No places found matching your interests!")
+            throw new ForbiddenException("No places found matching your interests!")
         }
 
         return recommendations
@@ -115,7 +115,7 @@ export class UserService {
         }
 
         if (user.age == null) {
-            throw new NotFoundException('Please set your age!')
+            throw new ConflictException('Please set your age!')
         }
 
         const places = await this.prisma.place.findMany({
@@ -142,7 +142,7 @@ export class UserService {
         })
 
         if (!places.length) {
-            throw new NotFoundException('Not enough comments to recommend!')
+            throw new ForbiddenException('Not enough comments to recommend!')
         }
 
         places.sort((place1, place2) => {
@@ -159,15 +159,42 @@ export class UserService {
     }
 
     async addFriend(sentToUserId: number, loggedInUserId: number) {
-        try {
-            return this.prisma.pending_Friend_Request.create({
-                data: {
-                    userID: loggedInUserId,
-                    friendID: sentToUserId
-                }
-            })
-        } catch (e) {
-            throw new ConflictException("You already sent a request to this user!")
+        const user = await this.prisma.user.findFirst({
+            where: { id: sentToUserId }
+        })
+
+        if(!user) {
+            throw new NotFoundException("The user you are trying to send the request to does not exist!")
+        }
+
+        const friend = await this.prisma.user_Friend.findFirst({
+            where: {
+                OR: [
+                    {
+                        userID: loggedInUserId,
+                        friendID: sentToUserId
+                    },
+                    {
+                        friendID: loggedInUserId,
+                        userID: sentToUserId
+                    }
+                ]
+            }
+        })
+
+        if (friend) {
+            throw new ForbiddenException("You already have this user as a friend!")
+        } else {
+            try {
+                return this.prisma.pending_Friend_Request.create({
+                    data: {
+                        userID: loggedInUserId,
+                        friendID: sentToUserId
+                    }
+                })
+            } catch (e) {
+                throw new ConflictException("You already sent a request to this user!")
+            }
         }
     }
 

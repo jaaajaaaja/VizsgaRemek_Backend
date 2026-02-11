@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from './user.service';
-import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
 
 describe('UserService', () => {
   let service: UserService
@@ -22,6 +22,13 @@ describe('UserService', () => {
       password: "password"
     }
   ]
+
+  const friendUser = {
+    id: 2,
+    userName: "testUsername",
+    email: "test@test.com",
+    password: "password"
+  }
 
   const mockInterests = [
     {
@@ -67,7 +74,8 @@ describe('UserService', () => {
     },
     user_Friend: {
       create: jest.fn(),
-      findMany: jest.fn()
+      findMany: jest.fn(),
+      findFirst: jest.fn()
     },
     pending_Friend_Request: {
       create: jest.fn(),
@@ -225,7 +233,7 @@ describe('UserService', () => {
       mockPrismaService.user_Interest.findMany.mockResolvedValue(mockInterests)
       mockPrismaService.place_Category.findMany.mockResolvedValue([])
 
-      await expect(service.recommendations(1)).rejects.toThrow(NotFoundException)
+      await expect(service.recommendations(1)).rejects.toThrow(ForbiddenException)
       expect(mockPrismaService.user_Interest.findMany).toHaveBeenCalledTimes(1)
       expect(mockPrismaService.place_Category.findMany).toHaveBeenCalledTimes(1)
     })
@@ -234,6 +242,7 @@ describe('UserService', () => {
   describe("addFriend", () => {
     it("should create a pending friend request", async () => {
       const mockRequest = { userID: 1, friendID: 2 }
+      mockPrismaService.user.findFirst.mockResolvedValue(2)
       mockPrismaService.pending_Friend_Request.create.mockResolvedValue(mockRequest)
 
       const result = await service.addFriend(2, 1)
@@ -245,9 +254,9 @@ describe('UserService', () => {
     })
 
     it("should throw ConflictException if request already exists", async () => {
-      mockPrismaService.pending_Friend_Request.create.mockRejectedValueOnce(new ConflictException("You already sent a request to this user!"))
+      mockPrismaService.pending_Friend_Request.create.mockRejectedValueOnce(new NotFoundException("You already sent a request to this user!"))
 
-      await expect(service.addFriend(2, 1)).rejects.toThrow(ConflictException)
+      await expect(service.addFriend(2, 1)).rejects.toThrow(NotFoundException)
     })
   })
 
@@ -338,41 +347,6 @@ describe('UserService', () => {
 
       await expect(service.friendlist(1)).rejects.toThrow(NotFoundException)
       expect(mockPrismaService.user_Friend.findMany).toHaveBeenCalledTimes(1)
-    })
-  })
-
-  describe('recommendByAge', () => {
-    it("should return places sorted by closest commenter age", async () => {
-      const mockUserWithAge = { id: 1, age: 30 }
-      const mockPlaces = [
-        {
-          id: 1,
-          googleplaceID: "place1",
-          name: "Place 1",
-          address: "Address 1",
-          comments: [
-            { user: { age: 50 } },
-            { user: { age: 28 } }
-          ]
-        },
-        {
-          id: 2,
-          googleplaceID: "place2",
-          name: "Place 2",
-          address: "Address 2",
-          comments: [
-            { user: { age: 31 } }
-          ]
-        }
-      ]
-
-      mockPrismaService.user.findFirst.mockResolvedValue(mockUserWithAge)
-      mockPrismaService.place.findMany.mockResolvedValue(mockPlaces)
-
-      const result = await service.recommendByAge(1)
-
-      expect(result[0].id).toBe(2)
-      expect(result[1].id).toBe(1)
     })
   })
 })

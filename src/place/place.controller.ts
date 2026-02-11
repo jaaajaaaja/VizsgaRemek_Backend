@@ -50,6 +50,7 @@ export class PlaceController {
     }
   })
   @Get()
+  @SkipThrottle({ postput: true, place: true, login: true })
   findAll() {
     return this.placeService.getAll();
   }
