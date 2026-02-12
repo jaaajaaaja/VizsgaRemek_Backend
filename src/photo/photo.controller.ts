@@ -6,8 +6,7 @@ import { extname } from 'path';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { CreatePhotoDto } from './dto/create-photo.dto';
-import { fileTypeFromBuffer } from 'file-type';
-import { ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiBadRequestResponse, ApiConsumes, ApiBody, ApiCreatedResponse, ApiUnauthorizedResponse, ApiCookieAuth } from '@nestjs/swagger';
+import { ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiBadRequestResponse, ApiConsumes, ApiCreatedResponse, ApiUnauthorizedResponse, ApiCookieAuth } from '@nestjs/swagger';
 
 @Controller('photo')
 export class PhotoController {
@@ -161,7 +160,7 @@ export class PhotoController {
 
     @ApiOperation({ summary: "Feltölt 1-3 képet egy helyhez" })
     @ApiCookieAuth()
-    @ApiConsumes('multipart/form-data')    
+    @ApiConsumes('multipart/form-data')
     @ApiCreatedResponse({
         description: "Sikeresen feltöltötte a képeket",
         schema: {
@@ -206,8 +205,8 @@ export class PhotoController {
                 return callback(new BadRequestException("userID and placeID are required!"), false)
             }
 
-            const fileType = await fileTypeFromBuffer(file.buffer)
-            if (!fileType || !fileType.mime.startsWith("image")) {
+            const fileType = file.mimetype
+            if (!fileType || !fileType.startsWith("image")) {
                 return callback(new BadRequestException("Only allowed file types are accepted!"), false)
             }
 

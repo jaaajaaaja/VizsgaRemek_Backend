@@ -23,7 +23,7 @@ describe('PhotoController E2E', () => {
         remove: jest.fn()
     }
 
-    const photoPath = path.join(__dirname, 'test picture', 'test_picture.png')
+    const photoPath = path.join(__dirname, 'test picture', 'books.png')
 
     const invalid_token = "invalid_token"
 
@@ -73,7 +73,7 @@ describe('PhotoController E2E', () => {
                 .attach('file', photoPath)
                 .expect(201)
 
-            deleteTestImage()
+            // deleteTestImage()
             return result
         })
 
