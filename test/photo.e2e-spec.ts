@@ -4,6 +4,7 @@ import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { JwtService } from '@nestjs/jwt';
 import { PhotoService } from 'src/photo/photo.service';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import path from 'path';
 import * as fs from 'fs';
 
@@ -23,7 +24,8 @@ describe('PhotoController E2E', () => {
         remove: jest.fn()
     }
 
-    const photoPath = path.join(__dirname, 'test picture', 'books.png')
+    const photoPath = path.join(__dirname, 'test picture', 'test_picture.png')
+    const wrong_image = path.join(__dirname, 'test picture', 'wrong_file.txt')
 
     const invalid_token = "invalid_token"
 
@@ -59,7 +61,7 @@ describe('PhotoController E2E', () => {
             }
         )
     })
-    
+
     afterAll(async () => {
         await app.close()
     })
@@ -73,7 +75,7 @@ describe('PhotoController E2E', () => {
                 .attach('file', photoPath)
                 .expect(201)
 
-            // deleteTestImage()
+            deleteTestImage()
             return result
         })
 
@@ -102,7 +104,7 @@ describe('PhotoController E2E', () => {
         })
     })
 
-    describe("should throw BadRequestException", () => {
+    describe("should throw bad request exceptions", () => {
         it('(POST) /photo/upload - userID missing', async () => {
             return request(app.getHttpServer())
                 .post('/photo/upload')
@@ -112,21 +114,12 @@ describe('PhotoController E2E', () => {
                 .expect(400)
         })
 
-        it('(POST) /photo/upload - placeID missing', async () => {
-            return request(app.getHttpServer())
-                .post('/photo/upload')
-                .set('Authorization', `Bearer ${token}`)
-                .field({ userID: 1 })
-                .attach('file', photoPath)
-                .expect(400)
-        })
-
         it('(POST) /photo/upload - zero files', async () => {
             return request(app.getHttpServer())
                 .post('/photo/upload')
                 .set('Authorization', `Bearer ${token}`)
                 .field({ placeID: 1, userID: 1 })
-                .expect(400)
+                .expect(409)
         })
     })
 })

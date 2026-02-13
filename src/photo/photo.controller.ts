@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, UseInterceptors, UploadedFiles, ParseIntPipe, UseGuards, Req, BadRequestException } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseInterceptors, UploadedFiles, ParseIntPipe, UseGuards, Req, BadRequestException, UnsupportedMediaTypeException, ConflictException } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { PhotoService } from './photo.service';
@@ -201,13 +201,14 @@ export class PhotoController {
         limits: { fileSize: 2 * 1024 * 1024 }, // 2 MB
         fileFilter: async (req, file, callback) => {
             const body = req.body
+            const fileType = file.mimetype
+
             if (!body.userID || !body.placeID) {
                 return callback(new BadRequestException("userID and placeID are required!"), false)
             }
 
-            const fileType = file.mimetype
-            if (!fileType || !fileType.startsWith("image")) {
-                return callback(new BadRequestException("Only allowed file types are accepted!"), false)
+            if (!fileType || !fileType.startsWith("image/")) {
+                return callback(new UnsupportedMediaTypeException("Not allowed file type!"), false)
             }
 
             callback(null, true)
@@ -215,7 +216,7 @@ export class PhotoController {
     }))
     async uploadFile(@UploadedFiles() files: Express.Multer.File[], @Body() body: CreatePhotoDto, @Req() request: Request) {
         if (!files || files.length === 0) {
-            throw new BadRequestException("No files were uploaded!")
+            throw new ConflictException("No files were uploaded!")
         }
 
         for (const file of files) {
