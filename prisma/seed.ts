@@ -163,7 +163,7 @@ async function main() {
         rating: faker.number.int({ min: 1, max: 5 }),
         userID: faker.helpers.arrayElement(users).id,
         placeID: faker.helpers.arrayElement(places).id,
-        
+        approved: faker.datatype.boolean(0.5)
     }))
 
     const testUser = await prisma.user.findUnique({ where: { email: "test@test.test" } })
@@ -204,6 +204,7 @@ async function main() {
         type: `image/${faker.helpers.arrayElement(imageTypes)}`,
         userID: faker.helpers.arrayElement(users).id,
         placeID: faker.helpers.arrayElement(places).id,
+        approved: faker.datatype.boolean(0.5)
     }))
 
     await prisma.photo.create({
@@ -212,6 +213,7 @@ async function main() {
             type: "image/jpg",
             userID: testUser ? testUser.id : 1,
             placeID: testPlace.id,
+            approved: true
         },
     })
 
@@ -271,6 +273,7 @@ async function main() {
         text: faker.lorem.paragraphs({ min: 1, max: 3 }),
         placeID: faker.helpers.arrayElement(places).id,
         userID: faker.helpers.arrayElement(users).id,
+        approved: faker.datatype.boolean(0.5)
     }))
 
     const testNews = await prisma.news.create({
