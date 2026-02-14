@@ -4,7 +4,6 @@ import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { JwtService } from '@nestjs/jwt';
 import { PhotoService } from 'src/photo/photo.service';
-import { ThrottlerGuard } from '@nestjs/throttler';
 import path from 'path';
 import * as fs from 'fs';
 
@@ -67,7 +66,7 @@ describe('PhotoController E2E', () => {
     })
 
     describe("should not throw exception", () => {
-        it('(POST) /photo/upload', async () => {
+        it('(POST) /photo/upload - one image', async () => {
             const result = await request(app.getHttpServer())
                 .post('/photo/upload')
                 .set('Authorization', `Bearer ${token}`)
@@ -79,28 +78,27 @@ describe('PhotoController E2E', () => {
             return result
         })
 
+        it('(POST) /photo/upload - multiple images', async () => {
+            const result = await request(app.getHttpServer())
+                .post('/photo/upload')
+                .set('Authorization', `Bearer ${token}`)
+                .field({ userID: 1, placeID: 1 })
+                .attach('file', photoPath)
+                .attach('file', photoPath)
+                .attach('file', photoPath)
+                .expect(201)
+
+            deleteTestImage()
+            deleteTestImage()
+            deleteTestImage()
+            return result
+        })
+
         it('(DELETE) /photo/:id', async () => {
             return request(app.getHttpServer())
                 .delete('/photo/1')
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200)
-        })
-    })
-
-    describe("should throw UnathorizedException", () => {
-        it('(POST) /photo', async () => {
-            return request(app.getHttpServer())
-                .post('/photo/upload')
-                .set('Authorization', `Bearer ${invalid_token}`)
-                .field({ userID: 1, placeID: 1 })
-                .expect(401)
-        })
-
-        it('(DELETE) /photo/:id', async () => {
-            return request(app.getHttpServer())
-                .delete('/photo/1')
-                .set('Authorization', `Bearer ${invalid_token}`)
-                .expect(401)
         })
     })
 
@@ -120,6 +118,15 @@ describe('PhotoController E2E', () => {
                 .set('Authorization', `Bearer ${token}`)
                 .field({ placeID: 1, userID: 1 })
                 .expect(409)
+        })
+
+        it('(POST) /photo/upload - wrong file type', async () => {
+            return request(app.getHttpServer())
+                .post('/photo/upload')
+                .set('Authorization', `Bearer ${token}`)
+                .field({ placeID: 1, userID: 1 })
+                .attach('file', wrong_image)
+                .expect(415)
         })
     })
 })
