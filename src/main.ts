@@ -8,33 +8,35 @@ import cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(
-    AppModule,
-  );
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  app.use(cookieParser(process.env.COOKIE_SECRET))
+  app.use(cookieParser(process.env.COOKIE_SECRET));
 
   app.enableCors({
-    origin: 'http://localhost:5173',
+    origin: ['http://localhost:5173', 'http://192.168.0.112:5173'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     preflightContinue: false,
     optionsSuccessStatus: 204,
     credentials: true,
-  })
+  });
 
   const config = new DocumentBuilder()
-    .setTitle("Barsonar API")
-    .setDescription("Barsonar Backend NestJS + Prisma + Swagger")
-    .setVersion("1.0.0")
-    .build()
+    .setTitle('Barsonar API')
+    .setDescription('Barsonar Backend NestJS + Prisma + Swagger')
+    .setVersion('1.0.0')
+    .build();
 
-  const document = SwaggerModule.createDocument(app, config)
-  SwaggerModule.setup("api", app, document)
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
 
   app.useGlobalPipes(new ValidationPipe());
 
   app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
 
-  await app.listen(process.env.PORT ?? 3000);
+  // await app.listen(process.env.PORT ?? 3000);
+
+  const port = process.env.PORT ?? 3000;
+  await app.listen(port, '0.0.0.0'); // <-- ide kell a 0.0.0.0
+  console.log(`Server running on http://0.0.0.0:${port}`);
 }
 void bootstrap();
