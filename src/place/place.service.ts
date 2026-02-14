@@ -99,4 +99,22 @@ export class PlaceService {
 
         return this.prisma.news.update({ where: { id }, data: fullData })
     }
+
+    async getNews(placeID: number) {
+        const news = await this.prisma.news.findFirst({
+            where: { placeID, approved: true },
+            select: {
+                id: true,
+                text: true,
+                placeID: true,
+                userID: true
+            }
+        })
+
+        if (!news) {
+            throw new NotFoundException("No news available for this place!")
+        }
+
+        return news
+    }
 }

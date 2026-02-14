@@ -275,9 +275,10 @@ async function main() {
 
     const testNews = await prisma.news.create({
         data: {
-            text: "This is a test news post for a place.",
+            text: "Test news text.",
             placeID: testPlace.id,
             userID: testUser ? testUser.id : 1,
+            approved: true
         },
     })
 

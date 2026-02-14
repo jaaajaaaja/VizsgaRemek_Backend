@@ -243,4 +243,36 @@ export class PlaceController {
   ) {
     return this.placeService.updateNews(id, body, request['user'].sub);
   }
+
+  @ApiOperation({ summary: "Visszadja a helyhez tartozó gíreket" })
+  @ApiParam({ name: "placeID", description: "place id" })
+  @ApiOkResponse({
+    description: "Visszadja a híreket",
+    schema: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          id: { type: "number", example: 1 },
+          text: { type: "string", example: "Test news text." },
+          placeID: { type: "number", example: 1 },
+          userID: { type: "number", example: 1 }
+        }
+      }
+    }
+  })
+  @ApiNotFoundResponse({
+    description: "Nincs a helyhez komment",
+    schema: {
+      type: "object",
+      properties: {
+        message: { type: "string", example: "No news available for this place!" }
+      }
+    }
+  })
+  @Get(':placeID/news')
+  @SkipThrottle({ postput: true, place: true, login: true })
+  async getNews(@Param('placeID', ParseIntPipe) placeID: number) {
+    return this.placeService.getNews(placeID)
+  }
 }
