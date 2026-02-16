@@ -8,6 +8,7 @@ import {
   UseGuards,
   Request,
   Res,
+  Req,
 } from '@nestjs/common';
 import express from 'express';
 import { AuthService } from './auth.service';
@@ -28,7 +29,7 @@ import {
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   @ApiBody({
     schema: {
@@ -63,7 +64,6 @@ export class AuthController {
       signed: true,
     });
 
-    // Return user info to frontend
     return {
       userId: result.userId,
       email: result.email,
@@ -79,10 +79,32 @@ export class AuthController {
     return req.user;
   }
 
+  @ApiOperation({ summary: 'Profil lekérése' })
+  @ApiCookieAuth()
+  @ApiOkResponse({
+    description: 'Lekért profil',
+    schema: {
+      type: "object",
+      properties: {
+        id: { type: "number", example: 1 },
+        userName: { type: "string", example: "felhasználónév" },
+        email: { type: "string", example: "felhasznalo@pelda.com" },
+        age: { type: "number", example: 18 }
+      }
+    }
+  })
+  @UseGuards(AuthGuard)
+  @SkipThrottle({ place: true, login: true, postput: true })
+  @Get('me')
+  getUserProfile(@Req() request: Request) {
+    return this.authService.getProfile(request["user"].sub)
+  }
+
   @ApiOperation({
     summary: 'Kijelentkezés',
     description: 'Szükséges hogy a felhasználó be legyen jelentkezve!',
   })
+  @ApiCookieAuth()
   @ApiOkResponse({ description: 'Sikeres kijelentkezés' })
   @UseGuards(AuthGuard)
   @SkipThrottle({ place: true, login: true, postput: true })

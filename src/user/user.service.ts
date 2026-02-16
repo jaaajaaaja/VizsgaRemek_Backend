@@ -13,7 +13,7 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async findOne(email: string) {
     const user = await this.prisma.user.findUnique({
@@ -279,15 +279,17 @@ export class UserService {
     return friends.map((f) => f.friend);
   }
 
-  // async getUserData(id: number){
-  //   return this.prisma.user.findUnique({
-  //     where: { id: id },
-  //     select: {
-  //       id: true,
-  //       userName: true,
-  //       email: true,
-  //       password: true,
-  //       age: true,
-  //     },})
-  // }
+  async getUserData(loggedInUserId: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: loggedInUserId },
+      select: {
+        id: true,
+        userName: true,
+        email: true,
+        age: true,
+      }
+    })
+
+    return user
+  }
 }

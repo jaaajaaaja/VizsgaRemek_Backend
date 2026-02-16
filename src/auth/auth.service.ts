@@ -12,7 +12,7 @@ export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async signIn(email: string, pass: string): Promise<any> {
     console.log('Login attempt:', { email, pass: pass ? '***' : 'undefined' });
@@ -47,5 +47,9 @@ export class AuthService {
       userId: user.id,
       email: user.email,
     };
+  }
+
+  async getProfile(loggedInUserId: number) {
+    return await this.userService.getUserData(loggedInUserId)
   }
 }
