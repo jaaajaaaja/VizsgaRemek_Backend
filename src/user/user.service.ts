@@ -50,6 +50,7 @@ export class UserService {
         userName: data.userName,
         email: data.email,
         password: hash,
+        age: data.age
       },
     });
   }

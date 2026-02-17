@@ -200,12 +200,6 @@ export class UserController {
     async remove(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
         return this.userService.remove(id, request["user"].sub)
     }
-    // @Get(':id')
-    // @UseGuards(AuthGuard)
-    // @SkipThrottle({ basic: true, place: true, login: true })
-    // async getUserData(@Param('id', ParseIntPipe) id: number) {
-    //     return this.userService.findOne(id)
-    // }
 
     @ApiOperation({ summary: "Módosít egy felhasználót" })
     @ApiCookieAuth()

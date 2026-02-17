@@ -27,7 +27,25 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+
+  SwaggerModule.setup('api', app, document, {
+    swaggerOptions: {
+      operationsSorter: (a: any, b: any) => {
+        const methodOrder: Record<string, number> = {
+          get: 1,
+          post: 2,
+          delete: 3,
+          put: 4,
+        }
+
+        const methodA = a.get('method');
+        const methodB = b.get('method');
+
+        return (methodOrder[methodA] || 99) - (methodOrder[methodB] || 99);
+      },
+    },
+  });
+
 
   app.useGlobalPipes(new ValidationPipe());
 
