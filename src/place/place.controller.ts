@@ -24,6 +24,12 @@ import { ApiCookieAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundRes
 export class PlaceController {
   constructor(private placeService: PlaceService) { }
 
+  /*
+  ----------------------------------------------------------------------------------------------------------
+  GET all place
+  ----------------------------------------------------------------------------------------------------------
+  */
+
   @ApiOperation({ summary: "Visszaadja az összes helyet" })
   @ApiOkResponse({
     description: "Visszaadja az összes helyet az adatbázisban, ha van",
@@ -55,6 +61,12 @@ export class PlaceController {
     return this.placeService.getAll();
   }
 
+  /*
+  ----------------------------------------------------------------------------------------------------------
+  GET place by id
+  ----------------------------------------------------------------------------------------------------------
+  */
+
   @ApiOperation({ summary: "Visszad egy helyet id alapján" })
   @ApiParam({ name: "id", description: "place id" })
   @ApiOkResponse({
@@ -83,6 +95,12 @@ export class PlaceController {
   async getOne(@Param('id', ParseIntPipe) id: number) {
     return this.placeService.getOne(id);
   }
+
+  /*
+  ----------------------------------------------------------------------------------------------------------
+  GET place by googleplaceID
+  ----------------------------------------------------------------------------------------------------------
+  */
 
   @ApiOperation({ summary: "Visszad egy helyet google place id alapján" })
   @ApiParam({ name: "googleplaceID", description: "googleplace id" })
@@ -113,6 +131,12 @@ export class PlaceController {
     return this.placeService.getOneByGoogleplaceID(googleplaceID);
   }
 
+  /*
+  ----------------------------------------------------------------------------------------------------------
+  POST place 
+  ----------------------------------------------------------------------------------------------------------
+  */
+
   @ApiOperation({ summary: "Létrehoz egy helyet" })
   @ApiCookieAuth()
   @ApiCreatedResponse({
@@ -134,6 +158,12 @@ export class PlaceController {
   async add(@Body() body: CreatePlaceDto) {
     return this.placeService.add(body);
   }
+
+  /*
+  ----------------------------------------------------------------------------------------------------------
+  POST place category by placeID
+  ----------------------------------------------------------------------------------------------------------
+  */
 
   @ApiOperation({ summary: "Létrehoz egy hely kategóriákat" })
   @ApiCookieAuth()
@@ -167,6 +197,12 @@ export class PlaceController {
     return this.placeService.addPlaceCategory(body, placeID);
   }
 
+  /*
+  ----------------------------------------------------------------------------------------------------------
+  POST news by placeID
+  ----------------------------------------------------------------------------------------------------------
+  */
+
   @ApiOperation({ summary: "Hozzáad a helyhez egy hírt" })
   @ApiCookieAuth()
   @ApiParam({ name: "id", description: "place id" })
@@ -198,6 +234,12 @@ export class PlaceController {
   async addNews(@Req() request: Request, @Body() body: CreateNewsDto) {
     return this.placeService.addNews(body, request['user'].sub);
   }
+
+  /*
+  ----------------------------------------------------------------------------------------------------------
+  PUT news by newsID
+  ----------------------------------------------------------------------------------------------------------
+  */
 
   @ApiOperation({ summary: "Módosít egy hírt id alapján" })
   @ApiCookieAuth()
@@ -244,7 +286,13 @@ export class PlaceController {
     return this.placeService.updateNews(id, body, request['user'].sub);
   }
 
-  @ApiOperation({ summary: "Visszadja a helyhez tartozó gíreket" })
+  /*
+  ----------------------------------------------------------------------------------------------------------
+  GET all news by placeID
+  ----------------------------------------------------------------------------------------------------------
+  */
+
+  @ApiOperation({ summary: "Visszadja a helyhez tartozó híreket" })
   @ApiParam({ name: "placeID", description: "place id" })
   @ApiOkResponse({
     description: "Visszadja a híreket",

@@ -10,6 +10,12 @@ import { ApiBadRequestResponse, ApiCookieAuth, ApiCreatedResponse, ApiForbiddenR
 export class CommentController {
   constructor(private commentService: CommentService) { }
 
+  /*
+    ----------------------------------------------------------------------------------------------------------
+    GET comment by userID
+    ----------------------------------------------------------------------------------------------------------
+  */
+
   @ApiOperation({ summary: "Visszaad egy kommentet id alapján" })
   @ApiParam({ name: "id", description: "comment id" })
   @ApiOkResponse({
@@ -51,6 +57,12 @@ export class CommentController {
     return this.commentService.findOne(id)
   }
 
+  /*
+    ----------------------------------------------------------------------------------------------------------
+    GET comment by userID
+    ----------------------------------------------------------------------------------------------------------
+  */
+
   @ApiOperation({ summary: "Visszaadja egy felhasználó összes kommentejét id alapján" })
   @ApiParam({ name: "userID", description: "user id" })
   @ApiOkResponse({
@@ -85,6 +97,12 @@ export class CommentController {
   async getAllByUser(@Param('userID', ParseIntPipe) userID: number) {
     return this.commentService.findAllByUser(userID)
   }
+
+  /*
+    ----------------------------------------------------------------------------------------------------------
+    GET comment by placeID
+    ----------------------------------------------------------------------------------------------------------
+  */
 
   @ApiOperation({ summary: "Visszaadja egy hely összes kommentejét id alapján" })
   @ApiParam({ name: "placeID", description: "place id" })
@@ -129,6 +147,12 @@ export class CommentController {
   async findAllByPlace(@Param('placeID', ParseIntPipe) placeID: number) {
     return this.commentService.findAllByPlace(placeID)
   }
+
+  /*
+    ----------------------------------------------------------------------------------------------------------
+    POST comment
+    ----------------------------------------------------------------------------------------------------------
+  */
 
   @ApiOperation({ summary: "Hozzáad egy kommentet" })
   @ApiCookieAuth()
@@ -179,6 +203,12 @@ export class CommentController {
     return this.commentService.add(body, request["user"].sub)
   }
 
+  /*
+    ----------------------------------------------------------------------------------------------------------
+    DELETE comment by id
+    ----------------------------------------------------------------------------------------------------------
+  */
+
   @ApiOperation({ summary: "Töröl egy kommentet id alapján" })
   @ApiCookieAuth()
   @ApiParam({ name: "id", description: "comment id" })
@@ -207,6 +237,12 @@ export class CommentController {
   async delete(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
     return this.commentService.remove(id, request["user"].sub)
   }
+
+  /*
+    ----------------------------------------------------------------------------------------------------------
+    PUT comment by id
+    ----------------------------------------------------------------------------------------------------------
+  */
 
   @ApiOperation({ summary: "Módosít egy kommentet" })
   @ApiCookieAuth()

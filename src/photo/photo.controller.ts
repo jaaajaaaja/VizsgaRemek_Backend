@@ -12,6 +12,12 @@ import { ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation,
 export class PhotoController {
     constructor(private photoService: PhotoService) { }
 
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    GET photo by id
+    ----------------------------------------------------------------------------------------------------------
+    */
+
     @ApiOperation({ summary: "Visszaad egy képet id alapján" })
     @ApiParam({ name: "id", description: "photo id" })
     @ApiOkResponse({
@@ -51,6 +57,12 @@ export class PhotoController {
         return this.photoService.getOne(id)
     }
 
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    GET all photos by userID
+    ----------------------------------------------------------------------------------------------------------
+    */
+
     @ApiOperation({ summary: "Visszaadja a felhasználő összes feltöltött és elfogadott képét" })
     @ApiParam({ name: "userID", description: "user id" })
     @ApiOkResponse({
@@ -84,6 +96,12 @@ export class PhotoController {
         return this.photoService.getAllByUser(userID)
     }
 
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    GET all photos by placeID
+    ----------------------------------------------------------------------------------------------------------
+    */
+
     @ApiOperation({ summary: "Visszaadja a helyhez feltöltött összes elfogadott képét" })
     @ApiParam({ name: "placeID", description: "place id" })
     @ApiOkResponse({
@@ -116,6 +134,12 @@ export class PhotoController {
     async getAllByPlace(@Param('placeID', ParseIntPipe) placeID: number) {
         return this.photoService.getAllByPlace(placeID)
     }
+
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    DELETE photo by id
+    ----------------------------------------------------------------------------------------------------------
+    */
 
     @ApiOperation({ summary: "Töröl egy képet id alapján" })
     @ApiCookieAuth()
@@ -157,6 +181,12 @@ export class PhotoController {
     async remove(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
         return this.photoService.remove(id, request["user"].sub)
     }
+
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    POST 1-3 photos
+    ----------------------------------------------------------------------------------------------------------
+    */
 
     @ApiOperation({ summary: "Feltölt 1-3 képet egy helyhez" })
     @ApiCookieAuth()

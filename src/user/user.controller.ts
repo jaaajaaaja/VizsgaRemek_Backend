@@ -12,6 +12,12 @@ import { ApiConflictResponse, ApiCookieAuth, ApiForbiddenResponse, ApiNotFoundRe
 export class UserController {
     constructor(private userService: UserService) { }
 
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    GET recommends a place
+    ----------------------------------------------------------------------------------------------------------
+    */
+
     @ApiOperation({ summary: "Visszaad egy helyet a felhasználó érdekeltségi köre alapján" })
     @ApiCookieAuth()
     @ApiOkResponse({
@@ -51,6 +57,12 @@ export class UserController {
     async recommendations(@Req() request: Request) {
         return this.userService.recommendations(request["user"].sub)
     }
+
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    GET recommends a places by age
+    ----------------------------------------------------------------------------------------------------------
+    */
 
     @ApiOperation({ summary: "Visszaad 5 helyet a felhasználó kora alapján (többi felhasználó kommentjeit veszi figyelembe)" })
     @ApiCookieAuth()
@@ -113,6 +125,12 @@ export class UserController {
         return this.userService.recommendByAge(request["user"].sub)
     }
 
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    POST user
+    ----------------------------------------------------------------------------------------------------------
+    */
+
     @ApiOperation({ summary: "Létrehoz egy felhasználót" })
     @ApiOkResponse({
         description: "Létrehozza a felhasználót",
@@ -141,6 +159,12 @@ export class UserController {
         return this.userService.add(body)
     }
 
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    POST user interest by id
+    ----------------------------------------------------------------------------------------------------------
+    */
+
     @ApiOperation({ summary: "Hozzáad egy felhasználó érdekeltséget" })
     @ApiCookieAuth()
     @ApiOkResponse({
@@ -168,6 +192,12 @@ export class UserController {
     async addUserInterest(@Body() body: CreateUserInterestDto, @Req() request: Request) {
         return this.userService.addUserInterest(body, request["user"].sub)
     }
+
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    DELETE user by id
+    ----------------------------------------------------------------------------------------------------------
+    */
 
     @ApiOperation({ summary: "Töröl egy felhasználót" })
     @ApiCookieAuth()
@@ -200,6 +230,12 @@ export class UserController {
     async remove(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
         return this.userService.remove(id, request["user"].sub)
     }
+
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    PUT user by id
+    ----------------------------------------------------------------------------------------------------------
+    */
 
     @ApiOperation({ summary: "Módosít egy felhasználót" })
     @ApiCookieAuth()
@@ -241,6 +277,12 @@ export class UserController {
     async update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateUserDto, @Req() request: Request) {
         return this.userService.update(id, body, request["user"].sub)
     }
+
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    POST friend request by userID
+    ----------------------------------------------------------------------------------------------------------
+    */
 
     @ApiOperation({ summary: "Elküldi egy barátkérelmet" })
     @ApiCookieAuth()
@@ -289,6 +331,12 @@ export class UserController {
         return this.userService.addFriend(id, request["user"].sub)
     }
 
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    POST deals with friend request by sender's userID
+    ----------------------------------------------------------------------------------------------------------
+    */
+
     @ApiOperation({ summary: "Elfogadja vagy elutasítja egy barátkérelmet" })
     @ApiCookieAuth()
     @ApiParam({ name: "id", description: "kérelmet küldő felhasználó id-ja" })
@@ -322,6 +370,12 @@ export class UserController {
         )
     }
 
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    GET user by userName
+    ----------------------------------------------------------------------------------------------------------
+    */
+
     @ApiOperation({ summary: "Felhasználóra keres felasználónév alapján" })
     @ApiParam({ name: "userName", description: "keresett felhasználó neve" })
     @ApiOkResponse({
@@ -340,7 +394,13 @@ export class UserController {
         return this.userService.searchByUsername(username)
     }
 
-    @ApiOperation({ summary: "Felhasználóra keres felasználónév alapján" })
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    GET friends
+    ----------------------------------------------------------------------------------------------------------
+    */
+
+    @ApiOperation({ summary: "Felhasználó barátainak lekérése" })
     @ApiCookieAuth()
     @ApiOkResponse({
         description: "Visszaadja a felhasználó barátait",
