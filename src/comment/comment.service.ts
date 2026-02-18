@@ -2,10 +2,14 @@ import { ForbiddenException, Injectable, NotFoundException, UnauthorizedExceptio
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { EventsGateway } from 'src/events/events.gateway';
 
 @Injectable()
 export class CommentService {
-  constructor(private prisma: PrismaService) { }
+  constructor(
+    private prisma: PrismaService,
+    private gateway: EventsGateway,
+  ) { }
 
   async findOne(id: number) {
     const comment = await this.prisma.comment.findUnique({ where: { id } })

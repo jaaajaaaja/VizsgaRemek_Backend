@@ -20,6 +20,7 @@ import { CommentService } from './comment/comment.service';
 import { AuthModule } from './auth/auth.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { APP_GUARD } from '@nestjs/core';
     PlaceModule,
     PhotoModule,
     AuthModule,
+    EventsModule,
   ],
   controllers: [AppController, PlaceController, PhotoController, UserController, CommentController],
   providers: [AppService, PlaceService, PhotoService, UserService, CommentService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
