@@ -1,31 +1,13 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Post,
-  UseGuards,
-  Request,
-  Res,
-  Req,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards, Request, Res, Req, } from '@nestjs/common';
 import express from 'express';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { SkipThrottle } from '@nestjs/throttler';
 import {
-  ApiBadRequestResponse,
-  ApiBody,
-  ApiCookieAuth,
-  ApiNotFoundResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiParam,
-  ApiResponse,
-  ApiTags,
-  ApiUnauthorizedResponse,
+  ApiBadRequestResponse, ApiBody, ApiCookieAuth, ApiOkResponse, ApiOperation, ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { RolesGuard } from './roles.guard';
+import { Roles } from './roles.decorator';
 
 @Controller('auth')
 export class AuthController {

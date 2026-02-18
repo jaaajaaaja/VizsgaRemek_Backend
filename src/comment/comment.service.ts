@@ -77,14 +77,14 @@ export class CommentService {
     return this.prisma.comment.create({ data: fullData })
   }
 
-  async remove(id: number, loggedInUserId: number) {
+  async remove(id: number, loggedInUserId: number, user: any) {
     const comment = await this.prisma.comment.findUnique({ where: { id } })
 
     if (!comment) {
       throw new NotFoundException("Can not delete comment, not found!")
     }
 
-    if (comment.userID !== loggedInUserId) {
+    if (comment.userID !== loggedInUserId && user.role !== 'admin') {
       throw new ForbiddenException("You can only delete your own comment!")
     }
 
@@ -102,11 +102,26 @@ export class CommentService {
       throw new ForbiddenException("You can only edit your own comments!")
     }
 
-    const fullData = {
-      ...data,
-      approved: false
+    return this.prisma.comment.update({
+      where: { id },
+      data: {
+        ...data,
+        approved: false
+      }
+    })
+  }
+
+  async getAll() {
+    return this.prisma.comment.findMany()
+  }
+
+  async approveByAdmin(id: number) {
+    const comment = await this.prisma.comment.findFirst({ where: { id } })
+
+    if (!comment) {
+      throw new NotFoundException("Comment not found!")
     }
 
-    return this.prisma.comment.update({ where: { id }, data: fullData })
+    return this.prisma.comment.update({ where: { id }, data: { approved: true } })
   }
 }

@@ -114,4 +114,18 @@ export class PhotoService {
 
         return this.prisma.photo.delete({ where: { id } })
     }
+
+    async update(id: number) {
+        const photo = await this.prisma.photo.findUnique({ where: { id } })
+
+        if (!photo) {
+            throw new NotFoundException("Image not found!")
+        }
+
+        return this.prisma.photo.update({ where: { id }, data: { approved: true } })
+    }
+
+    getAll() {
+        return this.prisma.photo.findMany()
+    }
 }

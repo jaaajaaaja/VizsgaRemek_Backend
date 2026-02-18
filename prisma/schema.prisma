@@ -21,6 +21,7 @@ model User {
   email            String                   @unique
   password         String
   age              Int?
+  role             String                   @default("user")
   comments         Comment[]
   photos           Photo[]
   userInterests    User_Interest[]
@@ -110,6 +111,6 @@ model News {
   placeID  Int
   userID   Int
   approved Boolean @default(false)
-  place    Place   @relation(fields: [placeID], references: [id])
-  user     User    @relation(fields: [userID], references: [id])
+  place    Place   @relation(fields: [placeID], references: [id], onDelete: Cascade)
+  user     User    @relation(fields: [userID], references: [id], onDelete: Cascade)
 }

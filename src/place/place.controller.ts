@@ -1,28 +1,62 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-  Put,
-  Req,
-  UseGuards,
+  Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Req, UseGuards,
 } from '@nestjs/common';
 import { PlaceService } from './place.service';
 import { CreatePlaceDto } from './dto/create-place.dto';
-import { UpdatePlaceDto } from './dto/update-place.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { CreatePlaceCategoryDto } from './dto/create-place-category.dto';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
 import { ApiCookieAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { Roles } from 'src/auth/roles.decorator';
+import { RolesGuard } from 'src/auth/roles.guard';
 
 @Controller('place')
 export class PlaceController {
   constructor(private placeService: PlaceService) { }
+
+  /*
+  ----------------------------------------------------------------------------------------------------------
+  PUT admin approves a news
+  ----------------------------------------------------------------------------------------------------------
+  */
+
+  @Get(":newsId/approve")
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
+  @SkipThrottle({ basic: true, place: true, login: true })
+  approveNews(@Param("newsId", ParseIntPipe) newsID: number) {
+    return this.placeService.approveNews(newsID)
+  }
+
+  /*
+  ----------------------------------------------------------------------------------------------------------
+  GET all news
+  ----------------------------------------------------------------------------------------------------------
+  */
+
+  @Get("/allNews")
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
+  @SkipThrottle({ basic: true, place: true, login: true })
+  getAllNews() {
+    return this.placeService.getAllNews()
+  }
+
+  /*
+  ----------------------------------------------------------------------------------------------------------
+  DELETE place admin
+  ----------------------------------------------------------------------------------------------------------
+  */
+
+  @Delete(":id")
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
+  @SkipThrottle({ basic: true, place: true, login: true })
+  remove(@Param("id", ParseIntPipe) id: number) {
+    return this.placeService.remove(id)
+  }
 
   /*
   ----------------------------------------------------------------------------------------------------------
@@ -31,6 +65,7 @@ export class PlaceController {
   */
 
   @ApiOperation({ summary: "Visszaadja az összes helyet" })
+  @ApiCookieAuth()
   @ApiOkResponse({
     description: "Visszaadja az összes helyet az adatbázisban, ha van",
     schema: {
@@ -56,9 +91,11 @@ export class PlaceController {
     }
   })
   @Get()
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
   @SkipThrottle({ postput: true, place: true, login: true })
   findAll() {
-    return this.placeService.getAll();
+    return this.placeService.getAll()
   }
 
   /*

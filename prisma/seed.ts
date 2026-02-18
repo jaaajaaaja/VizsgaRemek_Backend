@@ -17,10 +17,25 @@ const GOOGLE_PLACE_CATEGORIES = [
 async function main() {
     console.log("\nSeeding...\n")
 
+    const defaultPassword = await bcrypt.hash('12345678', 10)
+
+    //ADMIN
+
+    await prisma.user.create({
+        data: {
+            userName: "admin",
+            email: "admin@admin.admin",
+            password: defaultPassword,
+            age: 18,
+            role: "admin"
+        }
+    })
+
+    console.log("Admins in database: ", 1)
+
     //USERS
 
     const userCount = 15
-    const defaultPassword = await bcrypt.hash('12345678', 10)
 
     const userData = Array.from({ length: userCount }, () => ({
         userName: faker.internet.username(),

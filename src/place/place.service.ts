@@ -117,4 +117,31 @@ export class PlaceService {
 
         return news
     }
+
+    async remove(id: number) {
+        const place = await this.prisma.place.findFirst({ where: { id } })
+
+        if (!place) {
+            throw new NotFoundException("Place not found!")
+        }
+
+        return this.prisma.place.delete({ where: { id } })
+    }
+
+    async getAllNews() {
+        return this.prisma.news.findMany()
+    }
+
+    async approveNews(id: number) {
+        const news = await this.prisma.news.findFirst({ where: { id } })
+
+        if (!news) {
+            throw new NotFoundException("News not found!")
+        }
+
+        return this.prisma.news.update({
+            where: { id },
+            data: { approved: true }
+        })
+    }
 }

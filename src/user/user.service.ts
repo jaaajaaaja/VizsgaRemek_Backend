@@ -20,12 +20,11 @@ export class UserService {
       where: { email },
       select: {
         id: true,
-        userName: true,
         email: true,
         password: true,
-        age: true,
+        role: true
       },
-    });
+    })
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -292,5 +291,23 @@ export class UserService {
     })
 
     return user
+  }
+
+  async getAllUsers() {
+    return this.prisma.user.findMany()
+  }
+
+  async deleteUserByAdmin(id: number) {
+    const user = await this.prisma.user.findFirst({ where: { id } })
+
+    if (!user) {
+      throw new NotFoundException("User not found!")
+    }
+
+    return this.prisma.user.delete({ where: { id } })
+  }
+
+  async getAllUserInterestByAdmin() {
+    return this.prisma.user_Interest.findMany()
   }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, UseInterceptors, UploadedFiles, ParseIntPipe, UseGuards, Req, BadRequestException, UnsupportedMediaTypeException, ConflictException } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseInterceptors, UploadedFiles, ParseIntPipe, UseGuards, Req, BadRequestException, UnsupportedMediaTypeException, ConflictException, Put } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { PhotoService } from './photo.service';
@@ -7,10 +7,26 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { CreatePhotoDto } from './dto/create-photo.dto';
 import { ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiBadRequestResponse, ApiConsumes, ApiCreatedResponse, ApiUnauthorizedResponse, ApiCookieAuth } from '@nestjs/swagger';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { Roles } from 'src/auth/roles.decorator';
 
 @Controller('photo')
 export class PhotoController {
     constructor(private photoService: PhotoService) { }
+
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    GET all photo
+    ----------------------------------------------------------------------------------------------------------
+    */
+
+    @Get()
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles("admin")
+    @SkipThrottle({ postput: true, place: true, login: true })
+    getAll() {
+        return this.photoService.getAll()
+    }
 
     /*
     ----------------------------------------------------------------------------------------------------------
@@ -254,5 +270,19 @@ export class PhotoController {
         }
 
         return 201
+    }
+
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    POST approves or denys image visibility
+    ----------------------------------------------------------------------------------------------------------
+    */
+
+    @Put(':id/approved')
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles("admin")
+    @SkipThrottle({ basic: true, place: true, login: true })
+    async update(@Param('id', ParseIntPipe) id: number) {
+        return this.photoService.update(id)
     }
 }

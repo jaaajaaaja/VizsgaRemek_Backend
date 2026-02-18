@@ -24,15 +24,17 @@ export class AuthGuard implements CanActivate {
 
             const email = payload.email;
             if (!email) {
-                throw new UnauthorizedException('Email not found in token payload');
+                throw new UnauthorizedException('Email not found in token payload')
             }
 
-            const user = await this.prisma.user.findUnique({ where: { email } });
+            const user = await this.prisma.user.findUnique({ where: { email } })
             if (!user) {
-                throw new UnauthorizedException('User not found');
+                throw new UnauthorizedException('User not found')
             }
 
-            request['user'] = payload
+            const user_data = { sub: user.id, email: user.email, role: user.role }
+
+            request['user'] = user_data
         } catch {
             throw new UnauthorizedException()
         }

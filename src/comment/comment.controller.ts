@@ -3,12 +3,28 @@ import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ApiBadRequestResponse, ApiCookieAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiResponse, ApiUnauthorizedResponse, getSchemaPath } from '@nestjs/swagger';
+import { Roles } from 'src/auth/roles.decorator';
 
 @Controller('comment')
 export class CommentController {
   constructor(private commentService: CommentService) { }
+
+  /*
+    ----------------------------------------------------------------------------------------------------------
+    GET all comments
+    ----------------------------------------------------------------------------------------------------------
+  */
+
+  @Get("/all")
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
+  @SkipThrottle({ postput: true, place: true, login: true })
+  getAll() {
+    return this.commentService.getAll()
+  }
 
   /*
     ----------------------------------------------------------------------------------------------------------
@@ -235,7 +251,7 @@ export class CommentController {
   @UseGuards(AuthGuard)
   @SkipThrottle({ postput: true, place: true, login: true })
   async delete(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
-    return this.commentService.remove(id, request["user"].sub)
+    return this.commentService.remove(id, request["user"].sub, request["user"])
   }
 
   /*
@@ -292,5 +308,19 @@ export class CommentController {
   @SkipThrottle({ basic: true, place: true, login: true })
   async update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateCommentDto, @Req() request: Request) {
     return this.commentService.update(id, body, request["user"].sub)
+  }
+
+  /*
+    ----------------------------------------------------------------------------------------------------------
+    PUT approves a comment
+    ----------------------------------------------------------------------------------------------------------
+  */
+
+  @Put(":id/approved")
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
+  @SkipThrottle({ basic: true, place: true, login: true })
+  async approveByAdmin(@Param("id", ParseIntPipe) id: number) {
+    return this.commentService.approveByAdmin(id)
   }
 }

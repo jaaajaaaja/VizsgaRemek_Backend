@@ -7,10 +7,54 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { CreateUserInterestDto } from './dto/create-user-interest.dto';
 import { FriendRequestDto } from './dto/friend-request.dto';
 import { ApiConflictResponse, ApiCookieAuth, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { Roles } from 'src/auth/roles.decorator';
+import { RolesGuard } from 'src/auth/roles.guard';
 
 @Controller('user')
 export class UserController {
     constructor(private userService: UserService) { }
+
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    DELETE user by admin
+    ----------------------------------------------------------------------------------------------------------
+    */
+
+    @Delete(":id/admin")
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles("admin")
+    @SkipThrottle({ basic: true, place: true, login: true })
+    async deleteUserByAdmin(@Param("id", ParseIntPipe) id: number) {
+        return this.userService.deleteUserByAdmin(id)
+    }
+
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    GET all user interests
+    ----------------------------------------------------------------------------------------------------------
+    */
+
+    @Get("/allInterests")
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles("admin")    
+    @SkipThrottle({ postput: true, place: true, login: true })
+    getAllUserInterestByAdmin() {
+        return this.userService.getAllUserInterestByAdmin()
+    }
+
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    GET all
+    ----------------------------------------------------------------------------------------------------------
+    */
+
+    @Get("/all")
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles("admin")
+    @SkipThrottle({ postput: true, place: true, login: true })
+    getAllNews() {
+        return this.userService.getAllUsers()
+    }
 
     /*
     ----------------------------------------------------------------------------------------------------------
