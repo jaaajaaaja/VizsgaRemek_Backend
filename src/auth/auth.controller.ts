@@ -92,7 +92,7 @@ export class AuthController {
   @SkipThrottle({ place: true, login: true, postput: true })
   @Post('logout')
   logout(@Res({ passthrough: true }) res: express.Response) {
-    res.clearCookie('access_token');
+    res.clearCookie('access_token', { path: '/', httpOnly: true, sameSite: 'lax' });
     return { message: 'Logged out successfully' };
   }
 }

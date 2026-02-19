@@ -13,7 +13,7 @@ async function bootstrap() {
   app.use(cookieParser(process.env.COOKIE_SECRET));
 
   app.enableCors({
-    origin: ['http://localhost:5173', 'http://192.168.0.112:5173'],
+    origin: ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://10.4.117.34:5173'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     preflightContinue: false,
     optionsSuccessStatus: 204,
@@ -36,7 +36,7 @@ async function bootstrap() {
           post: 2,
           delete: 3,
           put: 4,
-        }
+        };
 
         const methodA = a.get('method');
         const methodB = b.get('method');
@@ -46,7 +46,6 @@ async function bootstrap() {
     },
   });
 
-
   app.useGlobalPipes(new ValidationPipe());
 
   app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
@@ -54,7 +53,7 @@ async function bootstrap() {
   // await app.listen(process.env.PORT ?? 3000);
 
   const port = process.env.PORT ?? 3000;
-  await app.listen(port, '0.0.0.0')
-  console.log(`Server running on http://0.0.0.0:${port}`)
+  await app.listen(port, '0.0.0.0');
+  console.log(`Server running on http://0.0.0.0:${port}`);
 }
 void bootstrap();
