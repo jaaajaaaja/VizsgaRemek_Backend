@@ -19,20 +19,6 @@ async function main() {
 
     const defaultPassword = await bcrypt.hash('12345678', 10)
 
-    //ADMIN
-
-    await prisma.user.create({
-        data: {
-            userName: "admin",
-            email: "admin@admin.admin",
-            password: defaultPassword,
-            age: 18,
-            role: "admin"
-        }
-    })
-
-    console.log("Admins in database: ", 1)
-
     //USERS
 
     const userCount = 15
@@ -53,6 +39,18 @@ async function main() {
         }
     })
 
+    await prisma.user.create({
+        data: {
+            userName: "admin",
+            email: "admin@admin.admin",
+            password: defaultPassword,
+            age: 18,
+            role: "admin"
+        }
+    })
+    
+    console.log("Admins in database: ", 1)
+
     await prisma.user.createMany({
         data: userData,
         skipDuplicates: true,
@@ -60,6 +58,7 @@ async function main() {
 
     const users = await prisma.user.findMany()
     console.log("Users in database:", users.length)
+
 
     //USER_INTEREST
 

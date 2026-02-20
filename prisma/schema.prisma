@@ -36,7 +36,7 @@ model User_Interest {
   id       Int    @id @default(autoincrement())
   interest String
   userID   Int
-  user     User   @relation(fields: [userID], references: [id])
+  user     User   @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([userID, interest])
 }

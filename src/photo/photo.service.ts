@@ -122,7 +122,9 @@ export class PhotoService {
             throw new NotFoundException("Image not found!")
         }
 
-        return this.prisma.photo.update({ where: { id }, data: { approved: true } })
+        const data = await this.prisma.photo.update({ where: { id }, data: { approved: true } })
+
+        return { id: data.id, approved: data.approved }
     }
 
     getAll() {

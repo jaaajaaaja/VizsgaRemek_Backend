@@ -20,7 +20,34 @@ export class PhotoController {
     ----------------------------------------------------------------------------------------------------------
     */
 
-    @Get()
+    @ApiOperation({ summary: "ADMIN - Visszaadja az összes képet" })
+    @ApiCookieAuth()
+    @ApiOkResponse({
+        description: "Visszadja a képeket",
+        schema: {
+            type: "array",
+            items: {
+                properties: {
+                    id: { type: "number", example: 1 },
+                    location: { type: "string", example: "uploads/example.jpg" },
+                    type: { type: "string", example: "image/jpg" },
+                    user: { type: "string", example: "user name" },
+                    place: { type: "string", example: "place name" },
+                    approved: { type: "boolean", example: false }
+                }
+            }
+        }
+    })
+    @ApiForbiddenResponse({
+        description: "Csak admin férhet hozzá a végponthoz",
+        schema: {
+            type: "object",
+            properties: {
+                message: { type: "string", example: "Forbidden resource!" }
+            }
+        }
+    })
+    @Get("/all")
     @UseGuards(AuthGuard, RolesGuard)
     @Roles("admin")
     @SkipThrottle({ postput: true, place: true, login: true })
@@ -274,10 +301,45 @@ export class PhotoController {
 
     /*
     ----------------------------------------------------------------------------------------------------------
-    POST approves or denys image visibility
+    POST approves image
     ----------------------------------------------------------------------------------------------------------
     */
 
+    @ApiOperation({ summary: "ADMIN - Elfogadja a képet" })
+    @ApiCookieAuth()
+    @ApiParam({ name: "id", description: "photo id" })
+    @ApiOkResponse({
+        description: "Sikeresen elfogadja a képet",
+        schema: {
+            type: "object",
+            properties: {
+                id: { type: "number", example: 1 },
+                location: { type: "string", example: "uploads/example.jpg" },
+                type: { type: "string", example: "image/jpg" },
+                user: { type: "string", example: "user name" },
+                place: { type: "string", example: "place name" },
+                approved: { type: "boolean", example: true }
+            }
+        }
+    })
+    @ApiForbiddenResponse({
+        description: "Csak admin férhet hozzá a végponthoz",
+        schema: {
+            type: "object",
+            properties: {
+                message: { type: "string", example: "Forbidden resource!" }
+            }
+        }
+    })
+    @ApiNotFoundResponse({
+        description: "Az elfogadni kívánt fotó nem található",
+        schema: {
+            type: "object",
+            properties: {
+                message: { type: "string", example: "Image not found!" }
+            }
+        }
+    })
     @Put(':id/approved')
     @UseGuards(AuthGuard, RolesGuard)
     @Roles("admin")

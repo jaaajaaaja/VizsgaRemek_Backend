@@ -22,7 +22,29 @@ export class PlaceController {
   ----------------------------------------------------------------------------------------------------------
   */
 
-  @Get(":newsId/approve")
+  @ApiOperation({ summary: "ADMIN - Elfogad egy hírt" })
+  @ApiCookieAuth()
+  @ApiParam({ name: "id", description: "news id" })
+  @ApiOkResponse({
+    description: "Sikeresen elfogadja a hírt",
+    schema: {
+      type: "object",
+      properties: {
+        id: { type: "number", example: 1 },
+        approved: { type: "boolean", example: true }
+      }
+    }
+  })
+  @ApiForbiddenResponse({
+    description: "Csak admin férhet hozzá a végponthoz",
+    schema: {
+      type: "object",
+      properties: {
+        message: { type: "string", example: "Forbidden resource!" }
+      }
+    }
+  })
+  @Put(":newsId/approve")
   @UseGuards(AuthGuard, RolesGuard)
   @Roles("admin")
   @SkipThrottle({ basic: true, place: true, login: true })
@@ -36,6 +58,33 @@ export class PlaceController {
   ----------------------------------------------------------------------------------------------------------
   */
 
+  @ApiOperation({ summary: "ADMIN - Visszaadja az összes hírt" })
+  @ApiCookieAuth()
+  @ApiOkResponse({
+    description: "Visszaadja a híreket",
+    schema: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          id: { type: "number", example: 1 },
+          text: { type: "string", example: "Test news text." },
+          placeID: { type: "number", example: 1 },
+          userID: { type: "number", example: 1 }
+        }
+      }
+
+    }
+  })
+  @ApiForbiddenResponse({
+    description: "Csak admin férhet hozzá a végponthoz",
+    schema: {
+      type: "object",
+      properties: {
+        message: { type: "string", example: "Forbidden resource!" }
+      }
+    }
+  })
   @Get("/allNews")
   @UseGuards(AuthGuard, RolesGuard)
   @Roles("admin")
@@ -50,6 +99,30 @@ export class PlaceController {
   ----------------------------------------------------------------------------------------------------------
   */
 
+  @ApiOperation({ summary: "ADMIN - Töröl egy helyet" })
+  @ApiCookieAuth()
+  @ApiParam({ name: "id", description: "place id" })
+  @ApiOkResponse({
+    description: "Töröl egy helyet",
+    schema: {
+      type: "object",
+      properties: {
+        id: { type: "number", example: 1 },
+        text: { type: "string", example: "Test news text." },
+        placeID: { type: "number", example: 1 },
+        userID: { type: "number", example: 1 }
+      }
+    }
+  })
+  @ApiForbiddenResponse({
+    description: "Csak admin férhet hozzá a végponthoz",
+    schema: {
+      type: "object",
+      properties: {
+        message: { type: "string", example: "Forbidden resource!" }
+      }
+    }
+  })
   @Delete(":id")
   @UseGuards(AuthGuard, RolesGuard)
   @Roles("admin")
@@ -64,7 +137,7 @@ export class PlaceController {
   ----------------------------------------------------------------------------------------------------------
   */
 
-  @ApiOperation({ summary: "Visszaadja az összes helyet" })
+  @ApiOperation({ summary: "ADMIN - Visszaadja az összes helyet" })
   @ApiCookieAuth()
   @ApiOkResponse({
     description: "Visszaadja az összes helyet az adatbázisban, ha van",
@@ -90,7 +163,7 @@ export class PlaceController {
       }
     }
   })
-  @Get()
+  @Get("/all")
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin')
   @SkipThrottle({ postput: true, place: true, login: true })

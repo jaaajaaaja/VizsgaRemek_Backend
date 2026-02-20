@@ -67,14 +67,14 @@ export class UserService {
     }
   }
 
-  async remove(id: number, loggedInUserId: number) {
+  async remove(id: number, loggedInUser: any) {
     const user = await this.prisma.user.findUnique({ where: { id } });
 
     if (!user) {
       throw new NotFoundException('User not found!');
     }
 
-    if (user.id != loggedInUserId) {
+    if (user.id != loggedInUser.sub && loggedInUser.role != "admin") {
       throw new ForbiddenException('You can only delete your own profile!');
     }
 
@@ -165,30 +165,35 @@ export class UserService {
     places.sort((place1, place2) => {
       const diffA = Math.min(
         ...place1.comments.map((comment) =>
-          Math.abs(comment.user.age! - user.age!),
-        ),
-      );
+          Math.abs(comment.user.age! - user.age!)
+        )
+      )
       const diffB = Math.min(
         ...place2.comments.map((comment) =>
-          Math.abs(comment.user.age! - user.age!),
-        ),
-      );
-      return diffA - diffB;
-    });
+          Math.abs(comment.user.age! - user.age!)
+        )
+      )
+      return diffA - diffB
+    })
 
-    return places.map(({ comments, ...place }) => place);
+    return places.map(({ comments, ...place }) => place)
   }
 
   async addFriend(sentToUserId: number, loggedInUserId: number) {
     const user = await this.prisma.user.findFirst({
-      where: { id: sentToUserId },
-    });
+      where: {
+        NOT: {
+          role: "admin"
+        },
+        id: sentToUserId,
+      }
+    })
 
     if (!user) {
-      throw new NotFoundException(
-        'The user you are trying to send the request to does not exist!',
-      );
+      throw new NotFoundException("The user you are trying to send the request to does not exist!")
     }
+
+
 
     const friend = await this.prisma.user_Friend.findFirst({
       where: {
@@ -252,10 +257,24 @@ export class UserService {
   }
 
   async searchByUsername(username: string) {
-    return this.prisma.user.findMany({
-      where: { userName: username },
-      select: { id: true, userName: true },
-    });
+    const users = this.prisma.user.findMany({
+      where: {
+        userName: username,
+        NOT: {
+          role: "admin"
+        }
+      },
+      select: {
+        id: true,
+        userName: true
+      }
+    })
+
+    if (!users) {
+      throw new NotFoundException("User(s) with this name not found!")
+    }
+
+    return users
   }
 
   async friendlist(loggedInUserId: number) {
@@ -294,7 +313,15 @@ export class UserService {
   }
 
   async getAllUsers() {
-    return this.prisma.user.findMany()
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        userName: true,
+        email: true,
+        age: true,
+        role: true,
+      }
+    })
   }
 
   async deleteUserByAdmin(id: number) {
@@ -308,6 +335,10 @@ export class UserService {
   }
 
   async getAllUserInterestByAdmin() {
-    return this.prisma.user_Interest.findMany()
+    return this.prisma.user_Interest.findMany({
+      orderBy: {
+        userID: "asc"
+      }
+    })
   }
 }

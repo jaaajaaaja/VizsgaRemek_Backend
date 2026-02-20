@@ -53,6 +53,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Profil lekérése', deprecated: true })
+  @ApiCookieAuth()
   @ApiOkResponse({ description: 'Lekért profil' })
   @UseGuards(AuthGuard)
   @SkipThrottle({ place: true, login: true, postput: true })

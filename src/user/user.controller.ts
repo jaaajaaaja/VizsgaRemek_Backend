@@ -16,27 +16,39 @@ export class UserController {
 
     /*
     ----------------------------------------------------------------------------------------------------------
-    DELETE user by admin
-    ----------------------------------------------------------------------------------------------------------
-    */
-
-    @Delete(":id/admin")
-    @UseGuards(AuthGuard, RolesGuard)
-    @Roles("admin")
-    @SkipThrottle({ basic: true, place: true, login: true })
-    async deleteUserByAdmin(@Param("id", ParseIntPipe) id: number) {
-        return this.userService.deleteUserByAdmin(id)
-    }
-
-    /*
-    ----------------------------------------------------------------------------------------------------------
     GET all user interests
     ----------------------------------------------------------------------------------------------------------
     */
 
+    @ApiOperation({ summary: "ADMIN - Visszaadja az összes felhasználó érdekeltséget" })
+    @ApiCookieAuth()
+    @ApiOkResponse({
+        description: "Visszaadja a felhasználókat",
+        schema: {
+            type: "array",
+            items: {
+                properties: {
+                    id: { type: "number", example: 1 },
+                    userName: { type: "string", example: "Felhasználónév" },
+                    email: { type: "string", example: "felhasznalonev@email.com" },
+                    age: { type: "number", example: 1 },
+                    role: { type: "string", example: "user" },
+                }
+            }
+        }
+    })
+    @ApiForbiddenResponse({
+        description: "Csak adminnak van hozzáférése a végponthoz",
+        schema: {
+            type: "object",
+            properties: {
+                message: { type: "string", example: "Forbidden resource!" }
+            }
+        }
+    })
     @Get("/allInterests")
     @UseGuards(AuthGuard, RolesGuard)
-    @Roles("admin")    
+    @Roles("admin")
     @SkipThrottle({ postput: true, place: true, login: true })
     getAllUserInterestByAdmin() {
         return this.userService.getAllUserInterestByAdmin()
@@ -48,6 +60,32 @@ export class UserController {
     ----------------------------------------------------------------------------------------------------------
     */
 
+    @ApiOperation({ summary: "ADMIN - Visszaadja az összes felhasználót" })
+    @ApiCookieAuth()
+    @ApiOkResponse({
+        description: "Visszaadja a felhasználókat",
+        schema: {
+            type: "array",
+            items: {
+                properties: {
+                    id: { type: "number", example: 1 },
+                    userName: { type: "string", example: "Felhasználónév" },
+                    email: { type: "string", example: "felhasznalonev@email.com" },
+                    age: { type: "number", example: 1 },
+                    role: { type: "string", example: "user" },
+                }
+            }
+        }
+    })
+    @ApiForbiddenResponse({
+        description: "Csak adminnak van hozzáférése a végponthoz",
+        schema: {
+            type: "object",
+            properties: {
+                message: { type: "string", example: "Forbidden resource!" }
+            }
+        }
+    })
     @Get("/all")
     @UseGuards(AuthGuard, RolesGuard)
     @Roles("admin")
@@ -272,7 +310,7 @@ export class UserController {
     @UseGuards(AuthGuard)
     @SkipThrottle({ postput: true, place: true, login: true })
     async remove(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
-        return this.userService.remove(id, request["user"].sub)
+        return this.userService.remove(id, request["user"])
     }
 
     /*
@@ -432,7 +470,7 @@ export class UserController {
             }
         }
     })
-    @Get('/searchByName/:userName')
+    @Get("/searchByName/:userName")
     @SkipThrottle({ basic: true, place: true, login: true })
     async searchByUsername(@Param('userName') username: string) {
         return this.userService.searchByUsername(username)

@@ -18,6 +18,27 @@ export class CommentController {
     ----------------------------------------------------------------------------------------------------------
   */
 
+  @ApiOperation({ summary: "ADMIN - Visszaadja az összes kommentet" })
+  @ApiCookieAuth()
+  @ApiOkResponse({
+    description: "Visszaadja a helyeket",
+    schema: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          id: { type: "number", example: 1 },
+          commentText: { type: "string", example: "Elég jó ez a hely!" },
+          rating: { type: "number", example: 4 },
+          createdAt: { type: "date", example: "2026-01-28 12:41:49.938" },
+          updatedAt: { type: "date", example: "2026-02-13 12:41:49.939" },
+          userID: { type: "number", example: 1 },
+          placeID: { type: "number", example: 1 },
+          approved: { type: "boolean", example: false }
+        }
+      }
+    }
+  })
   @Get("/all")
   @UseGuards(AuthGuard, RolesGuard)
   @Roles("admin")
@@ -251,7 +272,7 @@ export class CommentController {
   @UseGuards(AuthGuard)
   @SkipThrottle({ postput: true, place: true, login: true })
   async delete(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
-    return this.commentService.remove(id, request["user"].sub, request["user"])
+    return this.commentService.remove(id, request["user"])
   }
 
   /*
@@ -316,6 +337,37 @@ export class CommentController {
     ----------------------------------------------------------------------------------------------------------
   */
 
+  @ApiOperation({ summary: "ADMIN - Elfogadja a kommentet" })
+  @ApiCookieAuth()
+  @ApiParam({ name: "id", description: "comment id" })
+  @ApiOkResponse({
+    description: "Sikeres módosítás",
+    schema: {
+      type: "object",
+      properties: {
+        id: { type: "number", example: 1 },
+        approved: { type: "boolean", example: true }
+      }
+    }
+  })
+  @ApiNotFoundResponse({
+    description: "Nem található a komment amit el szeretne fogadni az admin",
+    schema: {
+      type: "object",
+      properties: {
+        message: { type: "string", example: "Comment not found!" }
+      }
+    }
+  })
+  @ApiForbiddenResponse({
+    description: "Csak adminnak van hozzáférése",
+    schema: {
+      type: "object",
+      properties: {
+        messsage: { type: "string", example: "Forbidden resource!" }
+      }
+    }
+  })
   @Put(":id/approved")
   @UseGuards(AuthGuard, RolesGuard)
   @Roles("admin")

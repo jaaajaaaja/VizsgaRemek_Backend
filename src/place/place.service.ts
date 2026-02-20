@@ -139,9 +139,8 @@ export class PlaceService {
             throw new NotFoundException("News not found!")
         }
 
-        return this.prisma.news.update({
-            where: { id },
-            data: { approved: true }
-        })
+        const update = await this.prisma.news.update({ where: { id }, data: { approved: true } })
+
+        return { id: update.id, approved: update.approved }
     }
 }
