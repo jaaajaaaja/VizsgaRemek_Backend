@@ -341,4 +341,16 @@ export class UserService {
       }
     })
   }
+
+  async interestList(loggedInUserId: number) {
+    const interests = await this.prisma.user_Interest.findMany({
+      where: { userID: loggedInUserId }
+    })
+
+    if(!interests) {
+      throw new NotFoundException("User has no interests set!")
+    }
+
+    return interests
+  }
 }

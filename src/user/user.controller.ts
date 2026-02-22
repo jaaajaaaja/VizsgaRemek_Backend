@@ -521,4 +521,42 @@ export class UserController {
     async friendlist(@Req() request: Request) {
         return this.userService.friendlist(request["user"].sub)
     }
+
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    GET user interests
+    ----------------------------------------------------------------------------------------------------------
+    */
+
+    @ApiOperation({ summary: "Felhasználó érdekeltségeinek lekérése" })
+    @ApiCookieAuth()
+    @ApiOkResponse({
+        description: "Visszaadja a felhasználó érdekeltségeit",
+        schema: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    id: { type: "number", example: 1 },
+                    interest: { type: "string", example: "beer_bar" },
+                    userID: { type: "number", example: 1 }
+                }
+            }
+        }
+    })
+    @ApiNotFoundResponse({
+        description: "Nincs beállítva érdekeltség a felhasználónak",
+        schema: {
+            type: "object",
+            properties: {
+                message: { type: "string", example: "User has no interests set!" }
+            }
+        }
+    })
+    @Get('/interests')
+    @UseGuards(AuthGuard)
+    @SkipThrottle({ basic: true, place: true, login: true })
+    async interestlist(@Req() request: Request) {
+        return this.userService.interestList(request["user"].sub)
+    }
 }
