@@ -129,7 +129,23 @@ export class PlaceService {
     }
 
     async getAllNews() {
-        return this.prisma.news.findMany()
+        return this.prisma.news.findMany({
+            where: { approved: true },
+            select: {
+                id: true,
+                text: true,
+                placeID: true,
+                userID: true,
+                createdAt: true,
+                place: {
+                    select: {
+                        name: true
+                    }
+                }
+            },
+            orderBy: { createdAt: "desc" },
+            take: 5
+        })
     }
 
     async approveNews(id: number) {

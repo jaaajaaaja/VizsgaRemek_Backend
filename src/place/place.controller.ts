@@ -86,8 +86,6 @@ export class PlaceController {
     }
   })
   @Get("/allNews")
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles("admin")
   @SkipThrottle({ basic: true, place: true, login: true })
   getAllNews() {
     return this.placeService.getAllNews()

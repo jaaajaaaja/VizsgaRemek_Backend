@@ -106,11 +106,12 @@ model Photo {
 }
 
 model News {
-  id       Int     @id @default(autoincrement())
-  text     String  @db.LongText
-  placeID  Int
-  userID   Int
-  approved Boolean @default(false)
-  place    Place   @relation(fields: [placeID], references: [id], onDelete: Cascade)
-  user     User    @relation(fields: [userID], references: [id], onDelete: Cascade)
+  id        Int      @id @default(autoincrement())
+  text      String   @db.LongText
+  placeID   Int
+  userID    Int
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  place     Place    @relation(fields: [placeID], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userID], references: [id], onDelete: Cascade)
 }
