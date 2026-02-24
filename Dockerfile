@@ -26,7 +26,6 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 ENTRYPOINT [ "docker-entrypoint.sh" ]
 
-
 EXPOSE 3000
 EXPOSE 5555
 
