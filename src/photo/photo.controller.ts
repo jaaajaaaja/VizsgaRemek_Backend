@@ -3,12 +3,12 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { PhotoService } from './photo.service';
 import { extname } from 'path';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from '../auth/auth.guard';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { CreatePhotoDto } from './dto/create-photo.dto';
 import { ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiBadRequestResponse, ApiConsumes, ApiCreatedResponse, ApiUnauthorizedResponse, ApiCookieAuth } from '@nestjs/swagger';
-import { RolesGuard } from 'src/auth/roles.guard';
-import { Roles } from 'src/auth/roles.decorator';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 
 @Controller('photo')
 export class PhotoController {

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PlaceController } from './place.controller';
 import { PlaceService } from './place.service';
 import { UpdatePlaceDto } from './dto/update-place.dto';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from '../auth/auth.guard';
 import { CreatePlaceCategoryDto } from './dto/create-place-category.dto';
 
 describe('PlaceController', () => {

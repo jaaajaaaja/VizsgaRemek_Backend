@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { PlaceService } from './place.service';
 import { NotFoundException } from '@nestjs/common';
 import { CreatePlaceCategoryDto } from './dto/create-place-category.dto';
