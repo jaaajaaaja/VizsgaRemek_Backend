@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  barsonar-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+      - "5555:5555"
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+      - uploads:/usr/src/app/uploads
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=mysql://appuser:apppassword@db:3306/barsonar
+      - NODE_ENV=development
+      - PORT=3000
+      - JWT_SECRET=secret
+      - COOKIE_SECRET=secret
+    depends_on:
+      - db
+    command: sh -c "npx prisma db push && npm run start:dev"
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    env_file:
+      - .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=barsonar
+      - MYSQL_USER=appuser
+      - MYSQL_PASSWORD=apppassword
+
+  prisma-studio:
+    image: node:22.19.0-alpine
+    working_dir: /app
+    volumes:
+      - ./:/app
+    ports:
+      - "5556:5555"
+    environment:
+      - DATABASE_URL=mysql://appuser:apppassword@db:3306/barsonar
+      - NODE_ENV=development
+    depends_on:
+      - db
+    command: npx prisma studio
+
+volumes:
+  mysql_data:
+  uploads:
