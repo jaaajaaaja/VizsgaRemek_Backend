@@ -12,8 +12,19 @@ async function bootstrap() {
 
   app.use(cookieParser(process.env.COOKIE_SECRET));
 
+  const frontend = process.env.FRONTEND_IP || "0.0.0.0"
+
   app.enableCors({
-    origin: ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://10.4.117.34:5173'],
+    origin: [
+      "localhost:5173",
+      "http://127.0.0.1:5173",
+      /^http:\/\/10\./,
+      /^http:\/\/172\.1[0-6]\./,
+      /^http:\/\/172\.2[0-9]\./,
+      /^http:\/\/172\.3[0-1]\./,
+      /^http:\/\/192\.168\./,
+      frontend
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     preflightContinue: false,
     optionsSuccessStatus: 204,

@@ -48,7 +48,7 @@ async function main() {
             role: "admin"
         }
     })
-    
+
     console.log("Admins in database: ", 1)
 
     await prisma.user.createMany({
@@ -310,11 +310,29 @@ async function main() {
     console.log("\nSeed complete!\n")
 }
 
-main()
-    .catch(err => {
-        console.error("Seed failed:", err)
-        process.exit(1)
-    })
-    .finally(async () => {
+async function isEmptyDb() {
+    const data = await prisma.user.findMany()
+
+    if (data.length === 0) {
+        main()
+            .catch(err => {
+                console.error("Seed failed:", err)
+                process.exit(1)
+            })
+            .finally(async () => {
+                await prisma.$disconnect()
+            })
+    } else {
+        console.log("\n" +
+                    " -------------------------------------------------------------------- \n" +
+                    "|                                                                    |\n" +
+                    "|   Seeding can not be executed because the database is not empty!   |\n" +
+                    "|                                                                    |\n" +
+                    " -------------------------------------------------------------------- "
+        )
+
         await prisma.$disconnect()
-    })
+    }
+}
+
+isEmptyDb()

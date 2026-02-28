@@ -4,7 +4,6 @@ WORKDIR /usr/src/app
 
 RUN apk add --no-cache netcat-openbsd
 
-
 COPY package*.json ./
 COPY tsconfig*.json ./
 COPY eslint.config.mjs ./
@@ -16,8 +15,6 @@ RUN npm install
 RUN npm install -g @nestjs/cli
 
 COPY src ./
-
-RUN npx prisma generate
 
 RUN npm run build
 
