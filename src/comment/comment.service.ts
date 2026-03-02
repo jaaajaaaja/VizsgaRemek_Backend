@@ -2,13 +2,11 @@ import { ForbiddenException, Injectable, NotFoundException, UnauthorizedExceptio
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { EventsGateway } from '../events/events.gateway';
 
 @Injectable()
 export class CommentService {
   constructor(
     private prisma: PrismaService,
-    private gateway: EventsGateway,
   ) { }
 
   async findOne(id: number) {
@@ -54,7 +52,23 @@ export class CommentService {
     }
 
     const comments = await this.prisma.comment.findMany({
-      where: { placeID: placeID, approved: true },
+      where: { 
+        placeID: placeID, approved: true 
+      },
+      select: {
+        id: true,
+        commentText: true,
+        rating: true,
+        createdAt: true,
+        updatedAt: true,        
+        placeID: true,
+        user: {
+          select: {
+            id: true,
+            userName: true
+          }
+        }
+      }
     })
 
     if (comments.length === 0) {

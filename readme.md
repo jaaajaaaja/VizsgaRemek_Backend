@@ -10,6 +10,7 @@
   - [1. Klónozás és függőségek telepítése](#1-klónozás-és-függőségek-telepítése)
   - [2. Környezeti változók](#2-környezeti-változók)
   - [3. Adatbázis beállítása](#3-adatbázis-beállítása)
+- [Futtatás Dockerben](#futtatás-dockerben)
 - [Adatbázis felépítése](#adatbázis-felépítése)
   - [Kapcsolatok](#kapcsolatok)
 - [Adatbázis seedelése](#adatbázis-seedelése)
@@ -39,6 +40,7 @@
 - **Tesztelés:** [Jest](https://www.npmjs.com/package/jest), [Supertest](https://www.npmjs.com/package/supertest)
 - **Kód formázás:** [Prettier](https://prettier.io/), [ESLint](https://eslint.org/)
 - **Teszt adatok generálása:** [Faker](https://fakerjs.dev/)
+- **Deployment:** [Docker](https://https://www.docker.com/)
 
 ---
 
@@ -95,6 +97,15 @@ npx prisma migrate dev --name migracio_neve
 
 # Prisma Client generálása
 npx prisma generate
+```
+
+## Futtatás Dockerben
+
+Ha nem szeretnéd fejleszteni az alkalmazást csak futtatni akkor elég ha letöltöd a Dockert beírsz két parancsot és már fut is a szerver. Természetesen a kódot attól még le kell tölteni a gépedre.
+
+```bash 
+docker build -t barsonar-backend --no-cache .
+docker compose up
 ```
 
 ## Adatbázis felépítése

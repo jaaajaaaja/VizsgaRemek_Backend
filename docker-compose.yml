@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-      - "5555:5555"
+      # - "5555:5555"
     volumes:
       - ./:/usr/src/app
       - /usr/src/app/node_modules
@@ -43,7 +43,7 @@ services:
     volumes:
       - ./:/app
     ports:
-      - "5556:5555"
+      - "5555:5555"
     environment:
       - DATABASE_URL=mysql://appuser:apppassword@db:3306/barsonar
       - NODE_ENV=development
