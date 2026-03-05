@@ -21,6 +21,7 @@ npm run build
 # Copy required prisma file for linux
 cp generated/prisma/libquery_engine-linux-musl-openssl-3.0.x.so.node ./dist/generated/prisma/
 
+# Listing folder to check if copy was successful
 echo "dist/generated/prisma"
 echo "--------------------------------------------------------------------------"
 ls dist/generated/prisma
