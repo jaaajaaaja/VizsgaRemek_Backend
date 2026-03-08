@@ -1,11 +1,8 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException, } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { SignInType } from 'src/types/auth-types';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +11,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) { }
 
-  async signIn(email: string, pass: string): Promise<any> {
+  async signIn(email: string, pass: string): Promise<SignInType> {
     console.log('Login attempt:', { email, pass: pass ? '***' : 'undefined' })
 
     const user = await this.userService.findOne(email)
@@ -27,13 +24,13 @@ export class AuthService {
     )
 
     if (!user) {
-      throw new NotFoundException('Invalid email or password!');
+      throw new NotFoundException('Invalid email or password!')
     }
 
-    const isPasswordValid = await bcrypt.compare(pass, user.password);
+    const isPasswordValid = await bcrypt.compare(pass, user.password)
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException()
     }
 
     console.log(

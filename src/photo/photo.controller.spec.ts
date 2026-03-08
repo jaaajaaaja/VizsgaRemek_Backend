@@ -1,12 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PhotoController } from './photo.controller';
-import { PrismaService } from '../prisma.service';
 import { PhotoService } from './photo.service';
 import { AuthGuard } from '../auth/auth.guard';
 
 describe('PhotoController', () => {
   let controller: PhotoController
-  let service: PhotoService
 
   const mockUser = {
     id: 1,
@@ -60,7 +58,6 @@ describe('PhotoController', () => {
       .compile()
 
     controller = module.get<PhotoController>(PhotoController)
-    service = module.get<PhotoService>(PhotoService)
   })
 
   afterEach(() => {

@@ -5,7 +5,10 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { SkipThrottle } from '@nestjs/throttler';
-import { ApiBadRequestResponse, ApiCookieAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiResponse, ApiUnauthorizedResponse, getSchemaPath } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse, ApiCookieAuth, ApiCreatedResponse, ApiForbiddenResponse,
+  ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiUnauthorizedResponse
+} from '@nestjs/swagger';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('comment')

@@ -6,7 +6,10 @@ import { AuthGuard } from '../auth/auth.guard';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CreateUserInterestDto } from './dto/create-user-interest.dto';
 import { FriendRequestDto } from './dto/friend-request.dto';
-import { ApiConflictResponse, ApiCookieAuth, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import {
+    ApiConflictResponse, ApiCookieAuth, ApiForbiddenResponse, ApiNotFoundResponse,
+    ApiOkResponse, ApiOperation, ApiParam, ApiUnauthorizedResponse
+} from '@nestjs/swagger';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 

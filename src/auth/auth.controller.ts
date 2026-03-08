@@ -6,8 +6,6 @@ import { SkipThrottle } from '@nestjs/throttler';
 import {
   ApiBadRequestResponse, ApiBody, ApiCookieAuth, ApiOkResponse, ApiOperation, ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { RolesGuard } from './roles.guard';
-import { Roles } from './roles.decorator';
 
 @Controller('auth')
 export class AuthController {

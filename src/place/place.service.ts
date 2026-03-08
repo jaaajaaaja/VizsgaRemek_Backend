@@ -1,16 +1,18 @@
 import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { UpdatePlaceDto } from './dto/update-place.dto';
 import { CreatePlaceDto } from './dto/create-place.dto';
 import { CreatePlaceCategoryDto } from './dto/create-place-category.dto';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
+import { GetAllByPlaceNewsType } from 'src/types/place-types';
+import { ApprovedByAdmin } from 'src/types/comment-types';
+import { News, Place, Place_Category } from 'generated/prisma/client';
 
 @Injectable()
 export class PlaceService {
     constructor(private prisma: PrismaService) { }
 
-    async getAll() {
+    async getAll(): Promise<Place[]> {
         const places = await this.prisma.place.findMany()
 
         if (!places) {
@@ -20,7 +22,7 @@ export class PlaceService {
         return places
     }
 
-    async getOne(id: number) {
+    async getOne(id: number): Promise<Place> {
         const place = await this.prisma.place.findUnique({ where: { id } })
 
         if (!place) {
@@ -30,7 +32,7 @@ export class PlaceService {
         return place
     }
 
-    async getOneByGoogleplaceID(googleplaceID: string) {
+    async getOneByGoogleplaceID(googleplaceID: string): Promise<Place> {
         const place = await this.prisma.place.findUnique({ where: { googleplaceID } })
 
         if (!place) {
@@ -40,11 +42,11 @@ export class PlaceService {
         return place
     }
 
-    async add(data: CreatePlaceDto) {
+    async add(data: CreatePlaceDto): Promise<Place> {
         return this.prisma.place.create({ data })
     }
 
-    async addPlaceCategory(data: CreatePlaceCategoryDto, placeID: number) {
+    async addPlaceCategory(data: CreatePlaceCategoryDto, placeID: number): Promise<Place_Category> {
         try {
             const fullData = {
                 category: data.category,
@@ -57,7 +59,7 @@ export class PlaceService {
         }
     }
 
-    async addNews(data: CreateNewsDto, loggedInUserId: number) {
+    async addNews(data: CreateNewsDto, loggedInUserId: number): Promise<News> {
         if (!loggedInUserId) {
             throw new UnauthorizedException("Log in to post news!")
         }
@@ -77,7 +79,7 @@ export class PlaceService {
         return this.prisma.news.create({ data: fullData })
     }
 
-    async updateNews(id: number, body: UpdateNewsDto, loggedInUserId: number) {
+    async updateNews(id: number, body: UpdateNewsDto, loggedInUserId: number): Promise<News> {
         const news = await this.prisma.news.findFirst({ where: { id } })
 
         if (!news) {
@@ -100,8 +102,8 @@ export class PlaceService {
         return this.prisma.news.update({ where: { id }, data: fullData })
     }
 
-    async getNews(placeID: number) {
-        const news = await this.prisma.news.findFirst({
+    async getNews(placeID: number): Promise<GetAllByPlaceNewsType[]> {
+        const news = await this.prisma.news.findMany({
             where: { placeID, approved: true },
             select: {
                 id: true,
@@ -118,7 +120,7 @@ export class PlaceService {
         return news
     }
 
-    async remove(id: number) {
+    async remove(id: number): Promise<Place> {
         const place = await this.prisma.place.findFirst({ where: { id } })
 
         if (!place) {
@@ -128,7 +130,7 @@ export class PlaceService {
         return this.prisma.place.delete({ where: { id } })
     }
 
-    async getAllNews() {
+    async getAllNews(): Promise<GetAllByPlaceNewsType[]> {
         return this.prisma.news.findMany({
             where: { approved: true },
             select: {
@@ -148,7 +150,7 @@ export class PlaceService {
         })
     }
 
-    async approveNews(id: number) {
+    async approveNews(id: number): Promise<ApprovedByAdmin> {
         const news = await this.prisma.news.findFirst({ where: { id } })
 
         if (!news) {

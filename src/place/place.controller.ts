@@ -8,7 +8,10 @@ import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { CreatePlaceCategoryDto } from './dto/create-place-category.dto';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
-import { ApiCookieAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import {
+  ApiCookieAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse,
+  ApiOkResponse, ApiOperation, ApiParam, ApiUnauthorizedResponse
+} from '@nestjs/swagger';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 

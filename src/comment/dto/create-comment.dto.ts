@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Transform, TransformFnParams } from "class-transformer";
-import { IsNotEmpty, IsNumber, IsOptional, IsString, Max, MaxLength, Min, MinLength, NotContains } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Max, MaxLength, Min, MinLength } from "class-validator";
 import sanitizeHtml from 'sanitize-html';
 
 export class CreateCommentDto {

@@ -1,11 +1,14 @@
 import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { GetAllBy, GetOne } from 'src/types/photo-types';
+import { ApprovedByAdmin } from 'src/types/comment-types';
+import { Photo } from 'generated/prisma/client';
 
 @Injectable()
 export class PhotoService {
     constructor(private prisma: PrismaService) { }
 
-    async getOne(id: number) {
+    async getOne(id: number): Promise<GetOne> {
         const photo = await this.prisma.photo.findUnique({
             where: { id },
             select: {
@@ -35,7 +38,7 @@ export class PhotoService {
         }
     }
 
-    async getAllByUser(userID: number) {
+    async getAllByUser(userID: number): Promise<GetAllBy[]> {
         const allByUser = await this.prisma.photo.findMany({
             where: { userID: userID, approved: true },
             select: {
@@ -54,7 +57,7 @@ export class PhotoService {
         return allByUser
     }
 
-    async getAllByPlace(placeID: number) {
+    async getAllByPlace(placeID: number): Promise<GetAllBy[]> {
         const allByPlace = await this.prisma.photo.findMany({
             where: { placeID: placeID, approved: true },
             select: {
@@ -73,7 +76,7 @@ export class PhotoService {
         return allByPlace
     }
 
-    async add(file: Express.Multer.File, userID: number, placeID: number, loggedInUserId: number) {
+    async add(file: Express.Multer.File, userID: number, placeID: number, loggedInUserId: number): Promise<Photo> {
         const user = await this.prisma.user.findUnique({
             where: { id: userID }
         })
@@ -101,7 +104,7 @@ export class PhotoService {
         })
     }
 
-    async remove(id: number, loggedInUserId: number) {
+    async remove(id: number, loggedInUserId: number): Promise<Photo> {
         const photo = await this.prisma.photo.findUnique({ where: { id } })
 
         if (!photo) {
@@ -115,7 +118,7 @@ export class PhotoService {
         return this.prisma.photo.delete({ where: { id } })
     }
 
-    async update(id: number) {
+    async update(id: number): Promise<ApprovedByAdmin> {
         const photo = await this.prisma.photo.findUnique({ where: { id } })
 
         if (!photo) {
@@ -127,7 +130,7 @@ export class PhotoService {
         return { id: data.id, approved: data.approved }
     }
 
-    getAll() {
+    getAll(): Promise<Photo[]> {
         return this.prisma.photo.findMany()
     }
 }
