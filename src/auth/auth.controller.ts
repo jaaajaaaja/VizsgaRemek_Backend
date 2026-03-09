@@ -36,18 +36,18 @@ export class AuthController {
     @Body() body: Record<string, any>,
     @Res({ passthrough: true }) res: express.Response,
   ) {
-    const result = await this.authService.signIn(body.email, body.password);
+    const result = await this.authService.signIn(body.email, body.password)
     res.cookie('access_token', result.access_token, {
       httpOnly: true,
       sameSite: 'lax',
       maxAge: 3600000,
       signed: true,
-    });
+    })
 
     return {
       userId: result.userId,
       email: result.email,
-    };
+    }
   }
 
   @ApiOperation({ summary: 'Profil lekérése', deprecated: true })
@@ -57,7 +57,7 @@ export class AuthController {
   @SkipThrottle({ place: true, login: true, postput: true })
   @Get('profile')
   getProfile(@Request() req) {
-    return req.user;
+    return req.user
   }
 
   @ApiOperation({ summary: 'Profil lekérése' })
@@ -91,7 +91,7 @@ export class AuthController {
   @SkipThrottle({ place: true, login: true, postput: true })
   @Post('logout')
   logout(@Res({ passthrough: true }) res: express.Response) {
-    res.clearCookie('access_token', { path: '/', httpOnly: true, sameSite: 'lax' });
-    return { message: 'Logged out successfully' };
+    res.clearCookie('access_token', { path: '/', httpOnly: true, sameSite: 'lax' })
+    return { message: 'Logged out successfully' }
   }
 }

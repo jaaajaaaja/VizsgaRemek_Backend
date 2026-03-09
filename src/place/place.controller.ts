@@ -204,7 +204,7 @@ export class PlaceController {
   @Get(':id')
   @SkipThrottle({ postput: true, place: true, login: true })
   async getOne(@Param('id', ParseIntPipe) id: number) {
-    return this.placeService.getOne(id);
+    return this.placeService.getOne(id)
   }
 
   /*
@@ -239,7 +239,7 @@ export class PlaceController {
   @Get('/getByGooglePlaceId/:googleplaceID')
   @SkipThrottle({ postput: true, place: true, login: true })
   async getOneByGooglePlaceId(@Param('googleplaceID') googleplaceID: string) {
-    return this.placeService.getOneByGoogleplaceID(googleplaceID);
+    return this.placeService.getOneByGoogleplaceID(googleplaceID)
   }
 
   /*
@@ -267,7 +267,7 @@ export class PlaceController {
   @SkipThrottle({ basic: true, place: true, login: true })
   @Throttle({ place: { ttl: 60000, limit: 10 } })
   async add(@Body() body: CreatePlaceDto) {
-    return this.placeService.add(body);
+    return this.placeService.add(body)
   }
 
   /*
@@ -305,7 +305,7 @@ export class PlaceController {
     @Param('placeID', ParseIntPipe) placeID: number,
     @Body() body: CreatePlaceCategoryDto,
   ) {
-    return this.placeService.addPlaceCategory(body, placeID);
+    return this.placeService.addPlaceCategory(body, placeID)
   }
 
   /*
@@ -343,7 +343,7 @@ export class PlaceController {
   @UseGuards(AuthGuard)
   @SkipThrottle({ basic: true, place: true, login: true })
   async addNews(@Req() request: Request, @Body() body: CreateNewsDto) {
-    return this.placeService.addNews(body, request['user'].sub);
+    return this.placeService.addNews(body, request['user'].sub)
   }
 
   /*
@@ -394,7 +394,7 @@ export class PlaceController {
     @Req() request: Request,
     @Body() body: UpdateNewsDto,
   ) {
-    return this.placeService.updateNews(id, body, request['user'].sub);
+    return this.placeService.updateNews(id, body, request['user'].sub)
   }
 
   /*

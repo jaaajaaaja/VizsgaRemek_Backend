@@ -70,7 +70,11 @@ describe('AuthService', () => {
 
       const result = await service.signIn(mockUser.email, mockUser.password)
 
-      expect(result).toEqual({ access_token: "jwt-token" })
+      expect(result).toEqual({
+        access_token: "jwt-token", "email": "test@test.com",
+        "role": undefined,
+        "userId": 1,
+      })
       expect(jwtService.signAsync).toHaveBeenCalledWith(
         {
           sub: mockUser.id,

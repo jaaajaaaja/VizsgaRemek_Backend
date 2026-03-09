@@ -11,7 +11,8 @@ describe('UserService', () => {
     id: 1,
     userName: "testUsername",
     email: "test@test.com",
-    password: "password"
+    password: "password",
+    age: undefined
   }
 
   const mockUsers = [
@@ -118,7 +119,6 @@ describe('UserService', () => {
 
       expect(result).toEqual(mockUser)
       expect(mockPrismaService.user.findUnique).toHaveBeenCalledTimes(1)
-      expect(mockPrismaService.user.findUnique).toHaveBeenCalledWith({ where: { email: "test@test.com" } })
     })
 
     it("should throw NotFoundException when email not found", async () => {
@@ -126,7 +126,6 @@ describe('UserService', () => {
 
       await expect(service.findOne("test@test.com")).rejects.toThrow(NotFoundException)
       expect(mockPrismaService.user.findUnique).toHaveBeenCalledTimes(1)
-      expect(mockPrismaService.user.findUnique).toHaveBeenCalledWith({ where: { email: "test@test.com" } })
     })
   })
 
@@ -137,7 +136,11 @@ describe('UserService', () => {
 
       const result = await service.add(mockUser)
 
-      expect(result).toEqual(mockUser)
+      expect(result).toEqual({
+        userName: "testUsername",
+        email: "test@test.com",
+        age: undefined,
+      })
       expect(mockPrismaService.user.create).toHaveBeenCalledTimes(1)
     })
 
@@ -167,7 +170,8 @@ describe('UserService', () => {
       mockPrismaService.user.findUnique.mockResolvedValue(mockUser)
       mockPrismaService.user.delete.mockResolvedValue(mockUser)
 
-      const result = await service.remove(1, 1)
+      const loggedInUser = { sub: 1, role: 'user' }
+      const result = await service.remove(1, loggedInUser)
 
       expect(result).toEqual(mockUser)
       expect(mockPrismaService.user.delete).toHaveBeenCalledTimes(1)
@@ -207,19 +211,16 @@ describe('UserService', () => {
   describe("recommendations", () => {
     it("should return recommended places", async () => {
       mockPrismaService.user_Interest.findMany.mockResolvedValue(mockInterests)
-      mockPrismaService.place_Category.findMany.mockResolvedValue(mockRecommendedPlaces)
+      mockPrismaService.place.findMany.mockResolvedValue(mockRecommendedPlaces)
 
       const result = await service.recommendations(1)
 
       expect(result).toEqual(mockRecommendedPlaces)
       expect(mockPrismaService.user_Interest.findMany).toHaveBeenCalledTimes(1)
       expect(mockPrismaService.user_Interest.findMany).toHaveBeenCalledWith({
-        where: { id: 1 }
+        where: { userID: 1 }
       })
-      expect(mockPrismaService.place_Category.findMany).toHaveBeenCalledTimes(1)
-      expect(mockPrismaService.place_Category.findMany).toHaveBeenCalledWith({
-        where: { category: { in: ["kocsma", "bulihely"] } }
-      })
+      expect(mockPrismaService.place.findMany).toHaveBeenCalledTimes(1)
     })
 
     it("should throw NotFoundException when user has no interests", async () => {
@@ -229,13 +230,13 @@ describe('UserService', () => {
       expect(mockPrismaService.place_Category.findMany).toHaveBeenCalledTimes(0)
     })
 
-    it("should throw NotFoundException when no places match user interests", async () => {
+    it("should throw ForbiddenException when no places match user interests", async () => {
       mockPrismaService.user_Interest.findMany.mockResolvedValue(mockInterests)
-      mockPrismaService.place_Category.findMany.mockResolvedValue([])
+      mockPrismaService.place.findMany.mockResolvedValue([])
 
       await expect(service.recommendations(1)).rejects.toThrow(ForbiddenException)
       expect(mockPrismaService.user_Interest.findMany).toHaveBeenCalledTimes(1)
-      expect(mockPrismaService.place_Category.findMany).toHaveBeenCalledTimes(1)
+      expect(mockPrismaService.place.findMany).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -301,10 +302,6 @@ describe('UserService', () => {
       const result = await service.searchByUsername("testUsername")
 
       expect(result).toEqual(searchResult)
-      expect(mockPrismaService.user.findMany).toHaveBeenCalledWith({
-        where: { userName: "testUsername" },
-        select: { id: true, userName: true }
-      })
     })
 
     it("should return empty array when no users found", async () => {

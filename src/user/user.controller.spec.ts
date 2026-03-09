@@ -116,7 +116,7 @@ describe('UserController', () => {
       const result = await controller.remove(1, { user: { sub: 1 } } as any)
 
       expect(result).toEqual(mockUser)
-      expect(service.remove).toHaveBeenCalledWith(1, 1)
+      expect(service.remove).toHaveBeenCalledWith(1, { sub: 1 })
       expect(service.remove).toHaveBeenCalledTimes(1)
     })
   })

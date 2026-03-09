@@ -165,7 +165,8 @@ describe('CommentService', () => {
       mockPrismaService.comment.findUnique.mockResolvedValue(mockComment)
       mockPrismaService.comment.delete.mockResolvedValue(mockComment)
 
-      const result = await service.remove(1, 1)
+      const loggedInUser = { sub: 1, role: 'user' }
+      const result = await service.remove(1, loggedInUser)
 
       expect(result).toEqual(mockComment)
       expect(mockPrismaService.comment.findUnique).toHaveBeenCalledWith({
@@ -189,7 +190,6 @@ describe('CommentService', () => {
       const updateCommentDto: UpdateCommentDto = {
         commentText: 'Updated comment text',
         rating: 5,
-        placeID: 1,
       }
 
       const existingComment = {

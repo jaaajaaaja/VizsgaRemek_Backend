@@ -6,7 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserInterestDto } from './dto/create-user-interest.dto';
 import * as bcrypt from 'bcrypt';
-import { FindOne, GetAllUserType, UserDataType } from 'src/types/user-types';
+import { AddUserType, FindOne, GetAllUserType, UserDataType } from 'src/types/user-types';
 import { Place, User, User_Interest } from 'generated/prisma/client';
 
 @Injectable()
@@ -25,31 +25,37 @@ export class UserService {
     })
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('User not found')
     }
 
-    return user;
+    return user
   }
 
-  async add(data: CreateUserDto): Promise<User> {
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(data.password, salt);
+  async add(data: CreateUserDto): Promise<AddUserType> {
+    const salt = await bcrypt.genSalt(10)
+    const hash = await bcrypt.hash(data.password, salt)
 
-    const email = data.email;
-    const user = await this.prisma.user.findUnique({ where: { email } });
+    const email = data.email
+    const user = await this.prisma.user.findUnique({ where: { email } })
 
     if (user) {
-      throw new ConflictException('Email already in use!');
+      throw new ConflictException('Email already in use!')
     }
 
-    return this.prisma.user.create({
+    const add = await this.prisma.user.create({
       data: {
         userName: data.userName,
         email: data.email,
         password: hash,
         age: data.age
       },
-    });
+    })
+
+    return {
+      userName: add.userName,
+      email: add.email,
+      age: add.age
+    }
   }
 
   async addUserInterest(
@@ -60,48 +66,48 @@ export class UserService {
       const fullData = {
         interest: data.interest,
         userID: loggedInUserId,
-      };
+      }
 
-      return this.prisma.user_Interest.create({ data: fullData });
+      return this.prisma.user_Interest.create({ data: fullData })
     } catch (e) {
-      throw new ForbiddenException('You already have this interest!');
+      throw new ForbiddenException('You already have this interest!')
     }
   }
 
   async remove(id: number, loggedInUser: any): Promise<User> {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+    const user = await this.prisma.user.findUnique({ where: { id } })
 
     if (!user) {
-      throw new NotFoundException('User not found!');
+      throw new NotFoundException('User not found!')
     }
 
     if (user.id != loggedInUser.sub && loggedInUser.role != "admin") {
-      throw new ForbiddenException('You can only delete your own profile!');
+      throw new ForbiddenException('You can only delete your own profile!')
     }
 
-    return this.prisma.user.delete({ where: { id } });
+    return this.prisma.user.delete({ where: { id } })
   }
 
   async update(id: number, data: UpdateUserDto, loggedInUserId: number): Promise<User> {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+    const user = await this.prisma.user.findUnique({ where: { id } })
 
     if (!user) {
-      throw new NotFoundException('User not found!');
+      throw new NotFoundException('User not found!')
     }
 
     if (user.id != loggedInUserId) {
-      throw new ForbiddenException('You can only edit your own profile!');
+      throw new ForbiddenException('You can only edit your own profile!')
     }
 
-    return this.prisma.user.update({ where: { id }, data });
+    return this.prisma.user.update({ where: { id }, data })
   }
 
   async recommendations(loggedInUserId: number): Promise<{ id: number, name: string }[]> {
     const interests = await this.prisma.user_Interest.findMany({
-      where: { id: loggedInUserId },
+      where: { userID: loggedInUserId },
     })
 
-    if (interests.length === 0 || !interests) {
+    if (interests.length === 0) {
       throw new NotFoundException('User has no interests!')
     }
 
@@ -124,7 +130,7 @@ export class UserService {
     })
 
     if (recommendations.length === 0) {
-      throw new ForbiddenException('No places found matching your interests!');
+      throw new ForbiddenException('No places found matching your interests!')
     }
 
     return recommendations
@@ -225,7 +231,7 @@ export class UserService {
     })
 
     if (friend) {
-      throw new ForbiddenException('You already have this user as a friend!');
+      throw new ForbiddenException('You already have this user as a friend!')
     } else {
       try {
         return this.prisma.pending_Friend_Request.create({
@@ -233,9 +239,9 @@ export class UserService {
             userID: loggedInUserId,
             friendID: sentToUserId,
           },
-        });
+        })
       } catch (e) {
-        throw new ConflictException('You already sent a request to this user!');
+        throw new ConflictException('You already sent a request to this user!')
       }
     }
   }
@@ -250,21 +256,21 @@ export class UserService {
         userID: recievedFromUserId,
         friendID: loggedInUserId,
       },
-    });
+    })
 
     if (!request) {
       throw new NotFoundException(
         'You do not have a pending friend request from this user!',
-      );
+      )
     }
 
     if (accepted) {
-      await this.prisma.user_Friend.create({ data: request });
-      await this.prisma.pending_Friend_Request.delete({ where: request });
-      return { message: 'Friend request accepted' };
+      await this.prisma.user_Friend.create({ data: request })
+      await this.prisma.pending_Friend_Request.delete({ where: request })
+      return { message: 'Friend request accepted' }
     } else {
-      await this.prisma.pending_Friend_Request.delete({ where: request });
-      return { message: 'Friend request rejected!' };
+      await this.prisma.pending_Friend_Request.delete({ where: request })
+      return { message: 'Friend request rejected!' }
     }
   }
 
@@ -293,7 +299,7 @@ export class UserService {
 
   async friendlist(loggedInUserId: number): Promise<{ id: number, userName: string }[]> {
     if (!loggedInUserId) {
-      throw new UnauthorizedException('Log in to see your friendlist!');
+      throw new UnauthorizedException('Log in to see your friendlist!')
     }
 
     const friends = await this.prisma.user_Friend.findMany({

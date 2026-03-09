@@ -64,7 +64,7 @@ describe('AuthController', () => {
 
     const result = await controller.signIn(body, mockResponse)
 
-    expect(service.signIn).toHaveBeenCalledWith(body.email, body.password)    
+    expect(service.signIn).toHaveBeenCalledWith(body.email, body.password)
   })
 
   it('signIn should throw UnauthorizedException on invalid credentials', async () => {
@@ -72,7 +72,7 @@ describe('AuthController', () => {
       email: 'test@example.com',
       password: 'wrongpassword',
     }
-    
+
     mockAuthService.signIn.mockRejectedValue(new UnauthorizedException())
 
     await expect(controller.signIn(body, mockResponse)).rejects.toThrow(UnauthorizedException)
@@ -97,7 +97,7 @@ describe('AuthController', () => {
   it('logout should clear access_token cookie', () => {
     const result = controller.logout(mockResponse)
 
-    expect(mockResponse.clearCookie).toHaveBeenCalledWith('access_token')
+    expect(mockResponse.clearCookie).toHaveBeenCalledWith('access_token', { "httpOnly": true, "path": "/", "sameSite": "lax" })
     expect(result).toEqual({ message: 'Logged out successfully' })
   })
 })
