@@ -12,6 +12,12 @@ import { Place, User, User_Interest } from 'generated/prisma/client';
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) { }
+  
+  /*
+    ----------------------------------------------------------------------------------------------------------
+    DEFAULT FUNCTIONS
+    ----------------------------------------------------------------------------------------------------------
+  */
 
   async findOne(email: string): Promise<FindOne> {
     const user = await this.prisma.user.findUnique({
@@ -58,22 +64,6 @@ export class UserService {
     }
   }
 
-  async addUserInterest(
-    data: CreateUserInterestDto,
-    loggedInUserId: number
-  ): Promise<User_Interest> {
-    try {
-      const fullData = {
-        interest: data.interest,
-        userID: loggedInUserId,
-      }
-
-      return this.prisma.user_Interest.create({ data: fullData })
-    } catch (e) {
-      throw new ForbiddenException('You already have this interest!')
-    }
-  }
-
   async remove(id: number, loggedInUser: any): Promise<User> {
     const user = await this.prisma.user.findUnique({ where: { id } })
 
@@ -101,6 +91,53 @@ export class UserService {
 
     return this.prisma.user.update({ where: { id }, data })
   }
+
+  async getAllUsers(): Promise<GetAllUserType[]> {
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        userName: true,
+        email: true,
+        age: true,
+        role: true,
+      }
+    })
+  }
+
+  async deleteUserByAdmin(id: number): Promise<User> {
+    const user = await this.prisma.user.findFirst({ where: { id } })
+
+    if (!user) {
+      throw new NotFoundException("User not found!")
+    }
+
+    return this.prisma.user.delete({ where: { id } })
+  }
+
+
+  async getUserData(loggedInUserId: number): Promise<UserDataType> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: loggedInUserId },
+      select: {
+        id: true,
+        userName: true,
+        email: true,
+        age: true,
+      }
+    })
+
+    if (!user) {
+      throw new NotFoundException("User not found!")
+    }
+
+    return user
+  }
+
+  /*
+    ----------------------------------------------------------------------------------------------------------
+    FRIENDS
+    ----------------------------------------------------------------------------------------------------------
+  */
 
   async recommendations(loggedInUserId: number): Promise<{ id: number, name: string }[]> {
     const interests = await this.prisma.user_Interest.findMany({
@@ -197,6 +234,12 @@ export class UserService {
 
     return places.map(({ comments, ...place }) => place)
   }
+
+  /*
+    ----------------------------------------------------------------------------------------------------------
+    FRIENDS
+    ----------------------------------------------------------------------------------------------------------
+  */
 
   async addFriend(
     sentToUserId: number,
@@ -321,44 +364,47 @@ export class UserService {
     return friends.map((f) => f.friend)
   }
 
-  async getUserData(loggedInUserId: number): Promise<UserDataType> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: loggedInUserId },
-      select: {
-        id: true,
-        userName: true,
-        email: true,
-        age: true,
+  /*
+    ----------------------------------------------------------------------------------------------------------
+    INTERESTS
+    ----------------------------------------------------------------------------------------------------------
+  */
+
+
+
+  async deleteUserInterest(id: number, loggedInUserId: number): Promise<User_Interest> {
+    const interest = await this.prisma.user_Interest.findFirst({
+      where: {
+        id: id,
+        userID: loggedInUserId
       }
     })
 
-    if (!user) {
-      throw new NotFoundException("User not found!")
+    if (!interest) {
+      throw new NotFoundException("Interest not found!")
     }
 
-    return user
-  }
-
-  async getAllUsers(): Promise<GetAllUserType[]> {
-    return this.prisma.user.findMany({
-      select: {
-        id: true,
-        userName: true,
-        email: true,
-        age: true,
-        role: true,
-      }
+    const deleteInterest = await this.prisma.user_Interest.delete({
+      where: { id: interest.id }
     })
+
+    return deleteInterest
   }
 
-  async deleteUserByAdmin(id: number): Promise<User> {
-    const user = await this.prisma.user.findFirst({ where: { id } })
+  async addUserInterest(
+    data: CreateUserInterestDto,
+    loggedInUserId: number
+  ): Promise<User_Interest> {
+    try {
+      const fullData = {
+        interest: data.interest,
+        userID: loggedInUserId,
+      }
 
-    if (!user) {
-      throw new NotFoundException("User not found!")
+      return this.prisma.user_Interest.create({ data: fullData })
+    } catch (e) {
+      throw new ForbiddenException('You already have this interest!')
     }
-
-    return this.prisma.user.delete({ where: { id } })
   }
 
   async getAllUserInterestByAdmin(): Promise<User_Interest[]> {

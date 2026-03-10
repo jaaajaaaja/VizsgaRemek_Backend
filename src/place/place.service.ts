@@ -12,6 +12,13 @@ import { News, Place, Place_Category } from 'generated/prisma/client';
 export class PlaceService {
     constructor(private prisma: PrismaService) { }
 
+
+    /*
+        ----------------------------------------------------------------------------------------------------------
+        PLACE
+        ----------------------------------------------------------------------------------------------------------
+    */
+
     async getAll(): Promise<Place[]> {
         const places = await this.prisma.place.findMany()
 
@@ -46,6 +53,22 @@ export class PlaceService {
         return this.prisma.place.create({ data })
     }
 
+    async remove(id: number): Promise<Place> {
+        const place = await this.prisma.place.findFirst({ where: { id } })
+
+        if (!place) {
+            throw new NotFoundException("Place not found!")
+        }
+
+        return this.prisma.place.delete({ where: { id } })
+    }
+
+    /*
+        ----------------------------------------------------------------------------------------------------------
+        PLACE CATEGORY
+        ----------------------------------------------------------------------------------------------------------
+    */
+
     async addPlaceCategory(data: CreatePlaceCategoryDto, placeID: number): Promise<Place_Category> {
         try {
             const fullData = {
@@ -58,6 +81,12 @@ export class PlaceService {
             throw new ForbiddenException("Place already has this category!")
         }
     }
+
+    /*
+        ----------------------------------------------------------------------------------------------------------
+        NEWS
+        ----------------------------------------------------------------------------------------------------------
+    */
 
     async addNews(data: CreateNewsDto, loggedInUserId: number): Promise<News> {
         if (!loggedInUserId) {
@@ -118,16 +147,6 @@ export class PlaceService {
         }
 
         return news
-    }
-
-    async remove(id: number): Promise<Place> {
-        const place = await this.prisma.place.findFirst({ where: { id } })
-
-        if (!place) {
-            throw new NotFoundException("Place not found!")
-        }
-
-        return this.prisma.place.delete({ where: { id } })
     }
 
     async getAllNews(): Promise<GetAllByPlaceNewsType[]> {

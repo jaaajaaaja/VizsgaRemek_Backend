@@ -6,29 +6,14 @@ import { SkipThrottle } from '@nestjs/throttler';
 import {
   ApiBadRequestResponse, ApiBody, ApiCookieAuth, ApiOkResponse, ApiOperation, ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { GetMe, GetProfile, Login, Logout } from 'src/decorators/auth.decorator';
+import { DisabledGuard } from 'src/decorators/disabled.decorator';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) { }
 
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        email: { type: 'string', example: 'user@example.com' },
-        password: { type: 'string', example: 'password123' },
-      },
-      required: ['email', 'password'],
-    },
-  })
-  @ApiOperation({ summary: 'Bejelentkezés (JWT cookie-ba)' })
-  @ApiOkResponse({ description: 'Sikeres bejelentkezés' })
-  @ApiBadRequestResponse({
-    description: 'Sikertelen bejelentkezés (helytelen email vagy jelszó)',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Sikertelen bejelentkezés (hibás jelszó)',
-  })
+  @Login()
   @HttpCode(HttpStatus.OK)
   @SkipThrottle({ place: true, basic: true, postput: true })
   @Post('login')
@@ -50,30 +35,18 @@ export class AuthController {
     }
   }
 
-  @ApiOperation({ summary: 'Profil lekérése', deprecated: true })
-  @ApiCookieAuth()
-  @ApiOkResponse({ description: 'Lekért profil' })
-  @UseGuards(AuthGuard)
+  /**
+ * @deprecated Use `getUserProfile()` instead.
+ */
+  @GetProfile()
+  @UseGuards(DisabledGuard)
   @SkipThrottle({ place: true, login: true, postput: true })
   @Get('profile')
-  getProfile(@Request() req) {
+  async getProfile(@Request() req: any) {
     return req.user
   }
 
-  @ApiOperation({ summary: 'Profil lekérése' })
-  @ApiCookieAuth()
-  @ApiOkResponse({
-    description: 'Lekért profil',
-    schema: {
-      type: "object",
-      properties: {
-        id: { type: "number", example: 1 },
-        userName: { type: "string", example: "felhasználónév" },
-        email: { type: "string", example: "felhasznalo@pelda.com" },
-        age: { type: "number", example: 18 }
-      }
-    }
-  })
+  @GetMe()
   @UseGuards(AuthGuard)
   @SkipThrottle({ place: true, login: true, postput: true })
   @Get('me')
@@ -81,12 +54,7 @@ export class AuthController {
     return this.authService.getProfile(request["user"].sub)
   }
 
-  @ApiOperation({
-    summary: 'Kijelentkezés',
-    description: 'Szükséges hogy a felhasználó be legyen jelentkezve!',
-  })
-  @ApiCookieAuth()
-  @ApiOkResponse({ description: 'Sikeres kijelentkezés' })
+  @Logout()
   @UseGuards(AuthGuard)
   @SkipThrottle({ place: true, login: true, postput: true })
   @Post('logout')
