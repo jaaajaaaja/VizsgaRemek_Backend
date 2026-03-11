@@ -26,19 +26,23 @@
 
 ## <span style="color:purple">Stack</span>
 
-- **Framework:** [<span style="color:#E92747">NestJS</span> <span style="color:#68a063 ">(Node.js)</span>](https://nestjs.com/)
-- **Programozási nyelv:** [<span style="color:#007acc">TypeScript</span>](https://www.typescriptlang.org/)
-- **Adatbázis:** [<span style="color:#00758F">My</span><span style="color:#F29111">SQL</span>](https://www.mysql.com/)
-- **ORM:** [<span style="color:#3DBFA6">Prisma</span>](https://www.prisma.io/)
-- **Autentikáció:** [<span style="color:#7549F2">JWT</span>](https://www.jwt.io/) (JSON Web Tokens)
-- **Jelszó titkosítás:** [<span style="color:#E05D44">bcrypt</span>](https://www.npmjs.com/package/bcrypt)
-- **Fájlfeltöltés:** [<span style="color:#68a063">Multer</span>](https://www.npmjs.com/package/multer)
-- **Validáció:** [class-validator, class-transformer](https://docs.nestjs.com/techniques/validation)
-- **Kérések maximalizálása:** [Trottler](https://github.com/nestjs/throttler)
-- **Tesztelés:** [<span style="color:#C21325">Jest</span>](https://www.npmjs.com/package/jest), [Supertest](https://www.npmjs.com/package/supertest)
-- **Kód formázás:** [<span style="color:#56B3B4">Prettier</span>](https://prettier.io/), [<span style="color:#4b32c3">ESLint</span>](https://eslint.org/)
-- **Teszt adatok generálása:** [<span style="color:#1FC994">Faker</span>](https://fakerjs.dev/)
-- **Deployment:** [<span style="color:#1D63ED">Docker</span>](https://https://www.docker.com/)
+![NestJS](https://img.shields.io/badge/NestJS-E0234E?logo=nestjs\&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-339933?logo=node.js\&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript\&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker\&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=mysql\&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-2D3748?logo=prisma\&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-black?logo=jsonwebtokens\&logoColor=white)
+![bcrypt](https://img.shields.io/badge/bcrypt-003A70)
+![Multer](https://img.shields.io/badge/Multer-FF6C37)
+![class--validator](https://img.shields.io/badge/class--validator-E34F26)
+![class--transformer](https://img.shields.io/badge/class--transformer-6DB33F)
+![Throttler](https://img.shields.io/badge/Throttler-FF9800)
+![Jest](https://img.shields.io/badge/Jest-C21325?logo=jest\&logoColor=white)
+![Supertest](https://img.shields.io/badge/Supertest-000000)
+![Prettier](https://img.shields.io/badge/Prettier-F7B93E?logo=prettier\&logoColor=black)
+![ESLint](https://img.shields.io/badge/ESLint-4B32C3?logo=eslint\&logoColor=white)
+![Faker](https://img.shields.io/badge/Faker-1A1A1A)
 
 ---
 
