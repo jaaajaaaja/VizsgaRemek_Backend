@@ -42,7 +42,8 @@ describe('PhotoService', () => {
       findMany: jest.fn(),
       findUnique: jest.fn(),
       create: jest.fn(),
-      delete: jest.fn()
+      delete: jest.fn(),
+      createMany: jest.fn(),
     },
     user: {
       findUnique: jest.fn()
@@ -93,7 +94,7 @@ describe('PhotoService', () => {
     it("should throw NotFoundException when photo does not exist", async () => {
       mockPrismaService.photo.findUnique.mockResolvedValue(null)
 
-      await expect(service.getOne(1)).rejects.toThrow(NotFoundException)      
+      await expect(service.getOne(1)).rejects.toThrow(NotFoundException)
     })
   })
 
@@ -153,10 +154,10 @@ describe('PhotoService', () => {
 
   describe("post", () => {
     it('should create a photo', async () => {
-      const file = {
+      const file = [{
         filename: 'test.jpg',
         mimetype: 'image/jpeg',
-      } as Express.Multer.File
+      }] as Express.Multer.File[]
 
       const userID = 1
       const placeID = 2
@@ -172,24 +173,19 @@ describe('PhotoService', () => {
 
       mockPrismaService.user.findUnique.mockResolvedValue({ id: userID })
       mockPrismaService.place.findUnique.mockResolvedValue({ id: placeID })
-      
+
       const result = await service.add(file, userID, placeID, loggedInUserId)
 
-      expect(mockPrismaService.photo.create).toHaveBeenCalledWith({
-        data: {
-          location: 'uploads/test.jpg',
-          type: 'image/jpeg',
-          userID: loggedInUserId,
-          placeID,
-        },
+      expect(mockPrismaService.photo.createMany).toHaveBeenCalledWith({
+        data: [
+          {
+            location: 'uploads/test.jpg',
+            type: 'image/jpeg',
+            userID: loggedInUserId,
+            placeID,
+          }
+        ],
       })
-
-      expect(result).toEqual(
-        expect.objectContaining({
-          location: 'uploads/test.jpg',
-          type: 'image/jpeg',
-        }),
-      )
     })
   })
 

@@ -25,3 +25,10 @@ export type GetAllBy = Prisma.PhotoGetPayload<{
         }
     }
 }>
+
+export type FilesArray = {
+    location: string
+    type: string
+    userID: number
+    placeID: number
+}

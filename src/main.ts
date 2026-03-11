@@ -6,11 +6,13 @@ import { ValidationPipe } from '@nestjs/common';
 import * as express from 'express';
 import cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import chalk from 'chalk';
+import * as ip from "ip"
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule)
 
-  app.use(cookieParser(process.env.COOKIE_SECRET));
+  app.use(cookieParser(process.env.COOKIE_SECRET))
 
   const frontend = process.env.FRONTEND_IP
 
@@ -37,15 +39,15 @@ async function bootstrap() {
     preflightContinue: false,
     optionsSuccessStatus: 204,
     credentials: true,
-  });
+  })
 
   const config = new DocumentBuilder()
     .setTitle('Barsonar API')
     .setDescription('Barsonar Backend NestJS + Prisma + Swagger')
     .setVersion('1.0.0')
-    .build();
+    .build()
 
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, config)
 
   SwaggerModule.setup('api', app, document, {
     swaggerOptions: {
@@ -57,25 +59,29 @@ async function bootstrap() {
           put: 4,
         };
 
-        const methodA = a.get('method');
-        const methodB = b.get('method');
+        const methodA = a.get('method')
+        const methodB = b.get('method')
 
-        return (methodOrder[methodA] || 99) - (methodOrder[methodB] || 99);
-      },
-    },
-  });
+        return (methodOrder[methodA] || 99) - (methodOrder[methodB] || 99)
+      }
+    }
+  })
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe())
 
-  app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
+  app.use('/uploads', express.static(join(process.cwd(), 'uploads')))
 
   // await app.listen(process.env.PORT ?? 3000);
 
-  const port = process.env.PORT ?? 3000;
-  await app.listen(port, '0.0.0.0');
-  console.log(`\nServer running on http://0.0.0.0:${port}`);
+  const port = process.env.PORT ?? 3000
+  await app.listen(port, '0.0.0.0')
+  const address = ip.address()
 
-  console.log("\nAllowed origins:\n")
+  console.log(
+    chalk.red(`\n${chalk.rgb(128, 0, 128)("Server running on:")} http://${address}:${port}`)
+  )
+
+  console.log(chalk.green(`\n${chalk.rgb(128, 0, 128)("Allowed origins:")}`))
   origins.forEach((e) => {
     if (typeof e !== "string") {
       e =
@@ -86,7 +92,7 @@ async function bootstrap() {
           .replace(/\\\./, "")
     }
 
-    console.log(e)
+    console.log(chalk.green(`\t${e}`))
   })
 }
 void bootstrap();

@@ -1,6 +1,7 @@
 import {
     Body, Controller, Delete, Get, Param, Post, UseInterceptors, UploadedFiles, ParseIntPipe,
-    UseGuards, Req, BadRequestException, UnsupportedMediaTypeException, ConflictException, Put
+    UseGuards, Req, BadRequestException, UnsupportedMediaTypeException, ConflictException, Put,
+    HttpStatus
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -124,16 +125,16 @@ export class PhotoController {
             callback(null, true)
         }
     }))
-    async uploadFile(@UploadedFiles() files: Express.Multer.File[], @Body() body: CreatePhotoDto, @Req() request: Request) {
+    async uploadFile(
+        @UploadedFiles() files: Express.Multer.File[],
+        @Body() body: CreatePhotoDto,
+        @Req() request: Request
+    ) {
         if (!files || files.length === 0) {
             throw new ConflictException("No files were uploaded!")
         }
 
-        for (const file of files) {
-            await this.photoService.add(file, body.userID, body.placeID, request["user"].sub)
-        }
-
-        return 201
+        return this.photoService.add(files, body.userID, body.placeID, request["user"].sub)
     }
 
     /*

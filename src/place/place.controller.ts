@@ -115,7 +115,7 @@ export class PlaceController {
   //GET all news
 
   @AdminGetAllNews()
-  @Get("/allNews")
+  @Get("/news/all")
   @SkipThrottle({ basic: true, place: true, login: true })
   getAllNews() {
     return this.placeService.getAllNews()

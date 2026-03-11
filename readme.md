@@ -1,68 +1,67 @@
-![Barsonar Backend](https://github.com/user-attachments/assets/1a878232-55f6-40bb-94ba-2e5be3fd6647)
+![Barsonar Backend](./assets/barsonar-backend-logo.png)
 
 
-## Tartalomjegyzék
-
+## <span style="color:purple">Tartalomjegyzék</span>
 - [Tartalomjegyzék](#tartalomjegyzék)
 - [Stack](#stack)
 - [Előfeltételek](#előfeltételek)
 - [Telepítés](#telepítés)
-  - [1. Klónozás és függőségek telepítése](#1-klónozás-és-függőségek-telepítése)
-  - [2. Környezeti változók](#2-környezeti-változók)
-  - [3. Adatbázis beállítása](#3-adatbázis-beállítása)
+    - [1. Klónozás és függőségek telepítése](#1-klónozás-és-függőségek-telepítése)
+    - [2. Környezeti változók](#2-környezeti-változók)
+    - [3. Adatbázis beállítása](#3-adatbázis-beállítása)
 - [Futtatás Dockerben](#futtatás-dockerben)
 - [Adatbázis felépítése](#adatbázis-felépítése)
-  - [Kapcsolatok](#kapcsolatok)
-- [Adatbázis seedelése](#adatbázis-seedelése)
+    - [Kapcsolatok](#kapcsolatok)
 - [Futtatás](#futtatás)
-  - [A feltöltött képek elérése](#a-feltöltött-képek-elérése)
+- [A feltöltött képek elérése](#a-feltöltött-képek-elérése)
 - [Tesztelés](#tesztelés)
-  - [Unit tesztek](#unit-tesztek)
-  - [E2E tesztek](#e2e-tesztek)
-  - [Tesztek helyileg](#tesztek-helyileg)
+    - [Unit tesztek](#unit-tesztek)
+    - [E2E tesztek](#e2e-tesztek)
+    - [Tesztek helyileg](#tesztek-helyileg)
 - [Biztonsági megjegyzések](#biztonsági-megjegyzések)
-  - [Fontos figyelmeztetések](#fontos-figyelmeztetések)
+    - [Fontos figyelmeztetések](#fontos-figyelmeztetések)
 - [Hozzájárulás](#hozzájárulás)
 
 ---
 
-## Stack
+## <span style="color:purple">Stack</span>
 
-- **Framework:** [NestJS](https://nestjs.com/) (Node.js)
-- **Programozási nyelv:** [TypeScript](https://www.typescriptlang.org/)
-- **Adatbázis:** [MySQL](https://www.mysql.com/)
-- **ORM:** [Prisma](https://www.prisma.io/)
-- **Autentikáció:** [JWT](https://www.jwt.io/) (JSON Web Tokens)
-- **Jelszó titkosítás:** [bcrypt](https://www.npmjs.com/package/bcrypt)
-- **Fájlfeltöltés:** [Multer](https://www.npmjs.com/package/multer)
+- **Framework:** [<span style="color:#E92747">NestJS</span> <span style="color:#68a063 ">(Node.js)</span>](https://nestjs.com/)
+- **Programozási nyelv:** [<span style="color:#007acc">TypeScript</span>](https://www.typescriptlang.org/)
+- **Adatbázis:** [<span style="color:#00758F">My</span><span style="color:#F29111">SQL</span>](https://www.mysql.com/)
+- **ORM:** [<span style="color:#3DBFA6">Prisma</span>](https://www.prisma.io/)
+- **Autentikáció:** [<span style="color:#7549F2">JWT</span>](https://www.jwt.io/) (JSON Web Tokens)
+- **Jelszó titkosítás:** [<span style="color:#E05D44">bcrypt</span>](https://www.npmjs.com/package/bcrypt)
+- **Fájlfeltöltés:** [<span style="color:#68a063">Multer</span>](https://www.npmjs.com/package/multer)
 - **Validáció:** [class-validator, class-transformer](https://docs.nestjs.com/techniques/validation)
 - **Kérések maximalizálása:** [Trottler](https://github.com/nestjs/throttler)
-- **Tesztelés:** [Jest](https://www.npmjs.com/package/jest), [Supertest](https://www.npmjs.com/package/supertest)
-- **Kód formázás:** [Prettier](https://prettier.io/), [ESLint](https://eslint.org/)
-- **Teszt adatok generálása:** [Faker](https://fakerjs.dev/)
-- **Deployment:** [Docker](https://https://www.docker.com/)
+- **Tesztelés:** [<span style="color:#C21325">Jest</span>](https://www.npmjs.com/package/jest), [Supertest](https://www.npmjs.com/package/supertest)
+- **Kód formázás:** [<span style="color:#56B3B4">Prettier</span>](https://prettier.io/), [<span style="color:#4b32c3">ESLint</span>](https://eslint.org/)
+- **Teszt adatok generálása:** [<span style="color:#1FC994">Faker</span>](https://fakerjs.dev/)
+- **Deployment:** [<span style="color:#1D63ED">Docker</span>](https://https://www.docker.com/)
 
 ---
 
-## Előfeltételek
+## <span style="color:purple">Előfeltételek</span>
 
 A projekt futtatásához szükséges:
 
-- **Node.js**
-- **npm**
-- **MySQL** adatbázis
+- **<span style="color:red">Node.js</span>**
+- **<span style="color:red">npm</span>**
+- **<span style="color:red">MySQL</span>**
+- **<span style="color: #1D63ED">Docker Desktop</span>**, ha csak futtatni szeretnéd a programot, nem fejleszteni
 
 ---
 
-## Telepítés
+## <span style="color:purple">Telepítés</span>
 
-### 1. Klónozás és függőségek telepítése
+#### 1. Klónozás és függőségek telepítése
 
 ```bash
 # Klónozd a repository-t  
 git clone <repository-url>
 
-# Lépj be a mappába ahova klónoztad aztán telepítsd a függőségeket (node_modules mappa)  
+# Lépj be a mappába ahova klónoztad a projektet, és telepítsd a függőségeket (node_modules mappa)  
 npm install
 ```
 
@@ -72,15 +71,16 @@ Hozz létre egy adatbázist MySQL-ben
 CREATE DATABASE adatbazis_neve
 ```
 
-### 2. Környezeti változók
+#### 2. Környezeti változók
 
 Nevezd át a projekt gyökerében lévő `.env.example` fájlt `.env`-re és állítsd be a következő képpen:
 
 ```env
-DATABASE_URL="mysql://felhasznalonev:jelszo@localhost:3306/adatbazis_neve"
+PORT=[számmal add meg a portot amelyen szeretnéd hogy fusson a backend]
+DATABASE_URL=mysql://felhasznalonev:jelszo@localhost:3306/adatbazis_neve
 JWT_SECRET=titkos_kulcs_ide
 COOKIE_SECRET=másik_titkos_kulcs_ide
-PORT=[számmal add meg a portot amelyen szeretnéd hogy fusson a backend]
+FRONTEND_IP=[az esetleges frontend ip címe, ha az nem localhost-on fut]
 ```
 
 Megjegyzés:  
@@ -89,17 +89,25 @@ Ha nem állítottál be külön felhasználót és annak egy jelszót az adatbá
 
 A `JWT_SECRET` és a `COOKIE_SECRET` pedig erős, véletlenszerű karakterláncok legyenek ha publikálni akarod a weboldalt. Éles környezetben használj legalább 32 karakter hosszú stringet.
 
-### 3. Adatbázis beállítása
+#### 3. Adatbázis beállítása
 
 ```bash
-# Prisma migrációk futtatása
-npx prisma migrate dev --name migracio_neve
+# A létrehozott adatbázis feltöltése
+npx prisma db push
+# vagy 
+npx prisma migrate reset # Csak fejlesztés közben add ki ezt a parancsot (itt a seed parancs is lefut)
+# Mind a két esetben a Prisma Client legenerálódik
 
-# Prisma Client generálása
-npx prisma generate
+# Új migráció hozzáadása
+npx prisma migrate dev --name migracio_neve
+  -> # Ebben az esetben viszont manuálisan le kell generálni a Prisma Clientet
+  npx prisma generate
+
+# Adatbázis feltöltése adatokkal (ha nem a migrate reset parancsot adtad ki)
+npx prisma db seed
 ```
 
-## Futtatás Dockerben
+## <span style="color:purple">Futtatás Dockerben</span>
 
 Ha nem szeretnéd fejleszteni az alkalmazást csak futtatni akkor elég ha letöltöd a Dockert beírsz két parancsot és már fut is a szerver. Természetesen a kódot attól még le kell tölteni a gépedre.
 
@@ -108,7 +116,7 @@ docker build -t barsonar-backend --no-cache .
 docker compose up
 ```
 
-## Adatbázis felépítése
+## <span style="color:purple">Adatbázis felépítése</span>
 
 Az adatbázis a következő táblákat tartalmazza:
 
@@ -178,7 +186,7 @@ Photo {
 }
 ```
 
-### Kapcsolatok
+#### Kapcsolatok
 
 - Egy felhasználó több kommentet, hírt és fotót hozhat létre
   - opcionálisan állíthat be hely kategóriákat, ami érdekli, hogy később kaphasson hely ajánlásokat
@@ -189,45 +197,37 @@ Photo {
   - felhasználó törlése esetén törlődnek a hozzá tartozó érdekeltségek és kitörli barátlistából is
   - hely törlése esetén törlődnek a hozzá tartozó kategóriák is
 
----
-
-## Adatbázis seedelése
-
-Az adatbázis feltöltése tesztadatokkal, Faker-t használ a valósághű adatok generálásához.
-
-```bash
-# Seed script futtatása
-npx prisma db seed
-```
 
 ---
 
-## Futtatás
+## <span style="color:purple">Futtatás</span>
 
 ```bash
 npm run start:dev
 ```
 
-A szerver a `http://localhost:3000` címen lesz elérhető (vagy a `PORT` környezeti változóban megadott porton).
+A szerver a
+- `http://localhost:3000`
+- `http://[lokális ip címed]:3000` 
+  
+címeken lesz elérhető (vagy a `PORT` környezeti változóban megadott porton).
 
 ---
 
-### A feltöltött képek elérése
+## <span style="color:purple">A feltöltött képek elérése</span>
 
-```
+```bash
 http://localhost:3000/uploads/<fájlnév>
-```
 
-Példa:
-```
+# Példa:
 http://localhost:3000/uploads/123456789.jpg
 ```
 
 ---
 
-## Tesztelés
+## <span style="color:purple">Tesztelés</span>
 
-### Unit tesztek
+#### Unit tesztek
 
 ```bash
 # Összes unit teszt futtatása
@@ -241,23 +241,23 @@ npm test
 npm run test:cov
 ```
 
-### E2E tesztek
+#### E2E tesztek
 
 ```bash
 # E2E tesztek futtatása
 npm run test:e2e
 ```
 
-### Tesztek helyileg
+#### Tesztek helyileg
 
 - A service és controller tesztek az `src/` mappában találhatók `*.spec.ts` kiterjesztéssel
 - E2E tesztek a `test/` mappában találhatók
 
 ---
 
-## Biztonsági megjegyzések
+## <span style="color:purple">Biztonsági megjegyzések</span>
 
-### Fontos figyelmeztetések
+#### Fontos figyelmeztetések
 
 1. **Fájlfeltöltés:** 
    - A fájlméret korlátozva van (2 MB)
@@ -267,9 +267,9 @@ npm run test:e2e
 
 ---
 
-## Hozzájárulás
+## <span style="color:purple">Hozzájárulás</span>
 
-A projekt fejlesztése során kérjük, hogy:
+**A projekt fejlesztése során kérjük, hogy:**
 
 1. Fork-old a repository-t
 2. Hozz létre egy feature branch-et (`git checkout -b feature/uj-funkcio`)

@@ -5,6 +5,7 @@ import { AuthService } from './auth.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from './auth.guard';
 import { JwtService } from '@nestjs/jwt';
+import { UserService } from 'src/user/user.service';
 
 describe('AuthController', () => {
   let controller: AuthController
@@ -12,6 +13,7 @@ describe('AuthController', () => {
 
   const mockAuthService: any = {
     signIn: jest.fn(),
+    getProfile: jest.fn(),
   }
 
   const mockJwtService: any = {
@@ -56,6 +58,7 @@ describe('AuthController', () => {
       email: 'test@example.com',
       password: 'password123',
     }
+
     const tokenResponse = {
       access_token: 'mock-jwt-token',
     }
@@ -79,17 +82,21 @@ describe('AuthController', () => {
     expect(service.signIn).toHaveBeenCalledWith(body.email, body.password)
   })
 
-  it('getProfile should return user from request', () => {
+  it('getProfile should return user from request', async () => {
     const mockUser = {
+      sub: 1,
       id: 1,
       userName: 'testuser',
       email: 'test@example.com',
     }
+
     const mockRequest = {
       user: mockUser,
-    }
+    } as any as Request
 
-    const result = controller.getProfile(mockRequest)
+    mockAuthService.getProfile.mockResolvedValue(mockUser)
+
+    const result = await controller.getUserProfile(mockRequest)
 
     expect(result).toEqual(mockUser)
   })
@@ -97,7 +104,14 @@ describe('AuthController', () => {
   it('logout should clear access_token cookie', () => {
     const result = controller.logout(mockResponse)
 
-    expect(mockResponse.clearCookie).toHaveBeenCalledWith('access_token', { "httpOnly": true, "path": "/", "sameSite": "lax" })
+    expect(mockResponse.clearCookie).toHaveBeenCalledWith(
+      'access_token',
+      {
+        "httpOnly": true,
+        "path": "/",
+        "sameSite": "lax"
+      }
+    )
     expect(result).toEqual({ message: 'Logged out successfully' })
   })
 })

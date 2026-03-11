@@ -1,6 +1,7 @@
 import { PrismaClient } from '../generated/prisma/client'
 import * as bcrypt from 'bcrypt'
 import { faker } from '@faker-js/faker'
+import chalk from 'chalk'
 
 const prisma = new PrismaClient()
 
@@ -139,10 +140,7 @@ async function main() {
         for (const category of categories) {
             placeCategoryData.push({
                 category,
-                placeID:
-                    place.id === 1
-                        ? faker.number.int({ min: 2, max: 20 })
-                        : place.id
+                placeID: faker.number.int({ min: 2, max: placeCount })
             })
         }
     }
@@ -181,24 +179,24 @@ async function main() {
     }))
 
     const testUser = await prisma.user.findUnique({ where: { email: "test@test.test" } })
-    await prisma.comment.create({
-        data: {
-            commentText: "This is a test comment.",
-            rating: 5,
-            userID: testUser ? testUser.id : 1,
-            placeID: testPlace.id,
-            approved: true
-        },
-    })
 
-    await prisma.comment.create({
-        data: {
-            commentText: "This is another test comment.",
-            rating: 5,
-            userID: testUser ? testUser.id : 1,
-            placeID: testPlace.id,
-            approved: true
-        },
+    await prisma.comment.createMany({
+        data: [
+            {
+                commentText: "This is a test comment.",
+                rating: 5,
+                userID: 1,
+                placeID: testPlace.id,
+                approved: true
+            },
+            {
+                commentText: "This is another test comment.",
+                rating: 5,
+                userID: testUser!!.id,
+                placeID: testPlace.id,
+                approved: true
+            },
+        ],
     })
 
     await prisma.comment.createMany({
@@ -265,8 +263,7 @@ async function main() {
 
     const pendingFriendRequestData: any = []
 
-    const sliceEnd = Math.min(6, users.length - 3)
-    for (let i = 1; i < sliceEnd; i++) {
+    for (let i = 1; i < userCount; i++) {
         const user = users[i]
         const friend = users[i + 2]
 
@@ -278,12 +275,15 @@ async function main() {
         }
     }
 
+    await prisma.pending_Friend_Request.createMany({ data: pendingFriendRequestData })
+
     const pendingFriendRequests = await prisma.pending_Friend_Request.findMany()
     console.log("Pending Friend Requests in database:", pendingFriendRequests.length)
 
     //NEWS
 
-    const newsData = Array.from({ length: 30 }, () => ({
+    const newsCount = 30
+    const newsData = Array.from({ length: newsCount }, () => ({
         text: faker.lorem.paragraphs({ min: 1, max: 3 }),
         placeID: faker.helpers.arrayElement(places).id,
         userID: faker.helpers.arrayElement(users).id,
@@ -323,13 +323,15 @@ async function isEmptyDb() {
                 await prisma.$disconnect()
             })
     } else {
-        console.log("\n" +
-                    " -------------------------------------------------------------------- \n" +
-                    "|                                                                    |\n" +
-                    "|   Seeding can not be executed because the database is not empty!   |\n" +
-                    "|                                                                    |\n" +
-                    " -------------------------------------------------------------------- "
-        )
+        console.log(chalk.red("\n" +
+            " -------------------------------------------------------------------- \n" +
+            "|                                                                    |\n" +
+            "|   Seeding can not be executed because the database is not empty!   |\n" +
+            "|                                                                    |\n" +
+            "|              Run 'npx prisma migrate reset' instead!               |\n" +
+            "|                                                                    |\n" +
+            " -------------------------------------------------------------------- "
+        ))
 
         await prisma.$disconnect()
     }

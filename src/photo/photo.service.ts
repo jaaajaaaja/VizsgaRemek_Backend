@@ -1,8 +1,8 @@
-import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { GetAllBy, GetOne } from 'src/types/photo-types';
+import { FilesArray, GetAllBy, GetOne } from 'src/types/photo-types';
 import { ApprovedByAdmin } from 'src/types/comment-types';
-import { Photo } from 'generated/prisma/client';
+import { Photo, Prisma } from 'generated/prisma/client';
 
 @Injectable()
 export class PhotoService {
@@ -76,7 +76,12 @@ export class PhotoService {
         return allByPlace
     }
 
-    async add(file: Express.Multer.File, userID: number, placeID: number, loggedInUserId: number): Promise<Photo> {
+    async add(
+        files: Express.Multer.File[],
+        userID: number,
+        placeID: number,
+        loggedInUserId: number
+    ): Promise<Prisma.BatchPayload> {
         const user = await this.prisma.user.findUnique({
             where: { id: userID }
         })
@@ -93,15 +98,24 @@ export class PhotoService {
             throw new NotFoundException(`Place with ID ${placeID} not found`)
         }
 
+        const fileArray = Array.isArray(files) ? files : [files]
 
-        return await this.prisma.photo.create({
-            data: {
+        const images: FilesArray[] = []
+
+        for (const file of fileArray) {
+            images.push({
                 location: `uploads/${file.filename}`,
                 type: file.mimetype,
                 userID: loggedInUserId,
                 placeID: placeID
-            }
+            })
+        }
+
+        const data = await this.prisma.photo.createMany({
+            data: images
         })
+
+        return data
     }
 
     async remove(id: number, loggedInUserId: number): Promise<Photo> {

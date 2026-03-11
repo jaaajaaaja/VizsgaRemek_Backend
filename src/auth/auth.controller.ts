@@ -3,9 +3,6 @@ import express from 'express';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { SkipThrottle } from '@nestjs/throttler';
-import {
-  ApiBadRequestResponse, ApiBody, ApiCookieAuth, ApiOkResponse, ApiOperation, ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
 import { GetMe, GetProfile, Login, Logout } from 'src/decorators/auth.decorator';
 import { DisabledGuard } from 'src/decorators/disabled.decorator';
 
@@ -36,8 +33,8 @@ export class AuthController {
   }
 
   /**
- * @deprecated Use `getUserProfile()` instead.
- */
+  * @deprecated Use `getUserProfile()` instead.
+  */
   @GetProfile()
   @UseGuards(DisabledGuard)
   @SkipThrottle({ place: true, login: true, postput: true })

@@ -3,6 +3,7 @@ import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { SignInType } from 'src/types/auth-types';
+import chalk from 'chalk';
 
 @Injectable()
 export class AuthService {
@@ -12,20 +13,18 @@ export class AuthService {
   ) { }
 
   async signIn(email: string, pass: string): Promise<SignInType> {
-    console.log('Login attempt:', { email, pass: pass ? '***' : 'undefined' })
+    console.log(chalk.yellow("\n--------------------------------------------"))
+    console.log(`\n${chalk.yellow("Login attempt:")}
+      ${chalk.rgb(128, 0, 128)("email: ")}${chalk.green(email ? email : "undefiend")}
+      ${chalk.rgb(128, 0, 128)("password:")} ${chalk.green(pass ? "***" : "undefined")}`
+    )
 
     const user = await this.userService.findOne(email)
 
-    console.log(
-      'User found:',
-      user
-        ? { id: user.id, email: user.email, hasPassword: !!user.password }
-        : 'null',
+    console.log(`${chalk.yellow("\nUser found:")} 
+      ${chalk.rgb(128, 0, 128)("email:")} ${chalk.green(user.email)} 
+      ${chalk.rgb(128, 0, 128)("password:")} ${chalk.green("***")} `
     )
-
-    if (!user) {
-      throw new NotFoundException('Invalid email or password!')
-    }
 
     const isPasswordValid = await bcrypt.compare(pass, user.password)
 
@@ -33,9 +32,12 @@ export class AuthService {
       throw new UnauthorizedException()
     }
 
-    console.log(
-      `✅ User logged in successfully: ${user.email} (ID: ${user.id})`,
+    console.log(`\n${chalk.yellow("User logged in successfully:")}
+      ${chalk.rgb(128, 0, 128)("id:")} ${chalk.green(user.id)}
+      ${chalk.rgb(128, 0, 128)("email:")} ${chalk.green(user.email)}
+      `
     )
+    console.log(chalk.yellow("--------------------------------------------"))
 
     const payload = { sub: user.id, email: user.email, role: user.role }
 

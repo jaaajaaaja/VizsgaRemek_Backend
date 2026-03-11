@@ -6,6 +6,6 @@ export class DisabledGuard implements CanActivate {
         throw new HttpException(
             "This endpoint has been disabled! Use /me instead!",
             HttpStatus.GONE, // 410
-        );
+        )
     }
 }

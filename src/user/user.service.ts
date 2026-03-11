@@ -8,6 +8,7 @@ import { CreateUserInterestDto } from './dto/create-user-interest.dto';
 import * as bcrypt from 'bcrypt';
 import { AddUserType, FindOne, GetAllUserType, UserDataType } from 'src/types/user-types';
 import { Place, User, User_Interest } from 'generated/prisma/client';
+import chalk from 'chalk';
 
 @Injectable()
 export class UserService {
@@ -31,7 +32,8 @@ export class UserService {
     })
 
     if (!user) {
-      throw new NotFoundException('User not found')
+      console.log(chalk.red("\nUser not found!"))
+      throw new NotFoundException("User not found")
     }
 
     return user
@@ -45,7 +47,7 @@ export class UserService {
     const user = await this.prisma.user.findUnique({ where: { email } })
 
     if (user) {
-      throw new ConflictException('Email already in use!')
+      throw new ConflictException("Email already in use!")
     }
 
     const add = await this.prisma.user.create({
@@ -68,11 +70,11 @@ export class UserService {
     const user = await this.prisma.user.findUnique({ where: { id } })
 
     if (!user) {
-      throw new NotFoundException('User not found!')
+      throw new NotFoundException("User not found!")
     }
 
     if (user.id != loggedInUser.sub && loggedInUser.role != "admin") {
-      throw new ForbiddenException('You can only delete your own profile!')
+      throw new ForbiddenException("You can only delete your own profile!")
     }
 
     return this.prisma.user.delete({ where: { id } })
