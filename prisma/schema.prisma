@@ -5,9 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider     = "prisma-client"
-  output       = "../generated/prisma"
-  moduleFormat = "cjs"
+  provider      = "prisma-client"
+  output        = "../generated/prisma"
+  moduleFormat  = "cjs"
   binaryTargets = ["windows", "linux-musl-openssl-3.0.x"]
 }
 
@@ -50,6 +50,7 @@ model User_Friend {
   friend   User @relation("requestRecieved", fields: [friendID], references: [id], onDelete: Cascade)
 
   @@unique([userID, friendID])
+  @@unique([friendID, userID])
 }
 
 model Pending_Friend_Request {
@@ -60,6 +61,7 @@ model Pending_Friend_Request {
   friend   User @relation("receivedRequests", fields: [friendID], references: [id], onDelete: Cascade)
 
   @@unique([userID, friendID])
+  @@unique([friendID, userID])
 }
 
 model Place {

@@ -2,8 +2,8 @@ import { Injectable, NotFoundException, UnauthorizedException, } from '@nestjs/c
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { SignInType } from 'src/types/auth-types';
 import chalk from 'chalk';
+import { SignInType } from 'src/types/auth-types';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +20,10 @@ export class AuthService {
     )
 
     const user = await this.userService.findOne(email)
+
+    if (!user) {
+      throw new NotFoundException()
+    }
 
     console.log(`${chalk.yellow("\nUser found:")} 
       ${chalk.rgb(128, 0, 128)("email:")} ${chalk.green(user.email)} 

@@ -7,7 +7,6 @@ import * as express from 'express';
 import cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import chalk from 'chalk';
-import * as ip from "ip"
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule)
@@ -71,14 +70,11 @@ async function bootstrap() {
 
   app.use('/uploads', express.static(join(process.cwd(), 'uploads')))
 
-  // await app.listen(process.env.PORT ?? 3000);
-
   const port = process.env.PORT ?? 3000
   await app.listen(port, '0.0.0.0')
-  const address = ip.address()
 
   console.log(
-    chalk.red(`\n${chalk.rgb(128, 0, 128)("Server running on:")} http://${address}:${port}`)
+    chalk.red(`\n${chalk.rgb(128, 0, 128)("Server running on:")} http://0.0.0.0:${port}`)
   )
 
   console.log(chalk.green(`\n${chalk.rgb(128, 0, 128)("Allowed origins:")}`))

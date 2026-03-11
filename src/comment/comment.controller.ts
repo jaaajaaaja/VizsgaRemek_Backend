@@ -2,8 +2,6 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Req, Use
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { AuthGuard } from '../auth/auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
 import { SkipThrottle } from '@nestjs/throttler';
 import {
   ApiBadRequestResponse, ApiCookieAuth, ApiCreatedResponse, ApiForbiddenResponse,
@@ -11,6 +9,8 @@ import {
 } from '@nestjs/swagger';
 import { Roles } from '../auth/roles.decorator';
 import { AddComment, AdminApprovesComment, AdminGetAllComments, DeleteComment, GetCommentById, GetCommentByPlace, GetCommentByUser, UpdateComment } from 'src/decorators/comment.decorator';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
 
 @Controller('comment')
 export class CommentController {

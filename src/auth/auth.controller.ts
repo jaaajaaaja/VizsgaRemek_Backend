@@ -1,10 +1,10 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards, Request, Res, Req, } from '@nestjs/common';
 import express from 'express';
 import { AuthService } from './auth.service';
-import { AuthGuard } from './auth.guard';
 import { SkipThrottle } from '@nestjs/throttler';
 import { GetMe, GetProfile, Login, Logout } from 'src/decorators/auth.decorator';
-import { DisabledGuard } from 'src/decorators/disabled.decorator';
+import { AuthGuard } from './auth.guard';
+import { DisabledGuard } from 'src/guards/disabled.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -36,7 +36,7 @@ export class AuthController {
   * @deprecated Use `getUserProfile()` instead.
   */
   @GetProfile()
-  @UseGuards(DisabledGuard)
+  @UseGuards(new DisabledGuard("/auth/me"))
   @SkipThrottle({ place: true, login: true, postput: true })
   @Get('profile')
   async getProfile(@Request() req: any) {
