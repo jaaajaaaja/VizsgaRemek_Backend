@@ -110,7 +110,7 @@ export class PhotoController {
             const body = req.body
             const fileType = file.mimetype
 
-            if (!body.userID || !body.placeID) {
+            if (!body.placeID) {
                 return callback(new BadRequestException("userID and placeID are required!"), false)
             }
 
@@ -130,7 +130,7 @@ export class PhotoController {
             throw new ConflictException("No files were uploaded!")
         }
 
-        return this.photoService.add(files, body.userID, body.placeID, request["user"].sub)
+        return this.photoService.add(files, Number(body.placeID), request["user"].sub)
     }
 
     /*

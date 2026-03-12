@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException, BadRequestException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { FilesArray, GetAllBy, GetOne } from 'src/types/photo-types';
 import { ApprovedByAdmin } from 'src/types/comment-types';
@@ -78,16 +78,15 @@ export class PhotoService {
 
     async add(
         files: Express.Multer.File[],
-        userID: number,
         placeID: number,
         loggedInUserId: number
     ): Promise<Prisma.BatchPayload> {
         const user = await this.prisma.user.findUnique({
-            where: { id: userID }
+            where: { id: loggedInUserId }
         })
 
-        if (user?.id != loggedInUserId) {
-            throw new UnauthorizedException("You can not post as another user!")
+        if(!user) {
+            throw new ConflictException("User does not exist!")
         }
 
         const place = await this.prisma.place.findUnique({
