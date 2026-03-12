@@ -98,14 +98,15 @@ model Comment {
 }
 
 model Photo {
-  id       Int     @id @default(autoincrement())
-  location String
-  type     String
-  userID   Int
-  placeID  Int
-  approved Boolean @default(false)
-  user     User    @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  place    Place   @relation(fields: [placeID], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id        Int      @id @default(autoincrement())
+  location  String
+  type      String
+  userID    Int
+  placeID   Int
+  createdAt DateTime @default(now())
+  approved  Boolean  @default(false)
+  user      User     @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  place     Place    @relation(fields: [placeID], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model News {

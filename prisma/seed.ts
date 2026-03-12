@@ -2,8 +2,7 @@ import { Photo, PrismaClient, Prisma } from '../generated/prisma/client'
 import * as bcrypt from 'bcrypt'
 import { faker } from '@faker-js/faker'
 import chalk from 'chalk'
-import { download_test_images } from 'src/download/download'
-import { DownloadType } from 'src/types/download-types'
+import { PhotoWithDownload } from 'src/functions/seed/PhotoWithDownload'
 
 const prisma = new PrismaClient()
 
@@ -177,7 +176,8 @@ async function main() {
         rating: faker.number.int({ min: 1, max: 5 }),
         userID: faker.helpers.arrayElement(users).id,
         placeID: faker.helpers.arrayElement(places).id,
-        approved: faker.datatype.boolean(0.5)
+        approved: faker.datatype.boolean(0.5),
+        createdAt: faker.date.between({ from: '2026-01-01T00:00:00.000Z', to: '2027-01-01T00:00:00.000Z' })
     }))
 
     const testUser = await prisma.user.findUnique({ where: { email: "test@test.test" } })
@@ -213,21 +213,6 @@ async function main() {
 
     const photoCount = 10
 
-    const images: DownloadType[] = await download_test_images(photoCount)
-    const photoData: Prisma.PhotoCreateManyInput[] = []
-
-    for (const image of images) {
-        const photo = {
-            location: `uploads/${image.location}`,
-            type: `image/${image.type}`,
-            userID: faker.helpers.arrayElement(users).id,
-            placeID: faker.helpers.arrayElement(places).id,
-            approved: faker.datatype.boolean(0.5)
-        }
-
-        photoData.push(photo)
-    }
-
     await prisma.photo.create({
         data: {
             location: "uploads/test_picture.png",
@@ -237,6 +222,8 @@ async function main() {
             approved: false
         },
     })
+
+    const photoData = await PhotoWithDownload(photoCount, users, places)
 
     await prisma.photo.createMany({
         data: photoData,
@@ -291,12 +278,13 @@ async function main() {
 
     //NEWS
 
-    const newsCount = 30
+    const newsCount = 500
     const newsData = Array.from({ length: newsCount }, () => ({
         text: faker.lorem.paragraphs({ min: 1, max: 3 }),
         placeID: faker.helpers.arrayElement(places).id,
         userID: faker.helpers.arrayElement(users).id,
-        approved: faker.datatype.boolean(0.5)
+        approved: faker.datatype.boolean(0.5),
+        createdAt: faker.date.between({ from: '2026-01-01T00:00:00.000Z', to: '2027-01-01T00:00:00.000Z' })
     }))
 
     const testNews = await prisma.news.create({

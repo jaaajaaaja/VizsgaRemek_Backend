@@ -23,3 +23,18 @@ export type GetAllNews = Prisma.NewsGetPayload<{
         }
     }
 }>
+
+export type PlaceStatisticsType = {
+    placeId: number
+    placeName: string
+    totalPhotos: number
+    totalComments: number
+    averageRating: number
+}
+
+export enum PeriodEnum {
+    TODAY = "today",
+    MONTH = "month",
+    WEEK = "week",
+    YEAR = "year"
+}

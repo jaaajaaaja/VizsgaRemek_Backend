@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Req, UseGuards,
+  Body, Controller, Delete, Get, Param, ParseEnumPipe, ParseIntPipe, Post, Put, Query, Req, UseGuards,
 } from '@nestjs/common';
 import { PlaceService } from './place.service';
 import { CreatePlaceDto } from './dto/create-place.dto';
@@ -14,6 +14,7 @@ import {
 } from 'src/decorators/place.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
+import { PeriodEnum } from 'src/types/place-types';
 
 @Controller('place')
 export class PlaceController {
@@ -34,6 +35,16 @@ export class PlaceController {
   @SkipThrottle({ basic: true, place: true, login: true })
   remove(@Param("id", ParseIntPipe) id: number) {
     return this.placeService.remove(id)
+  }
+
+  //GET admin most popular place this month
+
+  @Get("/statistics") // http://localhost:3000/place/statistics?period=year
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
+  @SkipThrottle({ postput: true, place: true, login: true })
+  getPopular(@Query("period", new ParseEnumPipe(PeriodEnum)) period: PeriodEnum) {
+    return this.placeService.getPopular(period)
   }
 
   //GET all place

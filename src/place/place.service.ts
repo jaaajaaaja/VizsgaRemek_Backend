@@ -4,7 +4,7 @@ import { CreatePlaceDto } from './dto/create-place.dto';
 import { CreatePlaceCategoryDto } from './dto/create-place-category.dto';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
-import { GetAllByPlaceNewsType } from 'src/types/place-types';
+import { GetAllByPlaceNewsType, PeriodEnum, PlaceStatisticsType } from 'src/types/place-types';
 import { ApprovedByAdmin } from 'src/types/comment-types';
 import { News, Place, Place_Category } from 'generated/prisma/client';
 
@@ -27,6 +27,83 @@ export class PlaceService {
         }
 
         return places
+    }
+
+    async getPopular(period: PeriodEnum): Promise<PlaceStatisticsType[]> {
+        const places: Place[] = await this.prisma.place.findMany()
+        const statistics: PlaceStatisticsType[] = []
+
+        const now = new Date()
+
+        let startOfMonth: Date = new Date()
+        let endOfMonth: Date = new Date()
+
+        if (period == PeriodEnum.TODAY) {
+            startOfMonth = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0)
+            endOfMonth = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999)
+        }
+
+        if (period == PeriodEnum.WEEK) {
+            const dayOfWeek = now.getDay()
+            startOfMonth.setDate(now.getDate() - dayOfWeek)
+            startOfMonth.setHours(0, 0, 0, 0)
+
+            endOfMonth.setDate(startOfMonth.getDate() + 6)
+            endOfMonth.setHours(23, 59, 59, 999)
+        }
+
+        if (period == PeriodEnum.MONTH) {
+            startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+            endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+        }
+
+        if (period == PeriodEnum.YEAR) {
+            startOfMonth = new Date(now.getFullYear(), 0, 1)
+            endOfMonth = new Date(now.getFullYear() + 1, 0, 1)
+        }
+
+        function query() {
+            return {
+                placeID: place.id,
+                createdAt: {
+                    gte: startOfMonth,
+                    lt: endOfMonth
+                }
+            }
+        }
+
+        for (var place of places) {
+            const totalComments = await this.prisma.comment.count({
+                where: query()
+            })            
+
+            console.log("*********************************")
+            console.log(place.id)
+            console.log("comments: ", totalComments)
+
+            const totalPhotos = await this.prisma.photo.count({
+                where: query()
+            })
+            console.log("photos: ", totalPhotos)
+
+            const averageRating = await this.prisma.comment.aggregate({
+                where: query(),
+                _avg: {
+                    rating: true
+                }
+            })
+            console.log("rating: ", averageRating._avg.rating)
+
+            statistics.push({
+                placeId: place.id,
+                placeName: place.name,
+                totalComments,
+                totalPhotos,
+                averageRating: averageRating._avg.rating || 0
+            })
+        }
+
+        return statistics
     }
 
     async getOne(id: number): Promise<Place> {

@@ -103,11 +103,10 @@ describe('PhotoController E2E', () => {
     })
 
     describe("should throw bad request exceptions", () => {
-        it('(POST) /photo/upload - userID missing', async () => {
+        it('(POST) /photo/upload - placeID missing', async () => {
             return request(app.getHttpServer())
                 .post('/photo/upload')
                 .set('Authorization', `Bearer ${token}`)
-                .field({ placeID: 1 })
                 .attach('file', photoPath)
                 .expect(400)
         })
