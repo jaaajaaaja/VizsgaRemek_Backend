@@ -145,6 +145,8 @@ export class PhotoService {
     }
 
     getAll(): Promise<Photo[]> {
-        return this.prisma.photo.findMany()
+        return this.prisma.photo.findMany({
+            where: { approved: false }
+        })
     }
 }

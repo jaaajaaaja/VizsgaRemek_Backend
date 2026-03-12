@@ -8,7 +8,6 @@ COPY package*.json ./
 COPY tsconfig*.json ./
 COPY eslint.config.mjs ./
 COPY prisma ./prisma
-RUN mkdir uploads
 
 RUN npm install
 

@@ -29,6 +29,7 @@ export class AuthController {
     return {
       userId: result.userId,
       email: result.email,
+      role: result.role,
     }
   }
 

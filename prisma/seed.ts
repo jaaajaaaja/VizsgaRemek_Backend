@@ -1,7 +1,9 @@
-import { PrismaClient } from '../generated/prisma/client'
+import { Photo, PrismaClient, Prisma } from '../generated/prisma/client'
 import * as bcrypt from 'bcrypt'
 import { faker } from '@faker-js/faker'
 import chalk from 'chalk'
+import { download_test_images } from 'src/download/download'
+import { DownloadType } from 'src/types/download-types'
 
 const prisma = new PrismaClient()
 
@@ -209,23 +211,30 @@ async function main() {
 
     //PHOTOS
 
-    const photoCount = 40
-    const imageTypes = ['jpg', 'jpeg', 'png', 'gif']
-    const photoData = Array.from({ length: photoCount }, () => ({
-        location: `uploads/${faker.string.alphanumeric(10)}.${faker.helpers.arrayElement(imageTypes)}`,
-        type: `image/${faker.helpers.arrayElement(imageTypes)}`,
-        userID: faker.helpers.arrayElement(users).id,
-        placeID: faker.helpers.arrayElement(places).id,
-        approved: faker.datatype.boolean(0.5)
-    }))
+    const photoCount = 10
+
+    const images: DownloadType[] = await download_test_images(photoCount)
+    const photoData: Prisma.PhotoCreateManyInput[] = []
+
+    for (const image of images) {
+        const photo = {
+            location: `uploads/${image.location}`,
+            type: `image/${image.type}`,
+            userID: faker.helpers.arrayElement(users).id,
+            placeID: faker.helpers.arrayElement(places).id,
+            approved: faker.datatype.boolean(0.5)
+        }
+
+        photoData.push(photo)
+    }
 
     await prisma.photo.create({
         data: {
-            location: "uploads/test-photo.jpg",
-            type: "image/jpg",
+            location: "uploads/test_picture.png",
+            type: "image/png",
             userID: testUser ? testUser.id : 1,
             placeID: testPlace.id,
-            approved: true
+            approved: false
         },
     })
 

@@ -151,7 +151,7 @@ export class PlaceService {
 
     async getAllNews(): Promise<GetAllByPlaceNewsType[]> {
         return this.prisma.news.findMany({
-            where: { approved: true },
+            where: { approved: false },
             select: {
                 id: true,
                 text: true,

@@ -132,7 +132,9 @@ export class CommentService {
   }
 
   async getAll(): Promise<Comment[]> {
-    return this.prisma.comment.findMany()
+    return this.prisma.comment.findMany({
+      where: { approved: false }
+    })
   }
 
   async approveByAdmin(id: number): Promise<ApprovedByAdmin> {
