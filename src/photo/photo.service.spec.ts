@@ -174,7 +174,7 @@ describe('PhotoService', () => {
       mockPrismaService.user.findUnique.mockResolvedValue({ id: userID })
       mockPrismaService.place.findUnique.mockResolvedValue({ id: placeID })
 
-      const result = await service.add(file, userID, placeID, loggedInUserId)
+      const result = await service.add(file, placeID, loggedInUserId)
 
       expect(mockPrismaService.photo.createMany).toHaveBeenCalledWith({
         data: [

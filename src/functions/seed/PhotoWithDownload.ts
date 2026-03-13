@@ -30,6 +30,13 @@ async function download_test_images(count: number): Promise<DownloadType[]> {
     return image_names
 }
 
+/**
+ * Use this if you want to download actual files for testing
+ * @param count how much test data you want
+ * @param users users list
+ * @param places palces list
+ * @returns list of photos
+ */
 export async function PhotoWithDownload(
     count: number,
     users: Prisma.UserCreateManyInput[],

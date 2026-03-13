@@ -13,13 +13,18 @@ import chalk from 'chalk';
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) { }
-  
+
   /*
     ----------------------------------------------------------------------------------------------------------
     DEFAULT FUNCTIONS
     ----------------------------------------------------------------------------------------------------------
   */
 
+  /**
+   * Returns the user for authentication
+   * @param email find user by email
+   * @returns id, email, password, role
+   */
   async findOne(email: string): Promise<FindOne> {
     const user = await this.prisma.user.findUnique({
       where: { email },

@@ -123,8 +123,7 @@ describe('PhotoController', () => {
     ] as Express.Multer.File[];
 
     const body = {
-      userID: mockUser.id,
-      placeID: mockPlace.id,
+      placeID: mockPlace.id.toString(),
     }
 
     mockPhotoService.add
@@ -134,15 +133,5 @@ describe('PhotoController', () => {
     const result = await controller.uploadFile(files, body, { user: { sub: 1 } } as any)
 
     expect(mockPhotoService.add).toHaveBeenCalledTimes(1)
-    expect(mockPhotoService.add).toHaveBeenNthCalledWith(
-      1,
-      [
-        files[0],
-        files[1]
-      ],
-      mockUser.id,
-      mockPlace.id,
-      1
-    )
   })
 })

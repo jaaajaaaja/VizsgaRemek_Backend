@@ -1,8 +1,9 @@
-import { Photo, PrismaClient, Prisma } from '../generated/prisma/client'
+import { PrismaClient, Prisma } from '../generated/prisma/client'
 import * as bcrypt from 'bcrypt'
 import { faker } from '@faker-js/faker'
 import chalk from 'chalk'
 import { PhotoWithDownload } from 'src/functions/seed/PhotoWithDownload'
+import { PhotoNoDownload } from 'src/functions/seed/PhotoNoDownload'
 
 const prisma = new PrismaClient()
 
@@ -21,11 +22,15 @@ async function main() {
 
     const defaultPassword = await bcrypt.hash('12345678', 10)
 
-    //USERS
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    USERS
+    ----------------------------------------------------------------------------------------------------------
+    */
 
     const userCount = 15
 
-    const userData = Array.from({ length: userCount }, () => ({
+    const userData: Prisma.UserCreateManyInput[] = Array.from({ length: userCount }, () => ({
         userName: faker.internet.username(),
         email: faker.internet.email(),
         password: defaultPassword,
@@ -62,9 +67,13 @@ async function main() {
     console.log("Users in database:", users.length)
 
 
-    //USER_INTEREST
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    USER INTERESTS
+    ----------------------------------------------------------------------------------------------------------
+    */
 
-    const userInterestData: any = []
+    const userInterestData: Prisma.User_InterestCreateManyInput[] = []
 
     for (const user of users) {
         const interests = faker.helpers.arrayElements(
@@ -102,7 +111,11 @@ async function main() {
     const userInterests = await prisma.user_Interest.findMany()
     console.log("User Interests in database:", userInterests.length)
 
-    //PLACES
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    PLACES
+    ----------------------------------------------------------------------------------------------------------
+    */
 
     const placeCount = 20
 
@@ -114,7 +127,7 @@ async function main() {
         }
     })
 
-    const placeData = Array.from({ length: placeCount }, () => ({
+    const placeData: Prisma.PlaceCreateManyInput[] = Array.from({ length: placeCount }, () => ({
         googleplaceID: `${faker.string.alphanumeric(20)}`,
         name: faker.company.name(),
         address: faker.location.streetAddress({ useFullAddress: true })
@@ -128,9 +141,13 @@ async function main() {
     const places = await prisma.place.findMany()
     console.log("Places in database:", places.length)
 
-    //PLACE_CATEGORY
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    PLACE CATEGORIES
+    ----------------------------------------------------------------------------------------------------------
+    */
 
-    const placeCategoryData: any[] = []
+    const placeCategoryData: Prisma.Place_CategoryCreateManyInput[] = []
 
     for (const place of places) {
         const categories = faker.helpers.arrayElements(
@@ -168,10 +185,14 @@ async function main() {
     const placeCategories = await prisma.place_Category.findMany()
     console.log("Place Categories in database:", placeCategories.length)
 
-    //COMMENTS
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    COMMENTS
+    ----------------------------------------------------------------------------------------------------------
+    */
 
     const commentCount = 50
-    const commentData = Array.from({ length: commentCount }, () => ({
+    const commentData: Prisma.CommentCreateManyInput[] = Array.from({ length: commentCount }, () => ({
         commentText: faker.lorem.sentence({ min: 5, max: 15 }),
         rating: faker.number.int({ min: 1, max: 5 }),
         userID: faker.helpers.arrayElement(users).id,
@@ -209,7 +230,11 @@ async function main() {
     const comments = await prisma.comment.findMany()
     console.log("Comments in database:", comments.length)
 
-    //PHOTOS
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    PHOTOS
+    ----------------------------------------------------------------------------------------------------------
+    */
 
     const photoCount = 10
 
@@ -223,7 +248,8 @@ async function main() {
         },
     })
 
-    const photoData = await PhotoWithDownload(photoCount, users, places)
+    // const photoData: Prisma.PhotoCreateManyInput[] = await PhotoWithDownload(photoCount, users, places)
+    const photoData: Prisma.PhotoCreateManyInput[] = PhotoNoDownload(photoCount, users, places)
 
     await prisma.photo.createMany({
         data: photoData,
@@ -233,9 +259,13 @@ async function main() {
     const photos = await prisma.photo.findMany()
     console.log("Photos in database:", photos.length)
 
-    //USER_FRIEND
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    FRIENDS
+    ----------------------------------------------------------------------------------------------------------
+    */
 
-    const userFriendData: any = []
+    const userFriendData: Prisma.User_FriendCreateManyInput[] = []
 
     for (let i = 0; i < users.length - 1; i++) {
         const user = users[i]
@@ -255,9 +285,13 @@ async function main() {
     const userFriends = await prisma.user_Friend.findMany()
     console.log("User Friends in database:", userFriends.length)
 
-    //PENDING_FRIEND_REQUEST
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    PENDING FRIEND REQUESTS
+    ----------------------------------------------------------------------------------------------------------
+    */
 
-    const pendingFriendRequestData: any = []
+    const pendingFriendRequestData: Prisma.Pending_Friend_RequestCreateManyInput[] = []
 
     for (let i = 1; i < userCount; i++) {
         const user = users[i]
@@ -276,10 +310,14 @@ async function main() {
     const pendingFriendRequests = await prisma.pending_Friend_Request.findMany()
     console.log("Pending Friend Requests in database:", pendingFriendRequests.length)
 
-    //NEWS
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    NEWS
+    ----------------------------------------------------------------------------------------------------------
+    */
 
     const newsCount = 500
-    const newsData = Array.from({ length: newsCount }, () => ({
+    const newsData: Prisma.NewsCreateManyInput[] = Array.from({ length: newsCount }, () => ({
         text: faker.lorem.paragraphs({ min: 1, max: 3 }),
         placeID: faker.helpers.arrayElement(places).id,
         userID: faker.helpers.arrayElement(users).id,

@@ -7,6 +7,7 @@ import { UpdateNewsDto } from './dto/update-news.dto';
 import { GetAllByPlaceNewsType, PeriodEnum, PlaceStatisticsType } from 'src/types/place-types';
 import { ApprovedByAdmin } from 'src/types/comment-types';
 import { News, Place, Place_Category } from 'generated/prisma/client';
+import { GetDate } from 'src/functions/place/GetDate';
 
 @Injectable()
 export class PlaceService {
@@ -33,34 +34,10 @@ export class PlaceService {
         const places: Place[] = await this.prisma.place.findMany()
         const statistics: PlaceStatisticsType[] = []
 
-        const now = new Date()
+        const getDate = GetDate(period)
 
-        let startOfMonth: Date = new Date()
-        let endOfMonth: Date = new Date()
-
-        if (period == PeriodEnum.TODAY) {
-            startOfMonth = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0)
-            endOfMonth = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999)
-        }
-
-        if (period == PeriodEnum.WEEK) {
-            const dayOfWeek = now.getDay()
-            startOfMonth.setDate(now.getDate() - dayOfWeek)
-            startOfMonth.setHours(0, 0, 0, 0)
-
-            endOfMonth.setDate(startOfMonth.getDate() + 6)
-            endOfMonth.setHours(23, 59, 59, 999)
-        }
-
-        if (period == PeriodEnum.MONTH) {
-            startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-            endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1)
-        }
-
-        if (period == PeriodEnum.YEAR) {
-            startOfMonth = new Date(now.getFullYear(), 0, 1)
-            endOfMonth = new Date(now.getFullYear() + 1, 0, 1)
-        }
+        const startOfMonth: Date = getDate.startOfMonth
+        const endOfMonth: Date = getDate.endOfMonth
 
         function query() {
             return {
@@ -75,7 +52,7 @@ export class PlaceService {
         for (var place of places) {
             const totalComments = await this.prisma.comment.count({
                 where: query()
-            })            
+            })
 
             console.log("*********************************")
             console.log(place.id)
