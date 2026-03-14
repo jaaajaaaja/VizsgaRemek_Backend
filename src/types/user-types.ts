@@ -1,4 +1,5 @@
 import { Prisma } from "generated/prisma/client";
+import { Request } from 'express';
 
 export type FindOne = Prisma.UserGetPayload<{
     select: {
@@ -32,4 +33,15 @@ export type AddUserType = {
     userName: string
     email: string
     age?: number | null
+}
+
+export type LoggedInUser = {
+    sub: number
+    email: string
+    password?: string
+    role: string
+}
+
+export interface AuthenticatedRequest extends Request {
+    user: LoggedInUser
 }

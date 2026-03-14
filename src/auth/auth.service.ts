@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import chalk from 'chalk';
 import { SignInType } from 'src/types/auth-types';
+import { LoggedInUser } from 'src/types/user-types';
 
 @Injectable()
 export class AuthService {
@@ -43,7 +44,7 @@ export class AuthService {
     )
     console.log(chalk.yellow("--------------------------------------------"))
 
-    const payload = { sub: user.id, email: user.email, role: user.role }
+    const payload: LoggedInUser = { sub: user.id, email: user.email, role: user.role }
 
     return {
       access_token: await this.jwtService.signAsync(payload),

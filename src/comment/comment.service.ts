@@ -4,6 +4,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Comment } from 'generated/prisma/browser';
 import { ApprovedByAdmin, FindAllByPlace, FindAllByUser } from 'src/types/comment-types';
+import type { LoggedInUser } from 'src/types/user-types';
 
 @Injectable()
 export class CommentService {
@@ -97,7 +98,7 @@ export class CommentService {
     return this.prisma.comment.create({ data: fullData })
   }
 
-  async remove(id: number, loggedInUser: any): Promise<Comment> {
+  async remove(id: number, loggedInUser: LoggedInUser): Promise<Comment> {
     const comment = await this.prisma.comment.findUnique({ where: { id } })
 
     if (!comment) {

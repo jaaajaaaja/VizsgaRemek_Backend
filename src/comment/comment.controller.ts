@@ -10,6 +10,7 @@ import {
 } from 'src/decorators/comment.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
+import type { AuthenticatedRequest } from 'src/types/user-types';
 
 @Controller('comment')
 export class CommentController {
@@ -79,8 +80,8 @@ export class CommentController {
   @Post()
   @UseGuards(AuthGuard)
   @SkipThrottle({ basic: true, place: true, login: true })
-  async add(@Body() body: CreateCommentDto, @Req() request: Request) {
-    return this.commentService.add(body, request["user"].sub)
+  async add(@Body() body: CreateCommentDto, @Req() request: AuthenticatedRequest) {
+    return this.commentService.add(body, request.user.sub)
   }
 
   /*
@@ -93,8 +94,8 @@ export class CommentController {
   @Delete(':id')
   @UseGuards(AuthGuard)
   @SkipThrottle({ postput: true, place: true, login: true })
-  async delete(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
-    return this.commentService.remove(id, request["user"])
+  async delete(@Param('id', ParseIntPipe) id: number, @Req() request: AuthenticatedRequest) {
+    return this.commentService.remove(id, request.user)
   }
 
   /*
@@ -107,8 +108,12 @@ export class CommentController {
   @Put(':id')
   @UseGuards(AuthGuard)
   @SkipThrottle({ basic: true, place: true, login: true })
-  async update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateCommentDto, @Req() request: Request) {
-    return this.commentService.update(id, body, request["user"].sub)
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdateCommentDto,
+    @Req() request: AuthenticatedRequest
+  ) {
+    return this.commentService.update(id, body, request.user.sub)
   }
 
   /*

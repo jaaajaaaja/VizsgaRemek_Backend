@@ -12,6 +12,7 @@ import {
 } from '../decorators/user.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
+import type { AuthenticatedRequest } from 'src/types/user-types';
 
 @Controller('user')
 export class UserController {
@@ -49,8 +50,8 @@ export class UserController {
     @Delete(':id')
     @UseGuards(AuthGuard)
     @SkipThrottle({ postput: true, place: true, login: true })
-    async remove(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
-        return this.userService.remove(id, request["user"])
+    async remove(@Param('id', ParseIntPipe) id: number, @Req() request: AuthenticatedRequest) {
+        return this.userService.remove(id, request.user)
     }
 
     //PUT user by id
@@ -59,8 +60,12 @@ export class UserController {
     @Put(':id')
     @UseGuards(AuthGuard)
     @SkipThrottle({ basic: true, place: true, login: true })
-    async update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateUserDto, @Req() request: Request) {
-        return this.userService.update(id, body, request["user"].sub)
+    async update(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() body: UpdateUserDto,
+        @Req() request: AuthenticatedRequest
+    ) {
+        return this.userService.update(id, body, request.user.sub)
     }
 
     /*
@@ -75,8 +80,8 @@ export class UserController {
     @Get('/recommendation')
     @UseGuards(AuthGuard)
     @SkipThrottle({ postput: true, place: true, login: true })
-    async recommendations(@Req() request: Request) {
-        return this.userService.recommendations(request["user"].sub)
+    async recommendations(@Req() request: AuthenticatedRequest) {
+        return this.userService.recommendations(request.user.sub)
     }
 
     //GET recommends a places by age
@@ -85,8 +90,8 @@ export class UserController {
     @Get('/recommendation/age')
     @UseGuards(AuthGuard)
     @SkipThrottle({ postput: true, place: true, login: true })
-    async recommendByAge(@Req() request: Request) {
-        return this.userService.recommendByAge(request["user"].sub)
+    async recommendByAge(@Req() request: AuthenticatedRequest) {
+        return this.userService.recommendByAge(request.user.sub)
     }
 
     /*
@@ -110,8 +115,8 @@ export class UserController {
     @Get('/friends')
     @UseGuards(AuthGuard)
     @SkipThrottle({ basic: true, place: true, login: true })
-    async friendlist(@Req() request: Request) {
-        return this.userService.friendlist(request["user"].sub)
+    async friendlist(@Req() request: AuthenticatedRequest) {
+        return this.userService.friendlist(request.user.sub)
     }
 
     //POST friend request by userID
@@ -120,8 +125,8 @@ export class UserController {
     @Post('/addFriend/:id')
     @UseGuards(AuthGuard)
     @SkipThrottle({ basic: true, place: true, login: true })
-    async addFriend(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
-        return this.userService.addFriend(id, request["user"].sub)
+    async addFriend(@Param('id', ParseIntPipe) id: number, @Req() request: AuthenticatedRequest) {
+        return this.userService.addFriend(id, request.user.sub)
     }
 
     //POST deals with friend request by sender's userID
@@ -130,10 +135,10 @@ export class UserController {
     @Post('/dealWithFriendRequest')
     @UseGuards(AuthGuard)
     @SkipThrottle({ basic: true, place: true, login: true })
-    async dealWithFriendRequest(@Req() request: Request, @Body() body: FriendRequestDto) {
+    async dealWithFriendRequest(@Req() request: AuthenticatedRequest, @Body() body: FriendRequestDto) {
         return this.userService.dealWithFriendRequest(
             body.recievedFromUserId,
-            request["user"].sub,
+            request.user.sub,
             body.accepted
         )
     }
@@ -150,8 +155,11 @@ export class UserController {
     @Post('/addInterest')
     @UseGuards(AuthGuard)
     @SkipThrottle({ basic: true, place: true, login: true })
-    async addUserInterest(@Body() body: CreateUserInterestDto, @Req() request: Request) {
-        return this.userService.addUserInterest(body, request["user"].sub)
+    async addUserInterest(
+        @Body() body: CreateUserInterestDto,
+        @Req() request: AuthenticatedRequest
+    ) {
+        return this.userService.addUserInterest(body, request.user.sub)
     }
 
     //GET user interests    
@@ -160,8 +168,8 @@ export class UserController {
     @Get('/interests')
     @UseGuards(AuthGuard)
     @SkipThrottle({ basic: true, place: true, login: true })
-    async interestlist(@Req() request: Request) {
-        return this.userService.interestList(request["user"].sub)
+    async interestlist(@Req() request: AuthenticatedRequest) {
+        return this.userService.interestList(request.user.sub)
     }
 
     //GET all user interests
@@ -181,7 +189,10 @@ export class UserController {
     @Delete('/deleteInterest/:id')
     @UseGuards(AuthGuard)
     @SkipThrottle({ basic: true, place: true, login: true })
-    async deleteUserInterest(@Param(":id", ParseIntPipe) id: number, @Req() request: Request) {
-        return this.userService.deleteUserInterest(id, request["user"].sub)
+    async deleteUserInterest(
+        @Param(":id", ParseIntPipe) id: number,
+        @Req() request: AuthenticatedRequest
+    ) {
+        return this.userService.deleteUserInterest(id, request.user.sub)
     }
 }

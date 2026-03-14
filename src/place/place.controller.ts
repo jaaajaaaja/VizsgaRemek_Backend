@@ -15,6 +15,7 @@ import {
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { PeriodEnum } from 'src/types/place-types';
+import type { AuthenticatedRequest } from 'src/types/user-types';
 
 @Controller('place')
 export class PlaceController {
@@ -138,8 +139,8 @@ export class PlaceController {
   @Post(':id/news')
   @UseGuards(AuthGuard)
   @SkipThrottle({ basic: true, place: true, login: true })
-  async addNews(@Req() request: Request, @Body() body: CreateNewsDto) {
-    return this.placeService.addNews(body, request['user'].sub)
+  async addNews(@Req() request: AuthenticatedRequest, @Body() body: CreateNewsDto) {
+    return this.placeService.addNews(body, request.user.sub)
   }
 
   //PUT news by newsID
@@ -150,10 +151,10 @@ export class PlaceController {
   @SkipThrottle({ basic: true, place: true, login: true })
   async updateNews(
     @Param('id', ParseIntPipe) id: number,
-    @Req() request: Request,
+    @Req() request: AuthenticatedRequest,
     @Body() body: UpdateNewsDto,
   ) {
-    return this.placeService.updateNews(id, body, request['user'].sub)
+    return this.placeService.updateNews(id, body, request.user.sub)
   }
 
   //GET all news by placeID

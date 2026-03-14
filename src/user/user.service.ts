@@ -6,7 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserInterestDto } from './dto/create-user-interest.dto';
 import * as bcrypt from 'bcrypt';
-import { AddUserType, FindOne, GetAllUserType, UserDataType } from 'src/types/user-types';
+import { AddUserType, FindOne, GetAllUserType, LoggedInUser, UserDataType } from 'src/types/user-types';
 import { Place, User, User_Interest } from 'generated/prisma/client';
 import chalk from 'chalk';
 
@@ -71,7 +71,7 @@ export class UserService {
     }
   }
 
-  async remove(id: number, loggedInUser: any): Promise<User> {
+  async remove(id: number, loggedInUser: LoggedInUser): Promise<User> {
     const user = await this.prisma.user.findUnique({ where: { id } })
 
     if (!user) {

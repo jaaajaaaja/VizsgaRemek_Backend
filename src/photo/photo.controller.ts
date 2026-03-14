@@ -13,6 +13,7 @@ import { Roles } from '../auth/roles.decorator';
 import { AddPhotos, AdminApprovesPhoto, AdminGetAllPhoto, DeletePhotoById, GetAllPhotoByPlace, GetAllPhotoByUser, GetPhotoById } from 'src/decorators/photo.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
+import type { AuthenticatedRequest } from 'src/types/user-types';
 
 @Controller('photo')
 export class PhotoController {
@@ -82,8 +83,8 @@ export class PhotoController {
     @Delete(':id')
     @UseGuards(AuthGuard)
     @SkipThrottle({ postput: true, place: true, login: true })
-    async remove(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
-        return this.photoService.remove(id, request["user"].sub)
+    async remove(@Param('id', ParseIntPipe) id: number, @Req() request: AuthenticatedRequest) {
+        return this.photoService.remove(id, request.user.sub)
     }
 
     /*
@@ -124,13 +125,13 @@ export class PhotoController {
     async uploadFile(
         @UploadedFiles() files: Express.Multer.File[],
         @Body() body: CreatePhotoDto,
-        @Req() request: Request
+        @Req() request: AuthenticatedRequest
     ) {
         if (!files || files.length === 0) {
             throw new ConflictException("No files were uploaded!")
         }
 
-        return this.photoService.add(files, Number(body.placeID), request["user"].sub)
+        return this.photoService.add(files, Number(body.placeID), request.user.sub)
     }
 
     /*

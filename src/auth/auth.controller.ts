@@ -5,6 +5,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { GetMe, GetProfile, Login, Logout } from 'src/decorators/auth.decorator';
 import { AuthGuard } from './auth.guard';
 import { DisabledGuard } from 'src/guards/disabled.guard';
+import type { AuthenticatedRequest } from 'src/types/user-types';
 
 @Controller('auth')
 export class AuthController {
@@ -48,8 +49,8 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @SkipThrottle({ place: true, login: true, postput: true })
   @Get('me')
-  getUserProfile(@Req() request: Request) {
-    return this.authService.getProfile(request["user"].sub)
+  getUserProfile(@Req() request: AuthenticatedRequest) {
+    return this.authService.getProfile(request.user.sub)
   }
 
   @Logout()
