@@ -6,7 +6,7 @@
 
 */
 -- AlterTable
-ALTER TABLE `photo` ADD COLUMN `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);
+ALTER TABLE `Photo` ADD COLUMN `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);
 
 -- CreateIndex
 CREATE UNIQUE INDEX `Pending_Friend_Request_friendID_userID_key` ON `Pending_Friend_Request`(`friendID`, `userID`);

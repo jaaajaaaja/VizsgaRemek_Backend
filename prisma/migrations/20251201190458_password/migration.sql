@@ -7,7 +7,7 @@
 
 */
 -- AlterTable
-ALTER TABLE `user` DROP COLUMN `passwordHash`,
+ALTER TABLE `User` DROP COLUMN `passwordHash`,
     ADD COLUMN `password` VARCHAR(191) NOT NULL;
 
 -- CreateIndex

@@ -8,8 +8,10 @@ while ! nc -z db 3306; do
 done
 echo "Database started"
 
+echo "Deploying prisma migrations"
+
 # Apply db migrations
-npx prisma db push
+npx prisma migrate deploy
 
 echo "Generating Prisma Client"
 
@@ -21,14 +23,13 @@ npm run build
 # Copy required prisma file for linux
 cp generated/prisma/libquery_engine-linux-musl-openssl-3.0.x.so.node ./dist/generated/prisma/
 
-# Listing folder to check if copy was successful
+# Listing generated prisma folder to check if copy was successful
 echo "dist/generated/prisma"
 echo "--------------------------------------------------------------------------"
 ls dist/generated/prisma
 echo "--------------------------------------------------------------------------"
 
-
-# Generate example data for testing
+# Generate data for testing
 npx prisma db seed
 
 # Start the app

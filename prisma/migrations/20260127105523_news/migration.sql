@@ -10,31 +10,31 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `place_category` DROP FOREIGN KEY `Place_Category_placeId_fkey`;
+ALTER TABLE `Place_Category` DROP FOREIGN KEY `Place_Category_placeId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `user_interest` DROP FOREIGN KEY `User_Interest_userId_fkey`;
+ALTER TABLE `User_Interest` DROP FOREIGN KEY `User_Interest_userId_fkey`;
 
 -- DropIndex
-DROP INDEX `Place_Category_placeId_fkey` ON `place_category`;
+DROP INDEX `Place_Category_placeId_fkey` ON `Place_Category`;
 
 -- DropIndex
-DROP INDEX `User_Interest_userId_fkey` ON `user_interest`;
+DROP INDEX `User_Interest_userId_fkey` ON `User_Interest`;
 
 -- AlterTable
-ALTER TABLE `comment` ADD COLUMN `approved` BOOLEAN NOT NULL DEFAULT false,
+ALTER TABLE `Comment` ADD COLUMN `approved` BOOLEAN NOT NULL DEFAULT false,
     ADD COLUMN `pending` BOOLEAN NOT NULL DEFAULT true;
 
 -- AlterTable
-ALTER TABLE `photo` ADD COLUMN `approved` BOOLEAN NOT NULL DEFAULT false,
+ALTER TABLE `Photo` ADD COLUMN `approved` BOOLEAN NOT NULL DEFAULT false,
     ADD COLUMN `pending` BOOLEAN NOT NULL DEFAULT true;
 
 -- AlterTable
-ALTER TABLE `place_category` DROP COLUMN `placeId`,
+ALTER TABLE `Place_Category` DROP COLUMN `placeId`,
     ADD COLUMN `placeID` INTEGER NOT NULL;
 
 -- AlterTable
-ALTER TABLE `user_interest` DROP COLUMN `userId`,
+ALTER TABLE `User_Interest` DROP COLUMN `userId`,
     ADD COLUMN `userID` INTEGER NOT NULL;
 
 -- CreateTable
@@ -76,22 +76,19 @@ CREATE UNIQUE INDEX `Place_Category_category_placeID_key` ON `Place_Category`(`c
 CREATE UNIQUE INDEX `User_Interest_userID_interest_key` ON `User_Interest`(`userID`, `interest`);
 
 -- AddForeignKey
-ALTER TABLE `User_Interest` ADD CONSTRAINT `User_Interest_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Place_Category` ADD CONSTRAINT `Place_Category_placeID_fkey` FOREIGN KEY (`placeID`) REFERENCES `Place`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `User_Friend` ADD CONSTRAINT `User_Friend_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `User_Friend` ADD CONSTRAINT `User_Friend_userID_friendID_fkey` FOREIGN KEY (`userID`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `User_Friend` ADD CONSTRAINT `User_Friend_friendID_fkey` FOREIGN KEY (`friendID`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Pending_Friend_Request` ADD CONSTRAINT `Pending_Friend_Request_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `User_Interest` ADD CONSTRAINT `User_Interest_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Pending_Friend_Request` ADD CONSTRAINT `Pending_Friend_Request_friendID_fkey` FOREIGN KEY (`friendID`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Place_Category` ADD CONSTRAINT `Place_Category_placeID_fkey` FOREIGN KEY (`placeID`) REFERENCES `Place`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `News` ADD CONSTRAINT `News_placeID_fkey` FOREIGN KEY (`placeID`) REFERENCES `Place`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
