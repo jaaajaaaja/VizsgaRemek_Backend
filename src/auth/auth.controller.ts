@@ -22,7 +22,7 @@ export class AuthController {
     res.cookie('access_token', result.access_token, {
       httpOnly: true,
       sameSite: 'lax',
-      maxAge: 3600000,
+      maxAge: 86400000,
       signed: true,
     })
 

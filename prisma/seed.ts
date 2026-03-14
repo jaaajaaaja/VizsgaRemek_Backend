@@ -1,13 +1,20 @@
-import { PrismaClient, Prisma } from '../generated/prisma/client'
+import { PrismaClient, Prisma, Place, User } from '../generated/prisma/client'
 import * as bcrypt from 'bcrypt'
 import { faker } from '@faker-js/faker'
 import chalk from 'chalk'
 import { PhotoWithDownload } from 'src/functions/seed/PhotoWithDownload'
 import { PhotoNoDownload } from 'src/functions/seed/PhotoNoDownload'
+import { CreateUsers } from 'src/functions/seed/CreateUsers'
+import { CraeteUserInterests } from 'src/functions/seed/CreateUserInterests'
+import { CreatePlace } from 'src/functions/seed/CreatePlaces'
+import { CreatePlaceCategories } from 'src/functions/seed/CreatePlaceCategories'
+import { CreateComments } from 'src/functions/seed/CreateComments'
+import { CreatePendingFriendRequests } from 'src/functions/seed/CreatePendingFriendREquests'
+import { CreateNews } from 'src/functions/seed/CreateNews'
 
 const prisma = new PrismaClient()
 
-const GOOGLE_PLACE_CATEGORIES = [
+export const GOOGLE_PLACE_CATEGORIES = [
     'bar',
     'pub',
     'nightclub',
@@ -30,31 +37,10 @@ async function main() {
 
     const userCount = 15
 
-    const userData: Prisma.UserCreateManyInput[] = Array.from({ length: userCount }, () => ({
-        userName: faker.internet.username(),
-        email: faker.internet.email(),
-        password: defaultPassword,
-        age: faker.number.int({ min: 18, max: 80 }),
-    }))
+    const usersData = await CreateUsers(userCount, defaultPassword)
 
-    await prisma.user.create({
-        data: {
-            userName: "test",
-            email: "test@test.test",
-            password: defaultPassword,
-            age: 25,
-        }
-    })
-
-    await prisma.user.create({
-        data: {
-            userName: "admin",
-            email: "admin@admin.admin",
-            password: defaultPassword,
-            age: 18,
-            role: "admin"
-        }
-    })
+    const userData: Prisma.UserCreateManyInput[] = usersData.userData
+    const testUser: User = usersData.testUser
 
     console.log("Admins in database: ", 1)
 
@@ -73,35 +59,7 @@ async function main() {
     ----------------------------------------------------------------------------------------------------------
     */
 
-    const userInterestData: Prisma.User_InterestCreateManyInput[] = []
-
-    for (const user of users) {
-        const interests = faker.helpers.arrayElements(
-            GOOGLE_PLACE_CATEGORIES,
-            { min: 0, max: 3 }
-        )
-
-        for (const interest of interests) {
-            userInterestData.push({
-                interest,
-                userID: user.id
-            })
-        }
-    }
-
-    await prisma.user_Interest.create({
-        data: {
-            interest: "billiard_hall",
-            userID: 1
-        }
-    })
-
-    await prisma.user_Interest.create({
-        data: {
-            interest: "beer_bar",
-            userID: 1
-        }
-    })
+    const userInterestData: Prisma.User_InterestCreateManyInput[] = await CraeteUserInterests(users)
 
     await prisma.user_Interest.createMany({
         data: userInterestData,
@@ -119,19 +77,10 @@ async function main() {
 
     const placeCount = 20
 
-    const testPlace = await prisma.place.create({
-        data: {
-            googleplaceID: "test-googleplace-id",
-            name: "Test Place",
-            address: "123 Test Street, Test City",
-        }
-    })
+    const placesData = (await CreatePlace(placeCount))
 
-    const placeData: Prisma.PlaceCreateManyInput[] = Array.from({ length: placeCount }, () => ({
-        googleplaceID: `${faker.string.alphanumeric(20)}`,
-        name: faker.company.name(),
-        address: faker.location.streetAddress({ useFullAddress: true })
-    }))
+    const placeData: Prisma.PlaceCreateManyInput[] = placesData.placeData
+    const testPlace: Place = placesData.testPlace
 
     await prisma.place.createMany({
         data: placeData,
@@ -147,35 +96,7 @@ async function main() {
     ----------------------------------------------------------------------------------------------------------
     */
 
-    const placeCategoryData: Prisma.Place_CategoryCreateManyInput[] = []
-
-    for (const place of places) {
-        const categories = faker.helpers.arrayElements(
-            GOOGLE_PLACE_CATEGORIES,
-            faker.number.int({ min: 1, max: 3 })
-        )
-
-        for (const category of categories) {
-            placeCategoryData.push({
-                category,
-                placeID: faker.number.int({ min: 2, max: placeCount })
-            })
-        }
-    }
-
-    await prisma.place_Category.create({
-        data: {
-            category: "billiard_hall",
-            placeID: 1
-        }
-    })
-
-    await prisma.place_Category.create({
-        data: {
-            category: "beer_bar",
-            placeID: 1
-        }
-    })
+    const placeCategoryData: Prisma.Place_CategoryCreateManyInput[] = await CreatePlaceCategories(placeCount, places)
 
     await prisma.place_Category.createMany({
         data: placeCategoryData,
@@ -192,35 +113,8 @@ async function main() {
     */
 
     const commentCount = 50
-    const commentData: Prisma.CommentCreateManyInput[] = Array.from({ length: commentCount }, () => ({
-        commentText: faker.lorem.sentence({ min: 5, max: 15 }),
-        rating: faker.number.int({ min: 1, max: 5 }),
-        userID: faker.helpers.arrayElement(users).id,
-        placeID: faker.helpers.arrayElement(places).id,
-        approved: faker.datatype.boolean(0.5),
-        createdAt: faker.date.between({ from: '2026-01-01T00:00:00.000Z', to: '2027-01-01T00:00:00.000Z' })
-    }))
 
-    const testUser = await prisma.user.findUnique({ where: { email: "test@test.test" } })
-
-    await prisma.comment.createMany({
-        data: [
-            {
-                commentText: "This is a test comment.",
-                rating: 5,
-                userID: 1,
-                placeID: testPlace.id,
-                approved: true
-            },
-            {
-                commentText: "This is another test comment.",
-                rating: 5,
-                userID: testUser!!.id,
-                placeID: testPlace.id,
-                approved: true
-            },
-        ],
-    })
+    const commentData: Prisma.CommentCreateManyInput[] = await CreateComments(commentCount, users, places)
 
     await prisma.comment.createMany({
         data: commentData,
@@ -291,21 +185,11 @@ async function main() {
     ----------------------------------------------------------------------------------------------------------
     */
 
-    const pendingFriendRequestData: Prisma.Pending_Friend_RequestCreateManyInput[] = []
+    const pendingFriendRequestData: Prisma.Pending_Friend_RequestCreateManyInput[] = CreatePendingFriendRequests(userCount, users)
 
-    for (let i = 1; i < userCount; i++) {
-        const user = users[i]
-        const friend = users[i + 2]
-
-        if (user.id !== friend.id) {
-            pendingFriendRequestData.push({
-                userID: user.id,
-                friendID: friend.id
-            })
-        }
-    }
-
-    await prisma.pending_Friend_Request.createMany({ data: pendingFriendRequestData })
+    await prisma.pending_Friend_Request.createMany({ 
+        data: pendingFriendRequestData
+    })
 
     const pendingFriendRequests = await prisma.pending_Friend_Request.findMany()
     console.log("Pending Friend Requests in database:", pendingFriendRequests.length)
@@ -317,22 +201,8 @@ async function main() {
     */
 
     const newsCount = 500
-    const newsData: Prisma.NewsCreateManyInput[] = Array.from({ length: newsCount }, () => ({
-        text: faker.lorem.paragraphs({ min: 1, max: 3 }),
-        placeID: faker.helpers.arrayElement(places).id,
-        userID: faker.helpers.arrayElement(users).id,
-        approved: faker.datatype.boolean(0.5),
-        createdAt: faker.date.between({ from: '2026-01-01T00:00:00.000Z', to: '2027-01-01T00:00:00.000Z' })
-    }))
-
-    const testNews = await prisma.news.create({
-        data: {
-            text: "Test news text.",
-            placeID: testPlace.id,
-            userID: testUser ? testUser.id : 1,
-            approved: true
-        },
-    })
+    
+    const newsData = await CreateNews(newsCount, places, users)
 
     await prisma.news.createMany({
         data: newsData,
