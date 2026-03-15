@@ -10,7 +10,10 @@ import { extname } from 'path';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { CreatePhotoDto } from './dto/create-photo.dto';
 import { Roles } from '../auth/roles.decorator';
-import { AddPhotos, AdminApprovesPhoto, AdminGetAllPhoto, DeletePhotoById, GetAllPhotoByPlace, GetAllPhotoByUser, GetPhotoById } from 'src/decorators/photo.decorator';
+import {
+    AddPhotos, AdminApprovesPhoto, AdminGetAllPhoto, DeletePhotoById,
+    GetAllPhotoByPlace, GetAllPhotoByUser, GetPhotoById
+} from 'src/decorators/photo.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import type { AuthenticatedRequest } from 'src/types/user-types';

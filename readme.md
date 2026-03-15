@@ -115,6 +115,8 @@ npx prisma db seed
 
 Ha nem szeretnéd fejleszteni az alkalmazást csak futtatni akkor elég ha letöltöd a Dockert beírsz két parancsot és már fut is a szerver. Természetesen a kódot attól még le kell tölteni a gépedre.
 
+Ha változtatni szeretnél a környezeti változókon akkor a `docker-compose.yml` fájlban megteheted.
+
 ```bash 
 docker build -t barsonar-backend --no-cache .
 docker compose up

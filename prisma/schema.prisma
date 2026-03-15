@@ -17,11 +17,11 @@ datasource db {
 }
 
 model User {
-  id               Int                      @id @default(autoincrement())
+  id               Int                      @id @default(autoincrement()) @db.UnsignedInt
   userName         String
   email            String                   @unique
   password         String
-  age              Int?
+  age              Int?                     @db.UnsignedInt
   role             String                   @default("user")
   comments         Comment[]
   photos           Photo[]
@@ -31,41 +31,46 @@ model User {
   requestRecieved  User_Friend[]            @relation("requestRecieved")
   sentRequests     Pending_Friend_Request[] @relation("sentRequests")
   receivedRequests Pending_Friend_Request[] @relation("receivedRequests")
+
+  @@map("User")
 }
 
 model User_Interest {
-  id       Int    @id @default(autoincrement())
+  id       Int    @id @default(autoincrement()) @db.UnsignedInt
   interest String
-  userID   Int
+  userID   Int    @db.UnsignedInt
   user     User   @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([userID, interest])
+  @@map("User_Interest")
 }
 
 model User_Friend {
-  id       Int  @id @default(autoincrement())
-  userID   Int
-  friendID Int
+  id       Int  @id @default(autoincrement()) @db.UnsignedInt
+  userID   Int  @db.UnsignedInt
+  friendID Int  @db.UnsignedInt
   user     User @relation("requestSent", fields: [userID], references: [id], onDelete: Cascade)
   friend   User @relation("requestRecieved", fields: [friendID], references: [id], onDelete: Cascade)
 
   @@unique([userID, friendID])
   @@unique([friendID, userID])
+  @@map("User_Friend")
 }
 
 model Pending_Friend_Request {
-  id       Int  @id @default(autoincrement())
-  userID   Int
-  friendID Int
+  id       Int  @id @default(autoincrement()) @db.UnsignedInt
+  userID   Int  @db.UnsignedInt
+  friendID Int  @db.UnsignedInt
   user     User @relation("sentRequests", fields: [userID], references: [id], onDelete: Cascade)
   friend   User @relation("receivedRequests", fields: [friendID], references: [id], onDelete: Cascade)
 
   @@unique([userID, friendID])
   @@unique([friendID, userID])
+  @@map("Pending_Friend_Request")
 }
 
 model Place {
-  id              Int              @id @default(autoincrement())
+  id              Int              @id @default(autoincrement()) @db.UnsignedInt
   googleplaceID   String           @unique
   name            String
   address         String
@@ -73,49 +78,58 @@ model Place {
   photos          Photo[]
   placeCategories Place_Category[]
   news            News[]
+
+  @@map("Place")
 }
 
 model Place_Category {
-  id       Int    @id @default(autoincrement())
+  id       Int    @id @default(autoincrement()) @db.UnsignedInt
   category String
-  placeID  Int
+  placeID  Int    @db.UnsignedInt
   place    Place  @relation(fields: [placeID], references: [id], onDelete: Cascade)
 
   @@unique([category, placeID])
+  @@map("Place_Category")
 }
 
 model Comment {
-  id          Int      @id @default(autoincrement())
+  id          Int      @id @default(autoincrement()) @db.UnsignedInt
   commentText String
-  rating      Int?
+  rating      Int?     @db.UnsignedInt
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  userID      Int
-  placeID     Int
+  userID      Int      @db.UnsignedInt
+  placeID     Int      @db.UnsignedInt
   approved    Boolean  @default(false)
   user        User     @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: Cascade)
   place       Place    @relation(fields: [placeID], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("Comment")
 }
 
 model Photo {
-  id        Int      @id @default(autoincrement())
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
   location  String
   type      String
-  userID    Int
-  placeID   Int
+  userID    Int      @db.UnsignedInt
+  placeID   Int      @db.UnsignedInt
   createdAt DateTime @default(now())
   approved  Boolean  @default(false)
   user      User     @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: Cascade)
   place     Place    @relation(fields: [placeID], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("Photo")
 }
 
 model News {
-  id        Int      @id @default(autoincrement())
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
   text      String   @db.LongText
-  placeID   Int
-  userID    Int
+  placeID   Int      @db.UnsignedInt
+  userID    Int      @db.UnsignedInt
   approved  Boolean  @default(false)
   createdAt DateTime @default(now())
   place     Place    @relation(fields: [placeID], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userID], references: [id], onDelete: Cascade)
+
+  @@map("News")
 }

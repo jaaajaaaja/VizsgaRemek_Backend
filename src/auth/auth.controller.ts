@@ -6,6 +6,7 @@ import { GetMe, GetProfile, Login, Logout } from 'src/decorators/auth.decorator'
 import { AuthGuard } from './auth.guard';
 import { DisabledGuard } from 'src/guards/disabled.guard';
 import type { AuthenticatedRequest } from 'src/types/user-types';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -16,7 +17,7 @@ export class AuthController {
   @SkipThrottle({ place: true, basic: true, postput: true })
   @Post('login')
   async signIn(
-    @Body() body: Record<string, any>,
+    @Body() body: LoginDto,
     @Res({ passthrough: true }) res: express.Response,
   ) {
     const result = await this.authService.signIn(body.email, body.password)
