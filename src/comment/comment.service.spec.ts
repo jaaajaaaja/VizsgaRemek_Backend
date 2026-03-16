@@ -47,7 +47,7 @@ describe('CommentService', () => {
   const mockPlace = {
     id: 1,
     googleplaceID: 'ChIJN1t_tDeuEmsRUsoyG83frY4',
-    name: 'Test Place',
+    name: 'Test place',
     address: 'Test Address',
   }
 

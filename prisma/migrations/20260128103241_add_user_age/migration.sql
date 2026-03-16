@@ -7,13 +7,13 @@
 
 */
 -- AlterTable
-ALTER TABLE `Comment` DROP COLUMN `pending`;
+ALTER TABLE `comment` DROP COLUMN `pending`;
 
 -- AlterTable
-ALTER TABLE `News` DROP COLUMN `pending`;
+ALTER TABLE `news` DROP COLUMN `pending`;
 
 -- AlterTable
-ALTER TABLE `Photo` DROP COLUMN `pending`;
+ALTER TABLE `photo` DROP COLUMN `pending`;
 
 -- AlterTable
-ALTER TABLE `User` ADD COLUMN `age` INTEGER NULL;
+ALTER TABLE `user` ADD COLUMN `age` INTEGER NULL;

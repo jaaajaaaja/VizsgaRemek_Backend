@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE `User` (
+CREATE TABLE `user` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `userName` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE `User` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Place` (
+CREATE TABLE `place` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `googleplaceID` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE `Place` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Comment` (
+CREATE TABLE `comment` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `commentText` VARCHAR(191) NOT NULL,
     `rating` INTEGER NULL,
@@ -34,7 +34,7 @@ CREATE TABLE `Comment` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Photo` (
+CREATE TABLE `photo` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `data` LONGBLOB NOT NULL,
     `type` VARCHAR(191) NOT NULL,
@@ -45,13 +45,13 @@ CREATE TABLE `Photo` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `Comment` ADD CONSTRAINT `Comment_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `comment` ADD CONSTRAINT `Comment_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Comment` ADD CONSTRAINT `Comment_placeID_fkey` FOREIGN KEY (`placeID`) REFERENCES `Place`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `comment` ADD CONSTRAINT `Comment_placeID_fkey` FOREIGN KEY (`placeID`) REFERENCES `place`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Photo` ADD CONSTRAINT `Photo_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `photo` ADD CONSTRAINT `Photo_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Photo` ADD CONSTRAINT `Photo_placeID_fkey` FOREIGN KEY (`placeID`) REFERENCES `Place`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `photo` ADD CONSTRAINT `Photo_placeID_fkey` FOREIGN KEY (`placeID`) REFERENCES `place`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

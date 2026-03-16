@@ -7,7 +7,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserInterestDto } from './dto/create-user-interest.dto';
 import * as bcrypt from 'bcrypt';
 import { AddUserType, FindOne, GetAllUserType, LoggedInUser, UserDataType } from 'src/types/user-types';
-import { Place, User, User_Interest } from 'generated/prisma/client';
+import { place, user, user_interest } from 'generated/prisma/client';
 import chalk from 'chalk';
 
 @Injectable()
@@ -71,7 +71,7 @@ export class UserService {
     }
   }
 
-  async remove(id: number, loggedInUser: LoggedInUser): Promise<User> {
+  async remove(id: number, loggedInUser: LoggedInUser): Promise<user> {
     const user = await this.prisma.user.findUnique({ where: { id } })
 
     if (!user) {
@@ -85,7 +85,7 @@ export class UserService {
     return this.prisma.user.delete({ where: { id } })
   }
 
-  async update(id: number, data: UpdateUserDto, loggedInUserId: number): Promise<User> {
+  async update(id: number, data: UpdateUserDto, loggedInUserId: number): Promise<user> {
     const user = await this.prisma.user.findUnique({ where: { id } })
 
     if (!user) {
@@ -111,7 +111,7 @@ export class UserService {
     })
   }
 
-  async deleteUserByAdmin(id: number): Promise<User> {
+  async deleteUserByAdmin(id: number): Promise<user> {
     const user = await this.prisma.user.findFirst({ where: { id } })
 
     if (!user) {
@@ -147,12 +147,12 @@ export class UserService {
   */
 
   async recommendations(loggedInUserId: number): Promise<{ id: number, name: string }[]> {
-    const interests = await this.prisma.user_Interest.findMany({
+    const interests = await this.prisma.user_interest.findMany({
       where: { userID: loggedInUserId },
     })
 
     if (interests.length === 0) {
-      throw new NotFoundException('User has no interests!')
+      throw new NotFoundException('user has no interests!')
     }
 
     const interest = interests.map((i) => i.interest)
@@ -180,7 +180,7 @@ export class UserService {
     return recommendations
   }
 
-  async recommendByAge(loggedInUserId: number): Promise<Place[]> {
+  async recommendByAge(loggedInUserId: number): Promise<place[]> {
     if (!loggedInUserId) {
       throw new UnauthorizedException('Log in first!')
     }
@@ -265,7 +265,7 @@ export class UserService {
       throw new NotFoundException("The user you are trying to send the request to does not exist!")
     }
 
-    const friend = await this.prisma.user_Friend.findFirst({
+    const friend = await this.prisma.user_friend.findFirst({
       where: {
         OR: [
           {
@@ -284,7 +284,7 @@ export class UserService {
       throw new ForbiddenException('You already have this user as a friend!')
     } else {
       try {
-        return this.prisma.pending_Friend_Request.create({
+        return this.prisma.pending_friend_request.create({
           data: {
             userID: loggedInUserId,
             friendID: sentToUserId,
@@ -301,7 +301,7 @@ export class UserService {
     loggedInUserId: number,
     accepted: boolean,
   ): Promise<{ message: string }> {
-    const request = await this.prisma.pending_Friend_Request.findFirst({
+    const request = await this.prisma.pending_friend_request.findFirst({
       where: {
         userID: recievedFromUserId,
         friendID: loggedInUserId,
@@ -315,11 +315,11 @@ export class UserService {
     }
 
     if (accepted) {
-      await this.prisma.user_Friend.create({ data: request })
-      await this.prisma.pending_Friend_Request.delete({ where: request })
+      await this.prisma.user_friend.create({ data: request })
+      await this.prisma.pending_friend_request.delete({ where: request })
       return { message: 'Friend request accepted' }
     } else {
-      await this.prisma.pending_Friend_Request.delete({ where: request })
+      await this.prisma.pending_friend_request.delete({ where: request })
       return { message: 'Friend request rejected!' }
     }
   }
@@ -352,7 +352,7 @@ export class UserService {
       throw new UnauthorizedException('Log in to see your friendlist!')
     }
 
-    const friends = await this.prisma.user_Friend.findMany({
+    const friends = await this.prisma.user_friend.findMany({
       where: { userID: loggedInUserId },
       include: {
         friend: {
@@ -379,8 +379,8 @@ export class UserService {
 
 
 
-  async deleteUserInterest(id: number, loggedInUserId: number): Promise<User_Interest> {
-    const interest = await this.prisma.user_Interest.findFirst({
+  async deleteUserInterest(id: number, loggedInUserId: number): Promise<user_interest> {
+    const interest = await this.prisma.user_interest.findFirst({
       where: {
         id: id,
         userID: loggedInUserId
@@ -391,7 +391,7 @@ export class UserService {
       throw new NotFoundException("Interest not found!")
     }
 
-    const deleteInterest = await this.prisma.user_Interest.delete({
+    const deleteInterest = await this.prisma.user_interest.delete({
       where: { id: interest.id }
     })
 
@@ -401,34 +401,34 @@ export class UserService {
   async addUserInterest(
     data: CreateUserInterestDto,
     loggedInUserId: number
-  ): Promise<User_Interest> {
+  ): Promise<user_interest> {
     try {
       const fullData = {
         interest: data.interest,
         userID: loggedInUserId,
       }
 
-      return this.prisma.user_Interest.create({ data: fullData })
+      return this.prisma.user_interest.create({ data: fullData })
     } catch (e) {
       throw new ForbiddenException('You already have this interest!')
     }
   }
 
-  async getAllUserInterestByAdmin(): Promise<User_Interest[]> {
-    return this.prisma.user_Interest.findMany({
+  async getAllUserInterestByAdmin(): Promise<user_interest[]> {
+    return this.prisma.user_interest.findMany({
       orderBy: {
         userID: "asc"
       }
     })
   }
 
-  async interestList(loggedInUserId: number): Promise<User_Interest[]> {
-    const interests = await this.prisma.user_Interest.findMany({
+  async interestList(loggedInUserId: number): Promise<user_interest[]> {
+    const interests = await this.prisma.user_interest.findMany({
       where: { userID: loggedInUserId }
     })
 
     if (!interests) {
-      throw new NotFoundException("User has no interests set!")
+      throw new NotFoundException("user has no interests set!")
     }
 
     return interests

@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { Comment } from 'generated/prisma/browser';
+import { comment } from 'generated/prisma/browser';
 import { ApprovedByAdmin, FindAllByPlace, FindAllByUser } from 'src/types/comment-types';
 import type { LoggedInUser } from 'src/types/user-types';
 
@@ -12,7 +12,7 @@ export class CommentService {
     private prisma: PrismaService,
   ) { }
 
-  async findOne(id: number): Promise<Comment> {
+  async findOne(id: number): Promise<comment> {
     const comment = await this.prisma.comment.findUnique({ where: { id } })
 
     if (!comment) {
@@ -41,7 +41,7 @@ export class CommentService {
     })
 
     if (comments.length === 0) {
-      throw new NotFoundException("User did not post any comments!")
+      throw new NotFoundException("user did not post any comments!")
     }
 
     return comments
@@ -75,13 +75,13 @@ export class CommentService {
     })
 
     if (comments.length === 0) {
-      throw new NotFoundException("Place does not have any comments!")
+      throw new NotFoundException("place does not have any comments!")
     }
 
     return comments
   }
 
-  async add(data: CreateCommentDto, loggedInUserId: number): Promise<Comment> {
+  async add(data: CreateCommentDto, loggedInUserId: number): Promise<comment> {
     const place = await this.prisma.place.findUnique({ where: { id: data.placeID } })
 
     if (!place) {
@@ -98,7 +98,7 @@ export class CommentService {
     return this.prisma.comment.create({ data: fullData })
   }
 
-  async remove(id: number, loggedInUser: LoggedInUser): Promise<Comment> {
+  async remove(id: number, loggedInUser: LoggedInUser): Promise<comment> {
     const comment = await this.prisma.comment.findUnique({ where: { id } })
 
     if (!comment) {
@@ -112,7 +112,7 @@ export class CommentService {
     return this.prisma.comment.delete({ where: { id } })
   }
 
-  async update(id: number, data: UpdateCommentDto, loggedInUserId: number): Promise<Comment> {
+  async update(id: number, data: UpdateCommentDto, loggedInUserId: number): Promise<comment> {
     const comment = await this.prisma.comment.findUnique({ where: { id } })
 
     if (!comment) {
@@ -132,7 +132,7 @@ export class CommentService {
     })
   }
 
-  async getAll(): Promise<Comment[]> {
+  async getAll(): Promise<comment[]> {
     return this.prisma.comment.findMany({
       where: { approved: false }
     })

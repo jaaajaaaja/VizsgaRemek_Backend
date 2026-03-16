@@ -1,11 +1,11 @@
 import { faker } from "@faker-js/faker"
-import { Place, Prisma, PrismaClient } from "generated/prisma/client"
+import { place, Prisma, PrismaClient } from "generated/prisma/client"
 import { GOOGLE_PLACE_CATEGORIES } from "prisma/seed"
 
 const prisma = new PrismaClient()
 
-export async function CreatePlaceCategories(placesCount: number, places: Place[]): Promise<Prisma.Place_CategoryCreateManyInput[]> {
-    const placeCategoryData: Prisma.Place_CategoryCreateManyInput[] = []
+export async function CreatePlaceCategories(placesCount: number, places: place[]): Promise<Prisma.place_categoryCreateManyInput[]> {
+    const placeCategoryData: Prisma.place_categoryCreateManyInput[] = []
 
     for (const place of places) {
         const categories = faker.helpers.arrayElements(
@@ -21,7 +21,7 @@ export async function CreatePlaceCategories(placesCount: number, places: Place[]
         }
     }
 
-    await prisma.place_Category.createMany({
+    await prisma.place_category.createMany({
         data: [
             {
                 category: "billiard_hall",

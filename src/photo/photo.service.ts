@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable, NotFoundException, UnauthorizedExceptio
 import { PrismaService } from '../prisma/prisma.service';
 import { FilesArray, GetAllBy, GetOne } from 'src/types/photo-types';
 import { ApprovedByAdmin } from 'src/types/comment-types';
-import { Photo, Prisma } from 'generated/prisma/client';
+import { photo, Prisma } from 'generated/prisma/client';
 
 @Injectable()
 export class PhotoService {
@@ -51,7 +51,7 @@ export class PhotoService {
         })
 
         if (!allByUser) {
-            throw new NotFoundException("User did not upload any images!")
+            throw new NotFoundException("user did not upload any images!")
         }
 
         return allByUser
@@ -70,7 +70,7 @@ export class PhotoService {
         })
 
         if (!allByPlace) {
-            throw new NotFoundException("Place does not have any images!")
+            throw new NotFoundException("place does not have any images!")
         }
 
         return allByPlace
@@ -86,7 +86,7 @@ export class PhotoService {
         })
 
         if(!user) {
-            throw new ConflictException("User does not exist!")
+            throw new ConflictException("user does not exist!")
         }
 
         const place = await this.prisma.place.findUnique({
@@ -94,7 +94,7 @@ export class PhotoService {
         })
 
         if (!place) {
-            throw new NotFoundException(`Place with ID ${placeID} not found`)
+            throw new NotFoundException(`place with ID ${placeID} not found`)
         }
 
         const fileArray = Array.isArray(files) ? files : [files]
@@ -117,7 +117,7 @@ export class PhotoService {
         return data
     }
 
-    async remove(id: number, loggedInUserId: number): Promise<Photo> {
+    async remove(id: number, loggedInUserId: number): Promise<photo> {
         const photo = await this.prisma.photo.findUnique({ where: { id } })
 
         if (!photo) {
@@ -143,7 +143,7 @@ export class PhotoService {
         return { id: data.id, approved: data.approved }
     }
 
-    getAll(): Promise<Photo[]> {
+    getAll(): Promise<photo[]> {
         return this.prisma.photo.findMany({
             where: { approved: false }
         })

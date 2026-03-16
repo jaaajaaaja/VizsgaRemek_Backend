@@ -127,45 +127,45 @@ docker compose up
 Az adatbázis a következő táblákat tartalmazza:
 
 ```ts
-User {
+user {
   id: number,
   userName: string,
   email: string,
   password: string
 }
 
-User_Interest {
+user_interest {
   id: number,
   interest: string,
   userID: number
 }
 
-User_Friend {
+user_friend {
   id: number,
   userID: number,
   friendID: number
 }
 
-Pending_Friend_Request {
+pending_friend_request {
   id: number,
   userID: number,
   friendID: number
 }
 
-Place {
+place {
   id: number,
   googlePlaceID: string,
   name: string,
   address: string
 }
 
-Place_Category {
+place_category {
   id: number,
   category: string,
   placeID: number
 }
 
-Comment {
+comment {
   id: number,
   commentText: string,
   rating: number,
@@ -175,7 +175,7 @@ Comment {
   placeID: number
 }
 
-News {
+news {
   id: number,
   text: string,
   placeID: number,
@@ -183,7 +183,7 @@ News {
   approved: boolean
 }
 
-Photo {
+photo {
   id: number,
   location: string,
   type: string,

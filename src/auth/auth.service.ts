@@ -37,7 +37,7 @@ export class AuthService {
       throw new UnauthorizedException()
     }
 
-    console.log(`\n${chalk.yellow("User logged in successfully:")}
+    console.log(`\n${chalk.yellow("user logged in successfully:")}
       ${chalk.rgb(128, 0, 128)("id:")} ${chalk.green(user.id)}
       ${chalk.rgb(128, 0, 128)("email:")} ${chalk.green(user.email)}
       `

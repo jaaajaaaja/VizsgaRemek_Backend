@@ -10,9 +10,9 @@ import { Prisma } from "generated/prisma/client";
  */
 export function PhotoNoDownload(
     count: number,
-    users: Prisma.UserCreateManyInput[],
-    places: Prisma.PlaceCreateManyInput[]
-): Prisma.PhotoCreateManyInput[] {
+    users: Prisma.userCreateManyInput[],
+    places: Prisma.placeCreateManyInput[]
+): Prisma.photoCreateManyInput[] {
     const FILE_TYPES = ["jpeg", "png", "gif"]
 
     const randomType = faker.helpers.arrayElement(FILE_TYPES)

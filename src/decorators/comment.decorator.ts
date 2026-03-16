@@ -94,7 +94,7 @@ export function GetCommentByUser() {
             schema: {
                 type: "object",
                 properties: {
-                    message: { type: "string", example: "User did not post any comments!" }
+                    message: { type: "string", example: "user did not post any comments!" }
                 }
             }
         })
@@ -137,7 +137,7 @@ export function GetCommentByPlace() {
             schema: {
                 type: "object",
                 properties: {
-                    message: { type: "string", example: "Place does not have any comments!" }
+                    message: { type: "string", example: "place does not have any comments!" }
                 }
             }
         })

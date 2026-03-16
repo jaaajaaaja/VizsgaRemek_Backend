@@ -1,14 +1,13 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Transform, TransformFnParams } from "class-transformer";
-import { IsNotEmpty, IsNumber, IsOptional, IsString, Max, MaxLength, Min, MinLength } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Length, Max, Min, } from "class-validator";
 import sanitizeHtml from 'sanitize-html';
 
 export class CreateCommentDto {
     @ApiProperty({ default: "Komment szöveg" })
     @IsNotEmpty()
     @IsString()
-    @MinLength(1)
-    @MaxLength(200)
+    @Length(1, 500)
     @Transform((params: TransformFnParams) =>
         sanitizeHtml(
             params.value,

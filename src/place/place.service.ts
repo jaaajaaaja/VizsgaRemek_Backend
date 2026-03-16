@@ -6,7 +6,7 @@ import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
 import { GetAllByPlaceNewsType, PeriodEnum, PlaceStatisticsType } from 'src/types/place-types';
 import { ApprovedByAdmin } from 'src/types/comment-types';
-import { News, Place, Place_Category } from 'generated/prisma/client';
+import { news, place, place_category } from 'generated/prisma/client';
 import { GetDate } from 'src/functions/place/GetDate';
 
 @Injectable()
@@ -16,11 +16,11 @@ export class PlaceService {
 
     /*
         ----------------------------------------------------------------------------------------------------------
-        PLACE
+        place
         ----------------------------------------------------------------------------------------------------------
     */
 
-    async getAll(): Promise<Place[]> {
+    async getAll(): Promise<place[]> {
         const places = await this.prisma.place.findMany()
 
         if (!places) {
@@ -31,7 +31,7 @@ export class PlaceService {
     }
 
     async getPopular(period: PeriodEnum): Promise<PlaceStatisticsType[]> {
-        const places: Place[] = await this.prisma.place.findMany()
+        const places: place[] = await this.prisma.place.findMany()
         const statistics: PlaceStatisticsType[] = []
 
         const getDate = GetDate(period)
@@ -83,7 +83,7 @@ export class PlaceService {
         return statistics
     }
 
-    async getOne(id: number): Promise<Place> {
+    async getOne(id: number): Promise<place> {
         const place = await this.prisma.place.findUnique({ where: { id } })
 
         if (!place) {
@@ -93,7 +93,7 @@ export class PlaceService {
         return place
     }
 
-    async getOneByGoogleplaceID(googleplaceID: string): Promise<Place> {
+    async getOneByGoogleplaceID(googleplaceID: string): Promise<place> {
         const place = await this.prisma.place.findUnique({ where: { googleplaceID } })
 
         if (!place) {
@@ -103,11 +103,11 @@ export class PlaceService {
         return place
     }
 
-    async add(data: CreatePlaceDto): Promise<Place> {
+    async add(data: CreatePlaceDto): Promise<place> {
         return this.prisma.place.create({ data })
     }
 
-    async remove(id: number): Promise<Place> {
+    async remove(id: number): Promise<place> {
         const place = await this.prisma.place.findFirst({ where: { id } })
 
         if (!place) {
@@ -119,30 +119,30 @@ export class PlaceService {
 
     /*
         ----------------------------------------------------------------------------------------------------------
-        PLACE CATEGORY
+        place CATEGORY
         ----------------------------------------------------------------------------------------------------------
     */
 
-    async addPlaceCategory(data: CreatePlaceCategoryDto, placeID: number): Promise<Place_Category> {
+    async addPlaceCategory(data: CreatePlaceCategoryDto, placeID: number): Promise<place_category> {
         try {
             const fullData = {
                 category: data.category,
                 placeID: placeID
             }
 
-            return this.prisma.place_Category.create({ data: fullData })
+            return this.prisma.place_category.create({ data: fullData })
         } catch (e) {
-            throw new ForbiddenException("Place already has this category!")
+            throw new ForbiddenException("place already has this category!")
         }
     }
 
     /*
         ----------------------------------------------------------------------------------------------------------
-        NEWS
+        news
         ----------------------------------------------------------------------------------------------------------
     */
 
-    async addNews(data: CreateNewsDto, loggedInUserId: number): Promise<News> {
+    async addNews(data: CreateNewsDto, loggedInUserId: number): Promise<news> {
         if (!loggedInUserId) {
             throw new UnauthorizedException("Log in to post news!")
         }
@@ -162,7 +162,7 @@ export class PlaceService {
         return this.prisma.news.create({ data: fullData })
     }
 
-    async updateNews(id: number, body: UpdateNewsDto, loggedInUserId: number): Promise<News> {
+    async updateNews(id: number, body: UpdateNewsDto, loggedInUserId: number): Promise<news> {
         const news = await this.prisma.news.findFirst({ where: { id } })
 
         if (!news) {

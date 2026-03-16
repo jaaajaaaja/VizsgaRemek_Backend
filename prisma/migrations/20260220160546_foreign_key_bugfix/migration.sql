@@ -1,5 +1,5 @@
 -- DropForeignKey
-ALTER TABLE `User_Interest` DROP FOREIGN KEY `User_Interest_userID_fkey`;
+ALTER TABLE `user_interest` DROP FOREIGN KEY `User_Interest_userID_fkey`;
 
 -- AddForeignKey
-ALTER TABLE `User_Interest` ADD CONSTRAINT `User_Interest_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `user_interest` ADD CONSTRAINT `User_Interest_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

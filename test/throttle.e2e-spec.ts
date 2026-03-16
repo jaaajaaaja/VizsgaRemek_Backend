@@ -130,7 +130,7 @@ describe('Throttle E2E', () => {
                 expect(lastResponse.status).toBe(429)
             })
 
-            it("GET BY USER", async () => {
+            it("GET BY user", async () => {
                 const agent = request(app.getHttpServer())
 
                 const endpoint = "/photo/getAllByUser/1"
@@ -145,7 +145,7 @@ describe('Throttle E2E', () => {
                 expect(lastResponse.status).toBe(429)
             })
 
-            it("GET BY PLACE", async () => {
+            it("GET BY place", async () => {
                 const agent = request(app.getHttpServer())
 
                 const endpoint = "/photo/getAllByPlace/1"
@@ -213,7 +213,7 @@ describe('Throttle E2E', () => {
                 expect(lastResponse.status).toBe(429)
             })
 
-            it("GET BY USER", async () => {
+            it("GET BY user", async () => {
                 const agent = request(app.getHttpServer())
 
                 const endpoint = "/comment/findAllByUser/1"
@@ -228,7 +228,7 @@ describe('Throttle E2E', () => {
                 expect(lastResponse.status).toBe(429)
             })
 
-            it("GET BY PLACE", async () => {
+            it("GET BY place", async () => {
                 const agent = request(app.getHttpServer())
 
                 const endpoint = "/comment/findAllByPlace/1"

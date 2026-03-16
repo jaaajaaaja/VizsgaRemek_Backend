@@ -1,7 +1,7 @@
 import { Prisma } from "generated/prisma/client";
 import { Request } from 'express';
 
-export type FindOne = Prisma.UserGetPayload<{
+export type FindOne = Prisma.userGetPayload<{
     select: {
         id: true
         email: true
@@ -10,7 +10,7 @@ export type FindOne = Prisma.UserGetPayload<{
     }
 }>
 
-export type UserDataType = Prisma.UserGetPayload<{
+export type UserDataType = Prisma.userGetPayload<{
     select: {
         id: true
         userName: true
@@ -19,7 +19,7 @@ export type UserDataType = Prisma.UserGetPayload<{
     }
 }>
 
-export type GetAllUserType = Prisma.UserGetPayload<{
+export type GetAllUserType = Prisma.userGetPayload<{
     select: {
         id: true
         userName: true

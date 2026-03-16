@@ -33,7 +33,7 @@ describe('PlaceService', () => {
       // delete: jest.fn(),
       // update: jest.fn()
     },
-    place_Category: {
+    place_category: {
       create: jest.fn(),
     },
     news: {
@@ -109,7 +109,7 @@ describe('PlaceService', () => {
       const category: CreatePlaceCategoryDto = { category: "test" }
       const returnCategory = { category: category, placeID: 1 }
 
-      mockPrismaService.place_Category.create.mockResolvedValue(returnCategory)
+      mockPrismaService.place_category.create.mockResolvedValue(returnCategory)
 
       const result = await service.addPlaceCategory(category, 1)
 

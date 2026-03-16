@@ -39,11 +39,11 @@ async function download_test_images(count: number): Promise<DownloadType[]> {
  */
 export async function PhotoWithDownload(
     count: number,
-    users: Prisma.UserCreateManyInput[],
-    places: Prisma.PlaceCreateManyInput[]
-): Promise<Prisma.PhotoCreateManyInput[]> {
+    users: Prisma.userCreateManyInput[],
+    places: Prisma.placeCreateManyInput[]
+): Promise<Prisma.photoCreateManyInput[]> {
     const images: DownloadType[] = await download_test_images(count)
-    const photoData: Prisma.PhotoCreateManyInput[] = []
+    const photoData: Prisma.photoCreateManyInput[] = []
 
     for (const image of images) {
         const photo = {

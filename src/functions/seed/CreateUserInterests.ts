@@ -1,11 +1,11 @@
 import { faker } from "@faker-js/faker"
-import { Prisma, PrismaClient, User } from "generated/prisma/client"
+import { Prisma, PrismaClient, user } from "generated/prisma/client"
 import { GOOGLE_PLACE_CATEGORIES } from "prisma/seed"
 
 const prisma = new PrismaClient()
 
-export async function CraeteUserInterests(users: User[]): Promise<Prisma.User_InterestCreateManyInput[]> {
-    const userInterestData: Prisma.User_InterestCreateManyInput[] = []
+export async function CraeteUserInterests(users: user[]): Promise<Prisma.user_interestCreateManyInput[]> {
+    const userInterestData: Prisma.user_interestCreateManyInput[] = []
 
     for (const user of users) {
         const interests = faker.helpers.arrayElements(
@@ -21,14 +21,14 @@ export async function CraeteUserInterests(users: User[]): Promise<Prisma.User_In
         }
     }
 
-    await prisma.user_Interest.create({
+    await prisma.user_interest.create({
         data: {
             interest: "billiard_hall",
             userID: 1
         }
     })
 
-    await prisma.user_Interest.create({
+    await prisma.user_interest.create({
         data: {
             interest: "beer_bar",
             userID: 1

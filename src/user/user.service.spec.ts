@@ -66,19 +66,19 @@ describe('UserService', () => {
       findMany: jest.fn(),
       findFirst: jest.fn(),
     },
-    place_Category: {
+    place_category: {
       findMany: jest.fn(),
     },
-    user_Interest: {
+    user_interest: {
       findMany: jest.fn(),
       create: jest.fn()
     },
-    user_Friend: {
+    user_friend: {
       create: jest.fn(),
       findMany: jest.fn(),
       findFirst: jest.fn()
     },
-    pending_Friend_Request: {
+    pending_friend_request: {
       create: jest.fn(),
       delete: jest.fn(),
       findFirst: jest.fn(),
@@ -157,7 +157,7 @@ describe('UserService', () => {
     it("should create a user interest", async () => {
       const interest = { interest: "bar", userID: mockUser[0] }
 
-      mockPrismaService.user_Interest.create.mockResolvedValue(interest)
+      mockPrismaService.user_interest.create.mockResolvedValue(interest)
 
       const result = await service.addUserInterest(("bar" as any), mockUser.id)
 
@@ -178,7 +178,7 @@ describe('UserService', () => {
       expect(mockPrismaService.user.delete).toHaveBeenCalledWith({ where: { id: 1 } })
     })
 
-    it("should throw NotFoundException when user not found", async () => {
+    it("should throw NotFoundException when User not found", async () => {
       mockPrismaService.user.findUnique.mockResolvedValue(null)
       mockPrismaService.user.delete.mockResolvedValue(mockUser)
 
@@ -199,7 +199,7 @@ describe('UserService', () => {
       expect(mockPrismaService.user.update).toHaveBeenCalledWith({ where: { id: 1 }, data: mockUser })
     })
 
-    it("should throw NotFoundException when user not found", async () => {
+    it("should throw NotFoundException when User not found", async () => {
       mockPrismaService.user.findUnique.mockResolvedValue(null)
       mockPrismaService.user.update.mockResolvedValue(mockUser)
 
@@ -210,32 +210,32 @@ describe('UserService', () => {
 
   describe("recommendations", () => {
     it("should return recommended places", async () => {
-      mockPrismaService.user_Interest.findMany.mockResolvedValue(mockInterests)
+      mockPrismaService.user_interest.findMany.mockResolvedValue(mockInterests)
       mockPrismaService.place.findMany.mockResolvedValue(mockRecommendedPlaces)
 
       const result = await service.recommendations(1)
 
       expect(result).toEqual(mockRecommendedPlaces)
-      expect(mockPrismaService.user_Interest.findMany).toHaveBeenCalledTimes(1)
-      expect(mockPrismaService.user_Interest.findMany).toHaveBeenCalledWith({
+      expect(mockPrismaService.user_interest.findMany).toHaveBeenCalledTimes(1)
+      expect(mockPrismaService.user_interest.findMany).toHaveBeenCalledWith({
         where: { userID: 1 }
       })
       expect(mockPrismaService.place.findMany).toHaveBeenCalledTimes(1)
     })
 
     it("should throw NotFoundException when user has no interests", async () => {
-      mockPrismaService.user_Interest.findMany.mockResolvedValue([])
+      mockPrismaService.user_interest.findMany.mockResolvedValue([])
 
       await expect(service.recommendations(1)).rejects.toThrow(NotFoundException)
-      expect(mockPrismaService.place_Category.findMany).toHaveBeenCalledTimes(0)
+      expect(mockPrismaService.place_category.findMany).toHaveBeenCalledTimes(0)
     })
 
     it("should throw ForbiddenException when no places match user interests", async () => {
-      mockPrismaService.user_Interest.findMany.mockResolvedValue(mockInterests)
+      mockPrismaService.user_interest.findMany.mockResolvedValue(mockInterests)
       mockPrismaService.place.findMany.mockResolvedValue([])
 
       await expect(service.recommendations(1)).rejects.toThrow(ForbiddenException)
-      expect(mockPrismaService.user_Interest.findMany).toHaveBeenCalledTimes(1)
+      expect(mockPrismaService.user_interest.findMany).toHaveBeenCalledTimes(1)
       expect(mockPrismaService.place.findMany).toHaveBeenCalledTimes(1)
     })
   })
@@ -244,18 +244,18 @@ describe('UserService', () => {
     it("should create a pending friend request", async () => {
       const mockRequest = { userID: 1, friendID: 2 }
       mockPrismaService.user.findFirst.mockResolvedValue(2)
-      mockPrismaService.pending_Friend_Request.create.mockResolvedValue(mockRequest)
+      mockPrismaService.pending_friend_request.create.mockResolvedValue(mockRequest)
 
       const result = await service.addFriend(2, 1)
 
       expect(result).toEqual(mockRequest)
-      expect(mockPrismaService.pending_Friend_Request.create).toHaveBeenCalledWith({
+      expect(mockPrismaService.pending_friend_request.create).toHaveBeenCalledWith({
         data: { userID: 1, friendID: 2 }
       })
     })
 
     it("should throw ConflictException if request already exists", async () => {
-      mockPrismaService.pending_Friend_Request.create.mockRejectedValueOnce(new NotFoundException("You already sent a request to this user!"))
+      mockPrismaService.pending_friend_request.create.mockRejectedValueOnce(new NotFoundException("You already sent a request to this user!"))
 
       await expect(service.addFriend(2, 1)).rejects.toThrow(NotFoundException)
     })
@@ -264,29 +264,29 @@ describe('UserService', () => {
   describe("dealWithFriendRequest", () => {
     it("should accept friend request and create friendship", async () => {
       const mockRequest = { id: 1, userID: 2, friendID: 1 }
-      mockPrismaService.pending_Friend_Request.findFirst.mockResolvedValue(mockRequest)
-      mockPrismaService.user_Friend.create.mockResolvedValue({ id: 1, userID: 2, friendID: 1 })
-      mockPrismaService.pending_Friend_Request.delete.mockResolvedValue(mockRequest)
+      mockPrismaService.pending_friend_request.findFirst.mockResolvedValue(mockRequest)
+      mockPrismaService.user_friend.create.mockResolvedValue({ id: 1, userID: 2, friendID: 1 })
+      mockPrismaService.pending_friend_request.delete.mockResolvedValue(mockRequest)
 
       await service.dealWithFriendRequest(2, 1, true)
 
-      expect(mockPrismaService.pending_Friend_Request.findFirst).toHaveBeenCalledWith({
+      expect(mockPrismaService.pending_friend_request.findFirst).toHaveBeenCalledWith({
         where: { userID: 2, friendID: 1 }
       })
-      expect(mockPrismaService.user_Friend.create).toHaveBeenCalledWith({ data: mockRequest })
-      expect(mockPrismaService.pending_Friend_Request.delete).toHaveBeenCalledWith({ where: mockRequest })
+      expect(mockPrismaService.user_friend.create).toHaveBeenCalledWith({ data: mockRequest })
+      expect(mockPrismaService.pending_friend_request.delete).toHaveBeenCalledWith({ where: mockRequest })
     })
 
     it("should reject friend request and delete it", async () => {
       const mockRequest = { id: 1, userID: 2, friendID: 1 }
-      mockPrismaService.pending_Friend_Request.findFirst.mockResolvedValue(mockRequest)
-      mockPrismaService.pending_Friend_Request.delete.mockResolvedValue(mockRequest)
+      mockPrismaService.pending_friend_request.findFirst.mockResolvedValue(mockRequest)
+      mockPrismaService.pending_friend_request.delete.mockResolvedValue(mockRequest)
 
       const result = await service.dealWithFriendRequest(2, 1, false)
 
       expect(result).toEqual({ message: "Friend request rejected!" })
-      expect(mockPrismaService.user_Friend.create).not.toHaveBeenCalled()
-      expect(mockPrismaService.pending_Friend_Request.delete).toHaveBeenCalledWith({ where: mockRequest })
+      expect(mockPrismaService.user_friend.create).not.toHaveBeenCalled()
+      expect(mockPrismaService.pending_friend_request.delete).toHaveBeenCalledWith({ where: mockRequest })
     })
   })
 
@@ -321,7 +321,7 @@ describe('UserService', () => {
         { friendID: 3, friend: { id: 3, userName: "friend2" } }
       ]
 
-      mockPrismaService.user_Friend.findMany.mockResolvedValue(friendsData)
+      mockPrismaService.user_friend.findMany.mockResolvedValue(friendsData)
 
       const result = await service.friendlist(1)
 
@@ -329,7 +329,7 @@ describe('UserService', () => {
         { id: 2, userName: "friend1" },
         { id: 3, userName: "friend2" }
       ])
-      expect(mockPrismaService.user_Friend.findMany).toHaveBeenCalledWith({
+      expect(mockPrismaService.user_friend.findMany).toHaveBeenCalledWith({
         where: { userID: 1 },
         include: {
           friend: {
@@ -340,10 +340,10 @@ describe('UserService', () => {
     })
 
     it("should throw NotFoundException when user has no friends", async () => {
-      mockPrismaService.user_Friend.findMany.mockResolvedValue([])
+      mockPrismaService.user_friend.findMany.mockResolvedValue([])
 
       await expect(service.friendlist(1)).rejects.toThrow(NotFoundException)
-      expect(mockPrismaService.user_Friend.findMany).toHaveBeenCalledTimes(1)
+      expect(mockPrismaService.user_friend.findMany).toHaveBeenCalledTimes(1)
     })
   })
 })

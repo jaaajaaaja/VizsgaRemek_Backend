@@ -1,6 +1,5 @@
-import { PrismaClient, Prisma, Place, User } from '../generated/prisma/client'
+import { PrismaClient, Prisma, place, user } from '../generated/prisma/client'
 import * as bcrypt from 'bcrypt'
-import { faker } from '@faker-js/faker'
 import chalk from 'chalk'
 import { PhotoWithDownload } from 'src/functions/seed/PhotoWithDownload'
 import { PhotoNoDownload } from 'src/functions/seed/PhotoNoDownload'
@@ -39,8 +38,8 @@ async function main() {
 
     const usersData = await CreateUsers(userCount, defaultPassword)
 
-    const userData: Prisma.UserCreateManyInput[] = usersData.userData
-    const testUser: User = usersData.testUser
+    const userData: Prisma.userCreateManyInput[] = usersData.userData
+    const testUser: user = usersData.testUser
 
     console.log("Admins in database: ", 1)
 
@@ -55,19 +54,19 @@ async function main() {
 
     /*
     ----------------------------------------------------------------------------------------------------------
-    USER INTERESTS
+    user INTERESTS
     ----------------------------------------------------------------------------------------------------------
     */
 
-    const userInterestData: Prisma.User_InterestCreateManyInput[] = await CraeteUserInterests(users)
+    const userInterestData: Prisma.user_interestCreateManyInput[] = await CraeteUserInterests(users)
 
-    await prisma.user_Interest.createMany({
+    await prisma.user_interest.createMany({
         data: userInterestData,
         skipDuplicates: true,
     })
 
-    const userInterests = await prisma.user_Interest.findMany()
-    console.log("User Interests in database:", userInterests.length)
+    const userInterests = await prisma.user_interest.findMany()
+    console.log("user Interests in database:", userInterests.length)
 
     /*
     ----------------------------------------------------------------------------------------------------------
@@ -79,8 +78,8 @@ async function main() {
 
     const placesData = (await CreatePlace(placeCount))
 
-    const placeData: Prisma.PlaceCreateManyInput[] = placesData.placeData
-    const testPlace: Place = placesData.testPlace
+    const placeData: Prisma.placeCreateManyInput[] = placesData.placeData
+    const testPlace: place = placesData.testPlace
 
     await prisma.place.createMany({
         data: placeData,
@@ -92,19 +91,19 @@ async function main() {
 
     /*
     ----------------------------------------------------------------------------------------------------------
-    PLACE CATEGORIES
+    place CATEGORIES
     ----------------------------------------------------------------------------------------------------------
     */
 
-    const placeCategoryData: Prisma.Place_CategoryCreateManyInput[] = await CreatePlaceCategories(placeCount, places)
+    const placeCategoryData: Prisma.place_categoryCreateManyInput[] = await CreatePlaceCategories(placeCount, places)
 
-    await prisma.place_Category.createMany({
+    await prisma.place_category.createMany({
         data: placeCategoryData,
         skipDuplicates: true,
     })
 
-    const placeCategories = await prisma.place_Category.findMany()
-    console.log("Place Categories in database:", placeCategories.length)
+    const placeCategories = await prisma.place_category.findMany()
+    console.log("place Categories in database:", placeCategories.length)
 
     /*
     ----------------------------------------------------------------------------------------------------------
@@ -114,7 +113,7 @@ async function main() {
 
     const commentCount = 50
 
-    const commentData: Prisma.CommentCreateManyInput[] = await CreateComments(commentCount, users, places)
+    const commentData: Prisma.commentCreateManyInput[] = await CreateComments(commentCount, users, places)
 
     await prisma.comment.createMany({
         data: commentData,
@@ -142,8 +141,8 @@ async function main() {
         },
     })
 
-    // const photoData: Prisma.PhotoCreateManyInput[] = await PhotoWithDownload(photoCount, users, places)
-    const photoData: Prisma.PhotoCreateManyInput[] = PhotoNoDownload(photoCount, users, places)
+    const photoData: Prisma.photoCreateManyInput[] = await PhotoWithDownload(photoCount, users, places)
+    // const photoData: Prisma.photoCreateManyInput[] = PhotoNoDownload(photoCount, users, places)
 
     await prisma.photo.createMany({
         data: photoData,
@@ -159,7 +158,7 @@ async function main() {
     ----------------------------------------------------------------------------------------------------------
     */
 
-    const userFriendData: Prisma.User_FriendCreateManyInput[] = []
+    const userFriendData: Prisma.user_friendCreateManyInput[] = []
 
     for (let i = 0; i < users.length - 1; i++) {
         const user = users[i]
@@ -171,13 +170,13 @@ async function main() {
         })
     }
 
-    await prisma.user_Friend.createMany({
+    await prisma.user_friend.createMany({
         data: userFriendData,
         skipDuplicates: true,
     })
 
-    const userFriends = await prisma.user_Friend.findMany()
-    console.log("User Friends in database:", userFriends.length)
+    const userFriends = await prisma.user_friend.findMany()
+    console.log("user Friends in database:", userFriends.length)
 
     /*
     ----------------------------------------------------------------------------------------------------------
@@ -185,22 +184,22 @@ async function main() {
     ----------------------------------------------------------------------------------------------------------
     */
 
-    const pendingFriendRequestData: Prisma.Pending_Friend_RequestCreateManyInput[] = CreatePendingFriendRequests(userCount, users)
+    const pendingFriendRequestData: Prisma.pending_friend_requestCreateManyInput[] = CreatePendingFriendRequests(userCount, users)
 
-    await prisma.pending_Friend_Request.createMany({ 
+    await prisma.pending_friend_request.createMany({ 
         data: pendingFriendRequestData
     })
 
-    const pendingFriendRequests = await prisma.pending_Friend_Request.findMany()
+    const pendingFriendRequests = await prisma.pending_friend_request.findMany()
     console.log("Pending Friend Requests in database:", pendingFriendRequests.length)
 
     /*
     ----------------------------------------------------------------------------------------------------------
-    NEWS
+    news
     ----------------------------------------------------------------------------------------------------------
     */
 
-    const newsCount = 500
+    const newsCount = 20
     
     const newsData = await CreateNews(newsCount, places, users)
 
@@ -210,7 +209,7 @@ async function main() {
     })
 
     const news = await prisma.news.findMany()
-    console.log("News in database:", news.length)
+    console.log("news in database:", news.length)
 
     console.log("\nSeed complete!\n")
 }

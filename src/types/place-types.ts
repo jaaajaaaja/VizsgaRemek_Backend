@@ -1,6 +1,6 @@
 import { Prisma } from "generated/prisma/client"
 
-export type GetAllByPlaceNewsType = Prisma.NewsGetPayload<{
+export type GetAllByPlaceNewsType = Prisma.newsGetPayload<{
     select: {
         id: true
         text: true
@@ -9,7 +9,7 @@ export type GetAllByPlaceNewsType = Prisma.NewsGetPayload<{
     }
 }>
 
-export type GetAllNews = Prisma.NewsGetPayload<{
+export type GetAllNews = Prisma.newsGetPayload<{
     select: {
         id: true
         text: true

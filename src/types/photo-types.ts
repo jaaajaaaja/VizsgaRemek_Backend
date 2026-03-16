@@ -8,7 +8,7 @@ export type GetOne = {
     placeName: string
 }
 
-export type GetAllBy = Prisma.PhotoGetPayload<{
+export type GetAllBy = Prisma.photoGetPayload<{
     select: {
         id: true
         location: true

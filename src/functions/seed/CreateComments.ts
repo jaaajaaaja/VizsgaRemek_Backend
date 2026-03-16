@@ -1,17 +1,17 @@
 import { faker } from "@faker-js/faker"
-import { Place, Prisma, PrismaClient, User } from "generated/prisma/client"
+import { place, Prisma, PrismaClient, user } from "generated/prisma/client"
 
 const prisma = new PrismaClient
 
 export async function CreateComments(
     count: number,
-    users: User[],
-    places: Place[]
-): Promise<Prisma.CommentCreateManyInput[]> {
+    users: user[],
+    places: place[]
+): Promise<Prisma.commentCreateManyInput[]> {
     const testUser = users[0]
     const testPlace = places[0]
 
-    const commentData: Prisma.CommentCreateManyInput[] = Array.from({ length: count }, () => ({
+    const commentData: Prisma.commentCreateManyInput[] = Array.from({ length: count }, () => ({
         commentText: faker.lorem.sentence({ min: 5, max: 15 }),
         rating: faker.number.int({ min: 1, max: 5 }),
         userID: faker.helpers.arrayElement(users).id,

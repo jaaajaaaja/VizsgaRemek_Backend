@@ -173,7 +173,7 @@ export function GetRecommendedPlaces() {
       schema: {
         type: "object",
         properties: {
-          message: { type: "string", example: "User has no interests!" }
+          message: { type: "string", example: "user has no interests!" }
         }
       }
     })
@@ -453,7 +453,7 @@ export function GetUserInterestList() {
       schema: {
         type: "object",
         properties: {
-          message: { type: "string", example: "User has no interests set!" }
+          message: { type: "string", example: "user has no interests set!" }
         }
       }
     })

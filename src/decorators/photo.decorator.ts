@@ -96,7 +96,7 @@ export function GetAllPhotoByUser() {
             schema: {
                 type: "object",
                 properties: {
-                    message: { type: "string", example: "User did not upload any images!" }
+                    message: { type: "string", example: "user did not upload any images!" }
                 }
             }
         })
@@ -128,7 +128,7 @@ export function GetAllPhotoByPlace() {
             schema: {
                 type: "object",
                 properties: {
-                    message: { type: "string", example: "Place does not have any images!" }
+                    message: { type: "string", example: "place does not have any images!" }
                 }
             }
         })

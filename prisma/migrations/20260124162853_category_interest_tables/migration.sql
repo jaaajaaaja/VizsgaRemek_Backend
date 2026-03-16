@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE `User_Interest` (
+CREATE TABLE `user_interest` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `interest` VARCHAR(191) NOT NULL,
     `userId` INTEGER NULL,
@@ -8,7 +8,7 @@ CREATE TABLE `User_Interest` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Place_Category` (
+CREATE TABLE `place_category` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `category` VARCHAR(191) NOT NULL,
     `placeId` INTEGER NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE `Place_Category` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `User_Interest` ADD CONSTRAINT `User_Interest_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `user_interest` ADD CONSTRAINT `User_Interest_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Place_Category` ADD CONSTRAINT `Place_Category_placeId_fkey` FOREIGN KEY (`placeId`) REFERENCES `Place`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `place_category` ADD CONSTRAINT `Place_Category_placeId_fkey` FOREIGN KEY (`placeId`) REFERENCES `place`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

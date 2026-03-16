@@ -1,10 +1,10 @@
-import { Prisma, User } from "generated/prisma/client"
+import { Prisma, user } from "generated/prisma/client"
 
 export function CreatePendingFriendRequests(
     usersCount: number,
-    users: User[]
-): Prisma.Pending_Friend_RequestCreateManyInput[] {
-    const pendingFriendRequestData: Prisma.Pending_Friend_RequestCreateManyInput[] = []
+    users: user[]
+): Prisma.pending_friend_requestCreateManyInput[] {
+    const pendingFriendRequestData: Prisma.pending_friend_requestCreateManyInput[] = []
 
     for (let i = 1; i < usersCount; i++) {
         const user = users[i]

@@ -216,7 +216,7 @@ export function AddCategory() {
             schema: {
                 type: "object",
                 properties: {
-                    message: { type: "string", example: "Place already has this category!" }
+                    message: { type: "string", example: "place already has this category!" }
                 }
             }
         })
@@ -246,7 +246,7 @@ export function AddNews() {
             schema: {
                 type: "object",
                 properties: {
-                    message: { type: "string", example: "Place already has this category!" }
+                    message: { type: "string", example: "place already has this category!" }
                 }
             }
         })

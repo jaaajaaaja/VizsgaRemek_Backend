@@ -1,6 +1,6 @@
 import { Prisma } from "generated/prisma/client";
 
-export type FindAllByUser = Prisma.CommentGetPayload<{
+export type FindAllByUser = Prisma.commentGetPayload<{
     select: {
         id: true
         commentText: true
@@ -12,7 +12,7 @@ export type FindAllByUser = Prisma.CommentGetPayload<{
     }
 }>
 
-export type FindAllByPlace = Prisma.CommentGetPayload<{
+export type FindAllByPlace = Prisma.commentGetPayload<{
     select: {
         id: true
         commentText: true
