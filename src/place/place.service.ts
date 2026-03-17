@@ -142,12 +142,12 @@ export class PlaceService {
         ----------------------------------------------------------------------------------------------------------
     */
 
-    async addNews(data: CreateNewsDto, loggedInUserId: number): Promise<news> {
+    async addNews(placeID: number, data: CreateNewsDto, loggedInUserId: number): Promise<news> {
         if (!loggedInUserId) {
             throw new UnauthorizedException("Log in to post news!")
         }
 
-        const place = await this.prisma.place.findFirst({ where: { id: data.placeID } })
+        const place = await this.prisma.place.findFirst({ where: { id: placeID } })
 
         if (!place) {
             throw new NotFoundException("Place not found")
@@ -155,7 +155,7 @@ export class PlaceService {
 
         const fullData = {
             text: data.text,
-            placeID: data.placeID,
+            placeID: placeID,
             userID: loggedInUserId
         }
 

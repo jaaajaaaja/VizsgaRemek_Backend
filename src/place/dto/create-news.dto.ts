@@ -14,9 +14,4 @@ export class CreateNewsDto {
         )
     )
     text: string
-
-    @ApiProperty({ default: 1 })
-    @IsNotEmpty()
-    @IsNumber()
-    placeID: number
 }

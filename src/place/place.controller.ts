@@ -139,8 +139,12 @@ export class PlaceController {
   @Post(':id/news')
   @UseGuards(AuthGuard)
   @SkipThrottle({ basic: true, place: true, login: true })
-  async addNews(@Req() request: AuthenticatedRequest, @Body() body: CreateNewsDto) {
-    return this.placeService.addNews(body, request.user.sub)
+  async addNews(
+    @Param("id", ParseIntPipe) id: number,
+    @Req() request: AuthenticatedRequest,
+    @Body() body: CreateNewsDto
+  ) {
+    return this.placeService.addNews(id, body, request.user.sub)
   }
 
   //PUT news by newsID
