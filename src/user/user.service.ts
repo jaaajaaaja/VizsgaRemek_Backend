@@ -428,7 +428,7 @@ export class UserService {
     })
 
     if (!interests) {
-      throw new NotFoundException("user has no interests set!")
+      throw new NotFoundException("User has no interests set!")
     }
 
     return interests

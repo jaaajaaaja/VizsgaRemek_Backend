@@ -132,7 +132,7 @@ export class PlaceService {
 
             return this.prisma.place_category.create({ data: fullData })
         } catch (e) {
-            throw new ForbiddenException("place already has this category!")
+            throw new ForbiddenException("Place already has this category!")
         }
     }
 
@@ -233,5 +233,21 @@ export class PlaceService {
         const update = await this.prisma.news.update({ where: { id }, data: { approved: true } })
 
         return { id: update.id, approved: update.approved }
+    }
+
+    async removeNews(id: number): Promise<{ id: number, message: string }> {
+        const news = await this.prisma.news.findFirst({
+            where: { id }
+        })
+
+        if (!news) {
+            throw new NotFoundException("News not found!")
+        }
+
+        await this.prisma.news.delete({
+            where: { id }
+        })
+
+        return {id, message: " deleted"}
     }
 }

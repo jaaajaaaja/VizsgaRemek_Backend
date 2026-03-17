@@ -1,6 +1,7 @@
 import { applyDecorators } from '@nestjs/common';
 import {
-  ApiOperation, ApiCookieAuth, ApiOkResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiConflictResponse, ApiUnauthorizedResponse, ApiParam,
+  ApiOperation, ApiCookieAuth, ApiOkResponse, ApiForbiddenResponse,
+  ApiNotFoundResponse, ApiConflictResponse, ApiUnauthorizedResponse, ApiParam,
 } from '@nestjs/swagger';
 
 /*

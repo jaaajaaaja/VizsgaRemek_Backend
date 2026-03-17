@@ -87,7 +87,7 @@ export class PhotoController {
     @UseGuards(AuthGuard)
     @SkipThrottle({ postput: true, place: true, login: true })
     async remove(@Param('id', ParseIntPipe) id: number, @Req() request: AuthenticatedRequest) {
-        return this.photoService.remove(id, request.user.sub)
+        return this.photoService.remove(id, request.user)
     }
 
     /*
@@ -115,7 +115,7 @@ export class PhotoController {
             const fileType = file.mimetype
 
             if (!body.placeID) {
-                return callback(new BadRequestException("userID and placeID are required!"), false)
+                return callback(new BadRequestException("placeID is required!"), false)
             }
 
             if (!fileType || !fileType.startsWith("image/")) {

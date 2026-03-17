@@ -1,5 +1,8 @@
 import { applyDecorators } from "@nestjs/common";
-import { ApiBadRequestResponse, ApiCookieAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiUnauthorizedResponse } from "@nestjs/swagger";
+import {
+    ApiBadRequestResponse, ApiCookieAuth, ApiCreatedResponse, ApiForbiddenResponse,
+    ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiUnauthorizedResponse
+} from "@nestjs/swagger";
 
 export function AdminGetAllComments() {
     return applyDecorators(

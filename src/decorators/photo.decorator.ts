@@ -1,5 +1,8 @@
 import { applyDecorators } from "@nestjs/common";
-import { ApiBadRequestResponse, ApiConsumes, ApiCookieAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiUnauthorizedResponse } from "@nestjs/swagger";
+import {
+    ApiBadRequestResponse, ApiConsumes, ApiCookieAuth, ApiCreatedResponse, ApiForbiddenResponse,
+    ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiUnauthorizedResponse
+} from "@nestjs/swagger";
 
 export function AdminGetAllPhoto() {
     return applyDecorators(
@@ -105,7 +108,7 @@ export function GetAllPhotoByUser() {
 
 export function GetAllPhotoByPlace() {
     return applyDecorators(
-        ApiOperation({ summary: "Visszaadja a helyhez feltöltött összes elfogadott képét" }),
+        ApiOperation({ summary: "Visszaadja a helyhez feltöltött összes elfogadott képet" }),
         ApiParam({ name: "placeID", description: "place id" }),
         ApiOkResponse({
             description: "Sikeresen visszaadja a képeket",
@@ -183,7 +186,7 @@ export function AddPhotos() {
             description: "Sikeresen feltöltötte a képeket",
             schema: {
                 type: "number",
-                example: 201
+                example: 3
             }
         }),
         ApiBadRequestResponse({
@@ -191,7 +194,7 @@ export function AddPhotos() {
             schema: {
                 type: "object",
                 properties: {
-                    message: { type: "string", example: "userID and placeID are required!" }
+                    message: { type: "string", example: "placeID is required!" }
                 }
             }
         }),

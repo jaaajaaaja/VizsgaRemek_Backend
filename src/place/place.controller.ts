@@ -10,7 +10,7 @@ import { UpdateNewsDto } from './dto/update-news.dto';
 import { Roles } from '../auth/roles.decorator';
 import {
   AddCategory, AddNews, AddPlace, AdminApprovesNews, AdminDeletesPlace, AdminGetAllNews,
-  AdminGetAllPlaces, GetAllNewsByPlace, GetPlaceByGoogleplaceID, GetPlaceById, UpdateNews
+  AdminGetAllPlaces, DeleteNewsDecorator, GetAllNewsByPlace, GetPlaceByGoogleplaceID, GetPlaceById, StatisticsDecorator, UpdateNews
 } from 'src/decorators/place.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
@@ -40,6 +40,7 @@ export class PlaceController {
 
   //GET admin most popular place this month
 
+  @StatisticsDecorator()
   @Get("/statistics") // http://localhost:3000/place/statistics?period=year
   @UseGuards(AuthGuard, RolesGuard)
   @Roles("admin")
@@ -53,7 +54,7 @@ export class PlaceController {
   @AdminGetAllPlaces()
   @Get("/all")
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles("admin")
   @SkipThrottle({ postput: true, place: true, login: true })
   findAll() {
     return this.placeService.getAll()
@@ -62,18 +63,18 @@ export class PlaceController {
   //GET place by id
 
   @GetPlaceById()
-  @Get(':id')
+  @Get(":id")
   @SkipThrottle({ postput: true, place: true, login: true })
-  async getOne(@Param('id', ParseIntPipe) id: number) {
+  async getOne(@Param("id", ParseIntPipe) id: number) {
     return this.placeService.getOne(id)
   }
 
   //GET place by googleplaceID
 
   @GetPlaceByGoogleplaceID()
-  @Get('/getByGooglePlaceId/:googleplaceID')
+  @Get("/getByGooglePlaceId/:googleplaceID")
   @SkipThrottle({ postput: true, place: true, login: true })
-  async getOneByGooglePlaceId(@Param('googleplaceID') googleplaceID: string) {
+  async getOneByGooglePlaceId(@Param("googleplaceID") googleplaceID: string) {
     return this.placeService.getOneByGoogleplaceID(googleplaceID)
   }
 
@@ -98,10 +99,10 @@ export class PlaceController {
   //POST place category by placeID
 
   @AddCategory()
-  @Post(':placeID/category')
+  @Post(":placeID/category")
   @SkipThrottle({ basic: true, place: true, login: true })
   async addPlaceCategory(
-    @Param('placeID', ParseIntPipe) placeID: number,
+    @Param("placeID", ParseIntPipe) placeID: number,
     @Body() body: CreatePlaceCategoryDto,
   ) {
     return this.placeService.addPlaceCategory(body, placeID)
@@ -136,7 +137,7 @@ export class PlaceController {
   //POST news by placeID
 
   @AddNews()
-  @Post(':id/news')
+  @Post(":id/news")
   @UseGuards(AuthGuard)
   @SkipThrottle({ basic: true, place: true, login: true })
   async addNews(
@@ -150,7 +151,7 @@ export class PlaceController {
   //PUT news by newsID
 
   @UpdateNews()
-  @Put('/news/:id')
+  @Put("/news/:id")
   @UseGuards(AuthGuard)
   @SkipThrottle({ basic: true, place: true, login: true })
   async updateNews(
@@ -164,9 +165,18 @@ export class PlaceController {
   //GET all news by placeID
 
   @GetAllNewsByPlace()
-  @Get(':placeID/news')
+  @Get(":placeID/news")
   @SkipThrottle({ postput: true, place: true, login: true })
-  async getNews(@Param('placeID', ParseIntPipe) placeID: number) {
+  async getNews(@Param("placeID", ParseIntPipe) placeID: number) {
     return this.placeService.getNews(placeID)
+  }
+
+  @DeleteNewsDecorator()
+  @Delete("/news/:id")
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
+  @SkipThrottle({ postput: true, place: true, login: true })
+  async deleteNews(@Param("id", ParseIntPipe) id: number) {
+    return this.placeService.removeNews(id)
   }
 }

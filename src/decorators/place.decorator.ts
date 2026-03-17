@@ -1,5 +1,9 @@
 import { applyDecorators } from "@nestjs/common";
-import { ApiCookieAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiUnauthorizedResponse } from "@nestjs/swagger";
+import {
+    ApiCookieAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse,
+    ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiUnauthorizedResponse
+} from "@nestjs/swagger";
+import { PeriodEnum } from "src/types/place-types";
 
 export function AdminApprovesNews() {
     return applyDecorators(
@@ -317,6 +321,55 @@ export function GetAllNewsByPlace() {
                 type: "object",
                 properties: {
                     message: { type: "string", example: "No news available for this place!" }
+                }
+            }
+        })
+    )
+}
+
+export function StatisticsDecorator() {
+    return applyDecorators(
+        ApiOperation({ summary: "ADMIN - Helyek statisztikáit adja vissza" }),
+        ApiCookieAuth(),
+        ApiQuery({ name: "period", enum: PeriodEnum }),
+        ApiOkResponse({
+            description: "Visszaadja a helyek statisztikáit a megadott intervallumon belül",
+            schema: {
+                items: {
+                    properties: {
+                        placeId: { type: "number", example: 1 },
+                        placeName: { type: "string", example: "Hely neve" },
+                        totalPhotos: { type: "number", example: 11 },
+                        totalComments: { type: "number", example: 15 },
+                        averageRating: { type: "number", example: 4.5 }
+                    }
+                }
+            }
+        })
+    )
+}
+
+export function DeleteNewsDecorator() {
+    return applyDecorators(
+        ApiOperation({ summary: "ADMIN - Hír törlése" }),
+        ApiCookieAuth(),
+        ApiParam({ name: "id", description: "news id" }),
+        ApiOkResponse({
+            description: "Sikeresen törli a hírt",
+            schema: {
+                type: "object",
+                properties: {
+                    id: { type: "number", example: 1 },
+                    message: { type: "string", example: "deleted" }
+                }
+            }
+        }),
+        ApiNotFoundResponse({
+            description: "A törölni kívánt hír nem található",
+            schema: {
+                type: "object",
+                properties: {
+                    message: { type: "string", example: "News not found!" }
                 }
             }
         })

@@ -41,7 +41,7 @@ export class CommentService {
     })
 
     if (comments.length === 0) {
-      throw new NotFoundException("user did not post any comments!")
+      throw new NotFoundException("User did not post any comments!")
     }
 
     return comments
@@ -75,7 +75,7 @@ export class CommentService {
     })
 
     if (comments.length === 0) {
-      throw new NotFoundException("place does not have any comments!")
+      throw new NotFoundException("Place does not have any comments!")
     }
 
     return comments

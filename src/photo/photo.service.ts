@@ -3,6 +3,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { FilesArray, GetAllBy, GetOne } from 'src/types/photo-types';
 import { ApprovedByAdmin } from 'src/types/comment-types';
 import { photo, Prisma } from 'generated/prisma/client';
+import { LoggedInUser } from 'src/types/user-types';
+import { DeleteFile } from 'src/functions/photo/DeleteImage';
 
 @Injectable()
 export class PhotoService {
@@ -51,7 +53,7 @@ export class PhotoService {
         })
 
         if (!allByUser) {
-            throw new NotFoundException("user did not upload any images!")
+            throw new NotFoundException("User did not upload any images!")
         }
 
         return allByUser
@@ -70,7 +72,7 @@ export class PhotoService {
         })
 
         if (!allByPlace) {
-            throw new NotFoundException("place does not have any images!")
+            throw new NotFoundException("Place does not have any images!")
         }
 
         return allByPlace
@@ -85,8 +87,8 @@ export class PhotoService {
             where: { id: loggedInUserId }
         })
 
-        if(!user) {
-            throw new ConflictException("user does not exist!")
+        if (!user) {
+            throw new ConflictException("User does not exist!")
         }
 
         const place = await this.prisma.place.findUnique({
@@ -117,16 +119,18 @@ export class PhotoService {
         return data
     }
 
-    async remove(id: number, loggedInUserId: number): Promise<photo> {
+    async remove(id: number, loggedInUser: LoggedInUser): Promise<photo> {
         const photo = await this.prisma.photo.findUnique({ where: { id } })
 
         if (!photo) {
             throw new NotFoundException("Image not found!")
         }
 
-        if (photo.userID != loggedInUserId) {
+        if (photo.userID != loggedInUser.sub && loggedInUser.role != "admin") {
             throw new ForbiddenException("You can only delete your own photos!")
         }
+
+        DeleteFile(photo.location.split("/")[1])
 
         return this.prisma.photo.delete({ where: { id } })
     }

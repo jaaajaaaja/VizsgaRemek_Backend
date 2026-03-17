@@ -1,18 +1,29 @@
 import { applyDecorators } from "@nestjs/common";
-import { ApiCookieAuth, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam } from "@nestjs/swagger";
+import {
+    ApiCookieAuth, ApiForbiddenResponse, ApiNotFoundResponse,
+    ApiOkResponse, ApiOperation, ApiUnauthorizedResponse
+} from "@nestjs/swagger";
 
 export function Login() {
     return applyDecorators(
-        ApiOperation({ summary: "ADMIN - Elfogadja a kommentet" }),
-        ApiCookieAuth(),
-        ApiParam({ name: "id", description: "comment id" }),
+        ApiOperation({ summary: "Bejelentkezés" }),
         ApiOkResponse({
-            description: "Sikeres módosítás",
+            description: "Sikeres bejelentkezés",
             schema: {
                 type: "object",
                 properties: {
                     id: { type: "number", example: 1 },
-                    approved: { type: "boolean", example: true }
+                    email: { type: "string", example: "email@email.email" },
+                    role: { type: "string", example: "user" }
+                }
+            }
+        }),
+        ApiUnauthorizedResponse({
+            description: "Helytelen jelszó",
+            schema: {
+                type: "object",
+                properties: {
+                    message: { type: "string", example: "Unathorized!" }
                 }
             }
         }),
