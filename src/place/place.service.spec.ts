@@ -125,7 +125,7 @@ describe('PlaceService', () => {
       mockPrismaService.place.findFirst.mockResolvedValue(mockPlaces[0])
       mockPrismaService.news.create.mockResolvedValue(createdNews)
 
-      const result = await service.addNews(newsData as any, 1)
+      const result = await service.addNews(1, newsData as any, 1)
 
       expect(result).toEqual(createdNews)
       expect(mockPrismaService.news.create).toHaveBeenCalledWith({
@@ -138,7 +138,7 @@ describe('PlaceService', () => {
 
       mockPrismaService.place.findFirst.mockResolvedValue(null)
 
-      await expect(service.addNews(newsData as any, 1)).rejects.toThrow(NotFoundException)
+      await expect(service.addNews(1, newsData as any, 1)).rejects.toThrow(NotFoundException)
       expect(mockPrismaService.news.create).not.toHaveBeenCalled()
     })
   })

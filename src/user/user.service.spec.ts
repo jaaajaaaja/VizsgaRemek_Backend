@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from './user.service';
 import { ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { LoggedInUser } from 'src/types/user-types';
 
 describe('UserService', () => {
   let service: UserService
@@ -170,7 +171,7 @@ describe('UserService', () => {
       mockPrismaService.user.findUnique.mockResolvedValue(mockUser)
       mockPrismaService.user.delete.mockResolvedValue(mockUser)
 
-      const loggedInUser = { sub: 1, role: 'user' }
+      const loggedInUser = { sub: 1, role: "user", email: "a@a.a" }
       const result = await service.remove(1, loggedInUser)
 
       expect(result).toEqual(mockUser)
@@ -182,7 +183,7 @@ describe('UserService', () => {
       mockPrismaService.user.findUnique.mockResolvedValue(null)
       mockPrismaService.user.delete.mockResolvedValue(mockUser)
 
-      await expect(service.remove(1, 1)).rejects.toThrow(NotFoundException)
+      await expect(service.remove(1, null as any as LoggedInUser)).rejects.toThrow(NotFoundException)
       expect(mockPrismaService.user.delete).toHaveBeenCalledTimes(0)
     })
   })

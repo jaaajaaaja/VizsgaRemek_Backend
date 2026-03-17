@@ -6,6 +6,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from './auth.guard';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
+import { AuthenticatedRequest } from 'src/types/user-types';
 
 describe('AuthController', () => {
   let controller: AuthController
@@ -92,7 +93,7 @@ describe('AuthController', () => {
 
     const mockRequest = {
       user: mockUser,
-    } as any as Request
+    } as any as AuthenticatedRequest
 
     mockAuthService.getProfile.mockResolvedValue(mockUser)
 

@@ -5,6 +5,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
+import { LoggedInUser } from 'src/types/user-types';
 
 describe('CommentService', () => {
   let service: CommentService
@@ -165,7 +166,7 @@ describe('CommentService', () => {
       mockPrismaService.comment.findUnique.mockResolvedValue(mockComment)
       mockPrismaService.comment.delete.mockResolvedValue(mockComment)
 
-      const loggedInUser = { sub: 1, role: 'user' }
+      const loggedInUser = { sub: 1, role: "user", email: "a@a.a" }
       const result = await service.remove(1, loggedInUser)
 
       expect(result).toEqual(mockComment)
@@ -180,7 +181,7 @@ describe('CommentService', () => {
     it("should throw NotFoundException when comment does not exits", async () => {
       mockPrismaService.comment.findUnique.mockResolvedValue(null)
 
-      await expect(service.remove(1, 1)).rejects.toThrow(NotFoundException)
+      await expect(service.remove(1, null as any as LoggedInUser)).rejects.toThrow(NotFoundException)
       expect(mockPrismaService.comment.delete).toHaveBeenCalledTimes(0)
     })
   })

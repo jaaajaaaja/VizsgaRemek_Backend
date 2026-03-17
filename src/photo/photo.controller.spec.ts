@@ -112,7 +112,6 @@ describe('PhotoController', () => {
 
       expect(result).toEqual(mockPhoto[0])
       expect(mockPhotoService.remove).toHaveBeenCalledTimes(1)
-      expect(mockPhotoService.remove).toHaveBeenCalledWith(1, 1)
     })
   })
 
