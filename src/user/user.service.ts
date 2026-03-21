@@ -37,7 +37,7 @@ export class UserService {
     })
 
     if (!user) {
-      console.log(chalk.red("\nUser not found!"))
+      // console.log(chalk.red("\nUser not found!"))
       throw new NotFoundException("User not found")
     }
 

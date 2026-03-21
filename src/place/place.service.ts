@@ -54,14 +54,14 @@ export class PlaceService {
                 where: query()
             })
 
-            console.log("*********************************")
-            console.log(place.id)
-            console.log("comments: ", totalComments)
+            // console.log("*********************************")
+            // console.log(place.id)
+            // console.log("comments: ", totalComments)
 
             const totalPhotos = await this.prisma.photo.count({
                 where: query()
             })
-            console.log("photos: ", totalPhotos)
+            // console.log("photos: ", totalPhotos)
 
             const averageRating = await this.prisma.comment.aggregate({
                 where: query(),
@@ -69,7 +69,7 @@ export class PlaceService {
                     rating: true
                 }
             })
-            console.log("rating: ", averageRating._avg.rating)
+            // console.log("rating: ", averageRating._avg.rating)
 
             statistics.push({
                 placeId: place.id,

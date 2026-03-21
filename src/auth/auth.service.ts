@@ -14,11 +14,11 @@ export class AuthService {
   ) { }
 
   async signIn(email: string, pass: string): Promise<SignInType> {
-    console.log(chalk.yellow("\n--------------------------------------------"))
-    console.log(`\n${chalk.yellow("Login attempt:")}
-      ${chalk.rgb(128, 0, 128)("email: ")}${chalk.green(email ? email : "undefiend")}
-      ${chalk.rgb(128, 0, 128)("password:")} ${chalk.green(pass ? "***" : "undefined")}`
-    )
+    // console.log(chalk.yellow("\n--------------------------------------------"))
+    // console.log(`\n${chalk.yellow("Login attempt:")}
+    //   ${chalk.rgb(128, 0, 128)("email: ")}${chalk.green(email ? email : "undefiend")}
+    //   ${chalk.rgb(128, 0, 128)("password:")} ${chalk.green(pass ? "***" : "undefined")}`
+    // )
 
     const user = await this.userService.findOne(email)
 
@@ -26,10 +26,10 @@ export class AuthService {
       throw new NotFoundException()
     }
 
-    console.log(`${chalk.yellow("\nUser found:")} 
-      ${chalk.rgb(128, 0, 128)("email:")} ${chalk.green(user.email)} 
-      ${chalk.rgb(128, 0, 128)("password:")} ${chalk.green("***")} `
-    )
+    // console.log(`${chalk.yellow("\nUser found:")} 
+    //   ${chalk.rgb(128, 0, 128)("email:")} ${chalk.green(user.email)} 
+    //   ${chalk.rgb(128, 0, 128)("password:")} ${chalk.green("***")} `
+    // )
 
     const isPasswordValid = await bcrypt.compare(pass, user.password)
 
@@ -37,12 +37,12 @@ export class AuthService {
       throw new UnauthorizedException()
     }
 
-    console.log(`\n${chalk.yellow("user logged in successfully:")}
-      ${chalk.rgb(128, 0, 128)("id:")} ${chalk.green(user.id)}
-      ${chalk.rgb(128, 0, 128)("email:")} ${chalk.green(user.email)}
-      `
-    )
-    console.log(chalk.yellow("--------------------------------------------"))
+    // console.log(`\n${chalk.yellow("user logged in successfully:")}
+    //   ${chalk.rgb(128, 0, 128)("id:")} ${chalk.green(user.id)}
+    //   ${chalk.rgb(128, 0, 128)("email:")} ${chalk.green(user.email)}
+    //   `
+    // )
+    // console.log(chalk.yellow("--------------------------------------------"))
 
     const payload: LoggedInUser = { sub: user.id, email: user.email, role: user.role }
 

@@ -6,11 +6,11 @@ export async function DeleteFile(imageName: string): Promise<void> {
             if (e) {
                 throw e
             }
-            console.log("Image successfully deleted!")
+            // console.log("Image successfully deleted!")
         })
     } catch (e) {
         if (e.code === "ENOENT") {
-            console.log("Image does not exist!")
+            // console.log("Image does not exist!")
         } else {
             throw e
         }

@@ -25,7 +25,7 @@ async function download_test_images(count: number): Promise<DownloadType[]> {
         image_names.push({ type: contentType, location: name })
     }
 
-    console.log(`Downloaded ${image_names.length} test images!`)
+    // console.log(`Downloaded ${image_names.length} test images!`)
 
     return image_names
 }
