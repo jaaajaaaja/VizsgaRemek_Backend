@@ -373,6 +373,27 @@ export function GetFriendList() {
   )
 }
 
+export function GetPendingFriendRequests() {
+  return applyDecorators(
+    ApiOperation({ summary: "Függőben lévő barátkérelmek lekérése" }),
+    ApiCookieAuth(),
+    ApiOkResponse({
+      description: "Visszaadja a függőben lévő barátkérelmeket",
+      schema: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            id: { type: "number", example: 1 },
+            userID: { type: "number", example: 2 },
+            userName: { type: "string", example: "felhasználónév" }
+          }
+        }
+      }
+    })
+  )
+}
+
 /*
   ----------------------------------------------------------------------------------------------------------
   INTERESTS

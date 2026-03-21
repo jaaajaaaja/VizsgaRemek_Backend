@@ -315,7 +315,9 @@ export class UserService {
     }
 
     if (accepted) {
-      await this.prisma.user_friend.create({ data: request })
+      await this.prisma.user_friend.create({
+        data: { userID: request.userID, friendID: request.friendID },
+      })
       await this.prisma.pending_friend_request.delete({ where: request })
       return { message: 'Friend request accepted' }
     } else {
@@ -369,6 +371,30 @@ export class UserService {
     }
 
     return friends.map((f) => f.friend)
+  }
+
+  async getPendingFriendRequests(loggedInUserId: number): Promise<{ id: number, userID: number, userName: string }[]> {
+    if (!loggedInUserId) {
+      throw new UnauthorizedException('Log in to see pending friend requests!')
+    }
+
+    const requests = await this.prisma.pending_friend_request.findMany({
+      where: { friendID: loggedInUserId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            userName: true
+          },
+        },
+      },
+    })
+
+    return requests.map((r) => ({
+      id: r.id,
+      userID: r.userID,
+      userName: r.user.userName,
+    }))
   }
 
   /*

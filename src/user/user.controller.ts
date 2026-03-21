@@ -8,7 +8,7 @@ import { FriendRequestDto } from './dto/friend-request.dto';
 import { Roles } from '../auth/roles.decorator';
 import {
     AddUserFriend, DealWithFriendRequest, DeleteUser, DeleteUserInterest, GetAllUserInterestsAdmin, GetAllUsersAdmin, GetFriendList,
-    GetRecommendationByAge, GetRecommendedPlaces, GetUserInterestList, PostUser, PostUserInterest, SearchByUsername, UpdateUser
+    GetPendingFriendRequests, GetRecommendationByAge, GetRecommendedPlaces, GetUserInterestList, PostUser, PostUserInterest, SearchByUsername, UpdateUser
 } from '../decorators/user.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
@@ -119,7 +119,13 @@ export class UserController {
         return this.userService.friendlist(request.user.sub)
     }
 
-    //POST friend request by userID
+    @GetPendingFriendRequests()
+    @Get('/pendingFriends')
+    @UseGuards(AuthGuard)
+    @SkipThrottle({ basic: true, place: true, login: true })
+    async pendingFriendRequests(@Req() request: AuthenticatedRequest) {
+        return this.userService.getPendingFriendRequests(request.user.sub)
+    }
 
     @AddUserFriend()
     @Post('/addFriend/:id')
@@ -190,7 +196,7 @@ export class UserController {
     @UseGuards(AuthGuard)
     @SkipThrottle({ basic: true, place: true, login: true })
     async deleteUserInterest(
-        @Param(":id", ParseIntPipe) id: number,
+        @Param("id", ParseIntPipe) id: number,
         @Req() request: AuthenticatedRequest
     ) {
         return this.userService.deleteUserInterest(id, request.user.sub)
