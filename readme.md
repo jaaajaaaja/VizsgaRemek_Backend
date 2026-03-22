@@ -29,19 +29,28 @@
 ![NestJS](https://img.shields.io/badge/NestJS-E0234E?logo=nestjs\&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?logo=node.js\&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript\&logoColor=white)
+
 ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker\&logoColor=white)
+
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=mysql\&logoColor=white)
 ![Prisma](https://img.shields.io/badge/Prisma-2D3748?logo=prisma\&logoColor=white)
+
 ![JWT](https://img.shields.io/badge/JWT-black?logo=jsonwebtokens\&logoColor=white)
 ![bcrypt](https://img.shields.io/badge/bcrypt-003A70)
+
 ![Multer](https://img.shields.io/badge/Multer-FF6C37)
+
 ![class--validator](https://img.shields.io/badge/class--validator-E34F26)
 ![class--transformer](https://img.shields.io/badge/class--transformer-6DB33F)
+
 ![Throttler](https://img.shields.io/badge/Throttler-FF9800)
+
 ![Jest](https://img.shields.io/badge/Jest-C21325?logo=jest\&logoColor=white)
 ![Supertest](https://img.shields.io/badge/Supertest-000000)
+
 ![Prettier](https://img.shields.io/badge/Prettier-F7B93E?logo=prettier\&logoColor=black)
 ![ESLint](https://img.shields.io/badge/ESLint-4B32C3?logo=eslint\&logoColor=white)
+
 ![Faker](https://img.shields.io/badge/Faker-1A1A1A)
 
 ---
@@ -116,6 +125,14 @@ npx prisma db seed
 Ha nem szeretnéd fejleszteni az alkalmazást csak futtatni akkor elég ha letöltöd a Dockert beírsz két parancsot és már fut is a szerver. Természetesen a kódot attól még le kell tölteni a gépedre.
 
 Ha változtatni szeretnél a környezeti változókon akkor a `docker-compose.yml` fájlban megteheted.
+
+---
+
+#### Fontos!
+Ha Windows operációs rendszeren akarod futtatni a konténert CMD-ből (parancssorból) add ki a következő utasításokat NE PowerShell-ből, különben nem fogja az ```docker-entrypoint.sh``` fájlt megtalálni. 
+Azonban ha egyszer elindítottad CMD-ből utána el tudod indítani PowerShell-ből is.
+
+---
 
 ```bash 
 docker build -t barsonar-backend --no-cache .
