@@ -13,7 +13,7 @@ export class AuthGuard implements CanActivate {
         const token = this.extractTokenFromHeader(request)
 
         if (!token) {
-            throw new UnauthorizedException()
+            throw new UnauthorizedException('No token provided')
         }
         try {
             const payload = await this.jwtService.verifyAsync(
@@ -36,20 +36,36 @@ export class AuthGuard implements CanActivate {
             const user_data = { sub: user.id, email: user.email, role: user.role }
 
             request.user = user_data
-        } catch {
+        } catch (error) {
             throw new UnauthorizedException()
         }
 
         return true
     }
 
-    private extractTokenFromHeader(request: Request): string | undefined {
-        const tokenFromCookie = request.signedCookies?.access_token
-        if (tokenFromCookie) {
-            return tokenFromCookie
+    private extractTokenFromHeader(request: AuthenticatedRequest): string | undefined {
+        const tokenFromSignedCookie = request.signedCookies?.access_token
+        if (tokenFromSignedCookie) {
+            return tokenFromSignedCookie
         }
 
-        const [type, token] = request.headers.authorization?.split(' ') ?? []
-        return type === 'Bearer' ? token : undefined
+        const [type, rawToken] = request.headers.authorization?.split(' ') ?? []
+
+        if (type === 'Bearer' && rawToken) {
+            let token = decodeURIComponent(rawToken)
+
+            if (token.startsWith('s:')) {
+                token = token.slice(2)
+            }
+
+            const parts = token.split('.')
+            if (parts.length > 3) {
+                token = parts.slice(0, 3).join('.')
+            }
+
+            return token
+        }
+
+        return undefined
     }
 }

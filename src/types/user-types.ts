@@ -45,3 +45,9 @@ export type LoggedInUser = {
 export interface AuthenticatedRequest extends Request {
     user: LoggedInUser
 }
+
+export type PendingFriendRequestType = {
+    id: number
+    userID: number
+    userName: string
+}

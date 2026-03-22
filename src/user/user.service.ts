@@ -6,7 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserInterestDto } from './dto/create-user-interest.dto';
 import * as bcrypt from 'bcrypt';
-import { AddUserType, FindOne, GetAllUserType, LoggedInUser, UserDataType } from 'src/types/user-types';
+import { AddUserType, FindOne, GetAllUserType, LoggedInUser, PendingFriendRequestType, UserDataType } from 'src/types/user-types';
 import { place, user, user_interest } from 'generated/prisma/client';
 import chalk from 'chalk';
 
@@ -373,7 +373,7 @@ export class UserService {
     return friends.map((f) => f.friend)
   }
 
-  async getPendingFriendRequests(loggedInUserId: number): Promise<{ id: number, userID: number, userName: string }[]> {
+  async getPendingFriendRequests(loggedInUserId: number): Promise<PendingFriendRequestType[]> {
     if (!loggedInUserId) {
       throw new UnauthorizedException('Log in to see pending friend requests!')
     }

@@ -8,7 +8,8 @@ import { FriendRequestDto } from './dto/friend-request.dto';
 import { Roles } from '../auth/roles.decorator';
 import {
     AddUserFriend, DealWithFriendRequest, DeleteUser, DeleteUserInterest, GetAllUserInterestsAdmin, GetAllUsersAdmin, GetFriendList,
-    GetPendingFriendRequests, GetRecommendationByAge, GetRecommendedPlaces, GetUserInterestList, PostUser, PostUserInterest, SearchByUsername, UpdateUser
+    GetPendingFriendRequests, GetRecommendationByAge, GetRecommendedPlaces, GetUserInterestList, PostUser, PostUserInterest,
+    SearchByUsername, UpdateUser
 } from '../decorators/user.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
@@ -104,7 +105,7 @@ export class UserController {
 
     @SearchByUsername()
     @Get("/searchByName/:userName")
-    @SkipThrottle({ basic: true, place: true, login: true })
+    @SkipThrottle({ postput: true, place: true, login: true })
     async searchByUsername(@Param('userName') username: string) {
         return this.userService.searchByUsername(username)
     }
@@ -114,15 +115,15 @@ export class UserController {
     @GetFriendList()
     @Get('/friends')
     @UseGuards(AuthGuard)
-    @SkipThrottle({ basic: true, place: true, login: true })
+    @SkipThrottle({ postput: true, place: true, login: true })
     async friendlist(@Req() request: AuthenticatedRequest) {
         return this.userService.friendlist(request.user.sub)
     }
-
+    
     @GetPendingFriendRequests()
     @Get('/pendingFriends')
     @UseGuards(AuthGuard)
-    @SkipThrottle({ basic: true, place: true, login: true })
+    @SkipThrottle({ postput: true, place: true, login: true })
     async pendingFriendRequests(@Req() request: AuthenticatedRequest) {
         return this.userService.getPendingFriendRequests(request.user.sub)
     }
@@ -173,7 +174,7 @@ export class UserController {
     @GetUserInterestList()
     @Get('/interests')
     @UseGuards(AuthGuard)
-    @SkipThrottle({ basic: true, place: true, login: true })
+    @SkipThrottle({ postput: true, place: true, login: true })
     async interestlist(@Req() request: AuthenticatedRequest) {
         return this.userService.interestList(request.user.sub)
     }

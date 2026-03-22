@@ -24,8 +24,8 @@ export class AuthController {
     res.cookie('access_token', result.access_token, {
       httpOnly: true,
       sameSite: 'lax',
-      maxAge: 86400000,
       signed: true,
+      maxAge: 86400000,
     })
 
     return {
@@ -59,7 +59,12 @@ export class AuthController {
   @SkipThrottle({ place: true, login: true, postput: true })
   @Post('logout')
   logout(@Res({ passthrough: true }) res: express.Response) {
-    res.clearCookie('access_token', { path: '/', httpOnly: true, sameSite: 'lax' })
+    res.clearCookie('access_token', {
+      path: '/',
+      httpOnly: true,
+      sameSite: 'lax',
+      signed: true,
+    })
     return { message: 'Logged out successfully' }
   }
 }
