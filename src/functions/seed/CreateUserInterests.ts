@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker"
 import { Prisma, PrismaClient, user } from "generated/prisma/client"
-import { GOOGLE_PLACE_CATEGORIES } from "prisma/seed"
+import { GOOGLE_PLACE_CATEGORIES } from "src/types/place-types"
 
 const prisma = new PrismaClient()
 

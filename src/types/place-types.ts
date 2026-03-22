@@ -38,3 +38,13 @@ export enum PeriodEnum {
     WEEK = "week",
     YEAR = "year"
 }
+
+export const GOOGLE_PLACE_CATEGORIES = [
+    "bar",
+    "pub",
+    "nightclub",
+    "dance_club",
+    "wine_bar",
+    "karaoke",
+    "bowling_alley",
+]

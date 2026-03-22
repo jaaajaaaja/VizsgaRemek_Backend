@@ -1,5 +1,6 @@
 import { applyDecorators } from "@nestjs/common";
 import {
+    ApiBadRequestResponse,
     ApiCookieAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse,
     ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiUnauthorizedResponse
 } from "@nestjs/swagger";
@@ -9,7 +10,7 @@ export function AdminApprovesNews() {
     return applyDecorators(
         ApiOperation({ summary: "ADMIN - Elfogad egy hírt" }),
         ApiCookieAuth(),
-        ApiParam({ name: "id", description: "news id" }),
+        ApiParam({ name: "newsId", description: "hír id-ja" }),
         ApiOkResponse({
             description: "Sikeresen elfogadja a hírt",
             schema: {
@@ -220,7 +221,7 @@ export function AddCategory() {
             schema: {
                 type: "object",
                 properties: {
-                    message: { type: "string", example: "place already has this category!" }
+                    message: { type: "string", example: "Place already has this category!" }
                 }
             }
         })
@@ -245,12 +246,26 @@ export function AddNews() {
                 }
             }
         }),
-        ApiForbiddenResponse({
-            description: "A helynek már van ilyen kategóriája",
+        ApiBadRequestResponse({
+            description: "",
             schema: {
                 type: "object",
                 properties: {
-                    message: { type: "string", example: "place already has this category!" }
+                    message: {
+                        type: "string", example: [
+                            "text must be longer than or equal to 10 characters",
+                            "text must be a string"
+                        ]
+                    }
+                }
+            }
+        }),
+        ApiNotFoundResponse({
+            description: "A hely nem található",
+            schema: {
+                type: "object",
+                properties: {
+                    message: { type: "string", example: "Place not found!" }
                 }
             }
         })
@@ -281,15 +296,6 @@ export function UpdateNews() {
                 type: "object",
                 properties: {
                     message: { type: "string", example: "You can only edit your own news!" }
-                }
-            }
-        }),
-        ApiUnauthorizedResponse({
-            description: "Csak bejelentkezett felhasználó módosíthat híreket",
-            schema: {
-                type: "object",
-                properties: {
-                    message: { type: "string", example: "You can not edit this news!" }
                 }
             }
         })

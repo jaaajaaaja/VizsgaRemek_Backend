@@ -13,16 +13,6 @@ import { CreateNews } from 'src/functions/seed/CreateNews'
 
 const prisma = new PrismaClient()
 
-export const GOOGLE_PLACE_CATEGORIES = [
-    'bar',
-    'pub',
-    'nightclub',
-    'dance_club',
-    'wine_bar',
-    'karaoke',
-    'bowling_alley',
-]
-
 async function main() {
     console.log("\nSeeding...\n")
 

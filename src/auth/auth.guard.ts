@@ -1,6 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException, } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { Request } from 'express';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthenticatedRequest } from "src/types/user-types";
 
@@ -13,7 +12,7 @@ export class AuthGuard implements CanActivate {
         const token = this.extractTokenFromHeader(request)
 
         if (!token) {
-            throw new UnauthorizedException('No token provided')
+            throw new UnauthorizedException("No token provided!")
         }
         try {
             const payload = await this.jwtService.verifyAsync(
@@ -23,14 +22,14 @@ export class AuthGuard implements CanActivate {
                 }
             )
 
-            const email = payload.email;
+            const email = payload.email
             if (!email) {
-                throw new UnauthorizedException('Email not found in token payload')
+                throw new UnauthorizedException("Email not found in token payload!")
             }
 
             const user = await this.prisma.user.findUnique({ where: { email } })
             if (!user) {
-                throw new UnauthorizedException('User not found')
+                throw new UnauthorizedException("User not found!")
             }
 
             const user_data = { sub: user.id, email: user.email, role: user.role }
@@ -44,25 +43,25 @@ export class AuthGuard implements CanActivate {
     }
 
     private extractTokenFromHeader(request: AuthenticatedRequest): string | undefined {
-        const tokenFromSignedCookie = request.signedCookies?.access_token
-        if (tokenFromSignedCookie) {
-            return tokenFromSignedCookie
+        const signedToken = request.signedCookies?.access_token
+        if (signedToken) {
+            return signedToken
         }
 
         const [type, rawToken] = request.headers.authorization?.split(' ') ?? []
 
-        if (type === 'Bearer' && rawToken) {
+        if (type === "Bearer" && rawToken) {
             let token = decodeURIComponent(rawToken)
 
-            if (token.startsWith('s:')) {
+            if (token.startsWith("s:")) {
                 token = token.slice(2)
             }
 
-            const parts = token.split('.')
+            const parts = token.split(".")
             if (parts.length > 3) {
-                token = parts.slice(0, 3).join('.')
+                token = parts.slice(0, 3).join(".")
             }
-
+           
             return token
         }
 

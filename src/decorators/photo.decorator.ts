@@ -1,6 +1,6 @@
 import { applyDecorators } from "@nestjs/common";
 import {
-    ApiBadRequestResponse, ApiConsumes, ApiCookieAuth, ApiCreatedResponse, ApiForbiddenResponse,
+    ApiBadRequestResponse, ApiConflictResponse, ApiConsumes, ApiCookieAuth, ApiCreatedResponse, ApiForbiddenResponse,
     ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiUnauthorizedResponse
 } from "@nestjs/swagger";
 
@@ -99,7 +99,7 @@ export function GetAllPhotoByUser() {
             schema: {
                 type: "object",
                 properties: {
-                    message: { type: "string", example: "user did not upload any images!" }
+                    message: { type: "string", example: "User did not upload any images!" }
                 }
             }
         })
@@ -131,7 +131,7 @@ export function GetAllPhotoByPlace() {
             schema: {
                 type: "object",
                 properties: {
-                    message: { type: "string", example: "place does not have any images!" }
+                    message: { type: "string", example: "Place does not have any images!" }
                 }
             }
         })
@@ -181,12 +181,20 @@ export function AddPhotos() {
     return applyDecorators(
         ApiOperation({ summary: "Feltölt 1-3 képet egy helyhez" }),
         ApiCookieAuth(),
-        ApiConsumes('multipart/form-data'),
+        ApiConsumes("multipart/form-data"),
         ApiCreatedResponse({
             description: "Sikeresen feltöltötte a képeket",
             schema: {
-                type: "number",
-                example: 3
+                type: "array",
+                items: {
+                    type: "object",
+                    properties: {
+                        location: {type: "string", example: "uploads/123456.png"},
+                        type: {type: "string", example: "image/png"},
+                        userID: {type: "number", example: 1},
+                        placeID: {type: "number", example: 1}
+                    }
+                }
             }
         }),
         ApiBadRequestResponse({
@@ -194,16 +202,16 @@ export function AddPhotos() {
             schema: {
                 type: "object",
                 properties: {
-                    message: { type: "string", example: "placeID is required!" }
+                    message: { type: "string", example: "placeID should not be empty" }
                 }
             }
         }),
-        ApiUnauthorizedResponse({
-            description: "Nincs hitelesítés vagy érvénytelen token",
+        ApiConflictResponse({
+            description: "Nincsenek feltöltött fájlok",
             schema: {
                 type: "object",
                 properties: {
-                    message: { type: "string", example: "Unauthorized" }
+                    message: { type: "string", example: "No files were uploaded!" }
                 }
             }
         })
@@ -221,10 +229,6 @@ export function AdminApprovesPhoto() {
                 type: "object",
                 properties: {
                     id: { type: "number", example: 1 },
-                    location: { type: "string", example: "uploads/example.jpg" },
-                    type: { type: "string", example: "image/jpg" },
-                    user: { type: "string", example: "user name" },
-                    place: { type: "string", example: "place name" },
                     approved: { type: "boolean", example: true }
                 }
             }

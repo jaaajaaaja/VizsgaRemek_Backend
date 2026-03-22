@@ -34,16 +34,16 @@ async function bootstrap() {
 
   app.enableCors({
     origin: origins,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     preflightContinue: false,
     optionsSuccessStatus: 204,
     credentials: true,
   })
 
   const config = new DocumentBuilder()
-    .setTitle('Barsonar API')
-    .setDescription('Barsonar Backend NestJS + Prisma + Swagger')
-    .setVersion('1.0.0')
+    .setTitle("BarSonar API")
+    .setDescription("Barsonar Backend NestJS + Prisma + Swagger")
+    .setVersion("1.0.0")
     .build()
 
   const document = SwaggerModule.createDocument(app, config)
@@ -58,8 +58,8 @@ async function bootstrap() {
           put: 4,
         };
 
-        const methodA = a.get('method')
-        const methodB = b.get('method')
+        const methodA = a.get("method")
+        const methodB = b.get("method")
 
         return (methodOrder[methodA] || 99) - (methodOrder[methodB] || 99)
       }
@@ -68,7 +68,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe())
 
-  app.use('/uploads', express.static(join(process.cwd(), 'uploads')))
+  app.use("/uploads", express.static(join(process.cwd(), "uploads")))
 
   const port = process.env.PORT ?? 3000
   await app.listen(port, '0.0.0.0')

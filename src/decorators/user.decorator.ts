@@ -2,6 +2,7 @@ import { applyDecorators } from '@nestjs/common';
 import {
   ApiOperation, ApiCookieAuth, ApiOkResponse, ApiForbiddenResponse,
   ApiNotFoundResponse, ApiConflictResponse, ApiUnauthorizedResponse, ApiParam,
+  ApiBadRequestResponse,
 } from '@nestjs/swagger';
 
 /*
@@ -53,6 +54,27 @@ export function PostUser() {
           email: { type: "string", example: "pelda@pelda.pelda" },
           password: { type: "string", example: "asd123" },
           age: { type: "number", example: 18 }
+        }
+      }
+    }),
+    ApiBadRequestResponse({
+      description: "Sikertelen felvétel",
+      schema: {
+        type: "object",
+        properties: {
+          message: {
+            type: "array",
+            example: [
+              "userName must be longer than or equal to 5 characters",
+              "userName must be a string",
+              "userName should not be empty",
+              "email must be an email",
+              "email should not be empty",
+              "password must be longer than or equal to 8 characters",
+              "password must be a string",
+              "password should not be empty"
+            ]
+          }
         }
       }
     }),
@@ -126,7 +148,7 @@ export function UpdateUser() {
       }
     }),
     ApiNotFoundResponse({
-      description: "A felhasználó nem használható",
+      description: "A felhasználó nem található",
       schema: {
         type: "object",
         properties: {
@@ -227,15 +249,6 @@ export function GetRecommendationByAge() {
           message: { type: "string", example: "Please set your age!" }
         }
       }
-    }),
-    ApiUnauthorizedResponse({
-      description: "Csak bejelentkezve lehet lekérni",
-      schema: {
-        type: "object",
-        properties: {
-          message: { type: "string", example: "Log in first!" }
-        }
-      }
     })
   )
 }
@@ -266,7 +279,13 @@ export function AddUserFriend() {
       schema: {
         type: "object",
         properties: {
-          message: { type: "string", example: "You already sent a request to this user!" }
+          message: {
+            type: "string", example: [
+              "You can not send a friend request to yourself!",
+              "You already sent this user a friend request!",
+              "You already have a pending friend request from this user!"
+            ]
+          }
         }
       }
     }),
@@ -323,12 +342,15 @@ export function SearchByUsername() {
     ApiOperation({ summary: "Felhasználóra keres felasználónév alapján" }),
     ApiParam({ name: "userName", description: "keresett felhasználó neve" }),
     ApiOkResponse({
-      description: "Visszaadja a felhasználót",
+      description: "Visszaadja azokat a felhasználókat akiknek tartalmazza a neve a keresett szót",
       schema: {
-        type: "object",
-        properties: {
-          id: { type: "number", example: 1 },
-          userName: { type: "string", example: "felhasználónév" }
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            id: { type: "number", example: 1 },
+            userName: { type: "string", example: "felhasználónév" }
+          }
         }
       }
     })
@@ -349,15 +371,6 @@ export function GetFriendList() {
             id: { type: "number", example: 1 },
             userName: { type: "string", example: "felhasználónév" }
           }
-        }
-      }
-    }),
-    ApiUnauthorizedResponse({
-      description: "Csak bejelentkezett felhasználó kérheti le a barátlistáját",
-      schema: {
-        type: "object",
-        properties: {
-          message: { type: "string", example: "Log in to see your friendlist!" }
         }
       }
     }),
@@ -385,9 +398,17 @@ export function GetPendingFriendRequests() {
           type: "object",
           properties: {
             id: { type: "number", example: 1 },
-            userID: { type: "number", example: 2 },
             userName: { type: "string", example: "felhasználónév" }
           }
+        }
+      }
+    }),
+    ApiBadRequestResponse({
+      description: "Nincs függőben lévő barátkérelem",
+      schema: {
+        type: "object",
+        properties: {
+          message: { type: "string", example: "You don't have any pending friend requests!" }
         }
       }
     })
@@ -475,7 +496,7 @@ export function GetUserInterestList() {
       schema: {
         type: "object",
         properties: {
-          message: { type: "string", example: "user has no interests set!" }
+          message: { type: "string", example: "User has no interests set!" }
         }
       }
     })

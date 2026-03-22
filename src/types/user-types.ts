@@ -48,6 +48,5 @@ export interface AuthenticatedRequest extends Request {
 
 export type PendingFriendRequestType = {
     id: number
-    userID: number
     userName: string
 }

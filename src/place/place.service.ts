@@ -54,14 +54,9 @@ export class PlaceService {
                 where: query()
             })
 
-            // console.log("*********************************")
-            // console.log(place.id)
-            // console.log("comments: ", totalComments)
-
             const totalPhotos = await this.prisma.photo.count({
                 where: query()
             })
-            // console.log("photos: ", totalPhotos)
 
             const averageRating = await this.prisma.comment.aggregate({
                 where: query(),
@@ -69,7 +64,6 @@ export class PlaceService {
                     rating: true
                 }
             })
-            // console.log("rating: ", averageRating._avg.rating)
 
             statistics.push({
                 placeId: place.id,
@@ -143,14 +137,10 @@ export class PlaceService {
     */
 
     async addNews(placeID: number, data: CreateNewsDto, loggedInUserId: number): Promise<news> {
-        if (!loggedInUserId) {
-            throw new UnauthorizedException("Log in to post news!")
-        }
-
         const place = await this.prisma.place.findFirst({ where: { id: placeID } })
 
         if (!place) {
-            throw new NotFoundException("Place not found")
+            throw new NotFoundException("Place not found!")
         }
 
         const fullData = {
@@ -171,10 +161,6 @@ export class PlaceService {
 
         if (news.userID != loggedInUserId) {
             throw new ForbiddenException("You can only edit your own news!")
-        }
-
-        if (!loggedInUserId) {
-            throw new UnauthorizedException("You can not edit this news!")
         }
 
         const fullData = {
@@ -248,6 +234,6 @@ export class PlaceService {
             where: { id }
         })
 
-        return {id, message: " deleted"}
+        return {id, message: "deleted"}
     }
 }

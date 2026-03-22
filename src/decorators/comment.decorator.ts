@@ -9,7 +9,7 @@ export function AdminGetAllComments() {
         ApiOperation({ summary: "ADMIN - Visszaadja az összes kommentet" }),
         ApiCookieAuth(),
         ApiOkResponse({
-            description: "Visszaadja a helyeket",
+            description: "Visszaadja a kommenteket",
             schema: {
                 type: "array",
                 items: {
@@ -97,7 +97,7 @@ export function GetCommentByUser() {
             schema: {
                 type: "object",
                 properties: {
-                    message: { type: "string", example: "user did not post any comments!" }
+                    message: { type: "string", example: "User did not post any comments!" }
                 }
             }
         })
@@ -140,7 +140,7 @@ export function GetCommentByPlace() {
             schema: {
                 type: "object",
                 properties: {
-                    message: { type: "string", example: "place does not have any comments!" }
+                    message: { type: "string", example: "Place does not have any comments!" }
                 }
             }
         })
@@ -167,14 +167,20 @@ export function AddComment() {
             schema: {
                 type: "object",
                 properties: {
-                    commentText: { type: "string", example: null },
-                    rating: { type: "number", example: 4 },
-                    placeID: { type: "number", example: 1 }
+                    message: {
+                        type: "array", example: [
+                            "commentText must be longer than or equal to 1 characters",
+                            "commentText must be a string",
+                            "commentText should not be empty",
+                            "placeID must be a number conforming to the specified constraints",
+                            "placeID should not be empty"
+                        ]
+                    }
                 }
             }
         }),
         ApiUnauthorizedResponse({
-            description: "Elutasítja a komment létrehozását, ha nem vagyunk bejelentkezve",
+            description: "Elutasítja a komment létrehozását, ha a felhasználó nincs bejelentkezve",
             schema: {
                 type: "object",
                 properties: {
@@ -242,9 +248,13 @@ export function UpdateComment() {
             schema: {
                 type: "object",
                 properties: {
-                    commentText: { type: "string", example: null },
-                    rating: { type: "number", example: 4 },
-                    placeID: { type: "number", example: 1 }
+                    message: {
+                        type: "array", example: [
+                            "commentText must be longer than or equal to 1 characters",
+                            "commentText should not be empty",
+                            "rating must not be greater than 5"
+                        ]
+                    }
                 }
             }
         }),

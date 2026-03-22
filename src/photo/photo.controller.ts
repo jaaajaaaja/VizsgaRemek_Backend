@@ -1,7 +1,6 @@
 import {
     Body, Controller, Delete, Get, Param, Post, UseInterceptors, UploadedFiles, ParseIntPipe,
     UseGuards, Req, BadRequestException, UnsupportedMediaTypeException, ConflictException, Put,
-    HttpStatus
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';

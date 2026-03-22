@@ -152,7 +152,7 @@ export class UserService {
     })
 
     if (interests.length === 0) {
-      throw new NotFoundException('user has no interests!')
+      throw new NotFoundException("User has no interests!")
     }
 
     const interest = interests.map((i) => i.interest)
@@ -174,28 +174,24 @@ export class UserService {
     })
 
     if (recommendations.length === 0) {
-      throw new ForbiddenException('No places found matching your interests!')
+      throw new ForbiddenException("No places found matching your interests!")
     }
 
     return recommendations
   }
 
   async recommendByAge(loggedInUserId: number): Promise<place[]> {
-    if (!loggedInUserId) {
-      throw new UnauthorizedException('Log in first!')
-    }
-
     const user = await this.prisma.user.findUnique({
       where: { id: loggedInUserId },
       select: { age: true },
     })
 
     if (!user) {
-      throw new NotFoundException('User not found!')
+      throw new NotFoundException("User not found!")
     }
 
     if (user.age == null) {
-      throw new ConflictException('Please set your age!')
+      throw new ConflictException("Please set your age!")
     }
 
     const places = await this.prisma.place.findMany({
@@ -222,7 +218,7 @@ export class UserService {
     })
 
     if (!places.length) {
-      throw new ForbiddenException('Not enough comments to recommend!')
+      throw new ForbiddenException("Not enough comments to recommend!")
     }
 
     places.sort((place1, place2) => {
@@ -265,6 +261,33 @@ export class UserService {
       throw new NotFoundException("The user you are trying to send the request to does not exist!")
     }
 
+    if(user.id == loggedInUserId) {
+      throw new ConflictException("You can not send a friend request to yourself!")
+    }
+
+    const already_sent = await this.prisma.pending_friend_request.findFirst({
+      where: {
+        OR: [
+          {
+            userID: loggedInUserId,
+            friendID: sentToUserId,
+          },
+          {
+            friendID: loggedInUserId,
+            userID: sentToUserId,
+          },
+        ],
+      }
+    })
+
+    if (already_sent?.userID == loggedInUserId) {
+      throw new ConflictException("You already sent this user a friend request!")
+    }
+
+    if (already_sent?.friendID == loggedInUserId) {
+      throw new ConflictException("You already have a pending friend request from this user!")
+    }
+
     const friend = await this.prisma.user_friend.findFirst({
       where: {
         OR: [
@@ -281,7 +304,7 @@ export class UserService {
     })
 
     if (friend) {
-      throw new ForbiddenException('You already have this user as a friend!')
+      throw new ForbiddenException("You already have this user as a friend!")
     } else {
       try {
         return this.prisma.pending_friend_request.create({
@@ -350,12 +373,17 @@ export class UserService {
   }
 
   async friendlist(loggedInUserId: number): Promise<{ id: number, userName: string }[]> {
-    if (!loggedInUserId) {
-      throw new UnauthorizedException('Log in to see your friendlist!')
-    }
-
     const friends = await this.prisma.user_friend.findMany({
-      where: { userID: loggedInUserId },
+      where: {
+        OR: [
+          {
+            userID: loggedInUserId,
+          },
+          {
+            friendID: loggedInUserId
+          }
+        ]
+      },
       include: {
         friend: {
           select: {
@@ -363,38 +391,63 @@ export class UserService {
             userName: true
           },
         },
+        user: {
+          select: {
+            id: true,
+            userName: true
+          }
+        }
       },
     })
 
     if (!friends || friends.length === 0) {
-      throw new NotFoundException('You do not have any friends yet!')
+      throw new NotFoundException("You do not have any friends yet!")
     }
 
-    return friends.map((f) => f.friend)
+    return friends.map((f) => (
+      f.user.id == loggedInUserId ? f.friend : f.user
+    ))
   }
 
   async getPendingFriendRequests(loggedInUserId: number): Promise<PendingFriendRequestType[]> {
     if (!loggedInUserId) {
-      throw new UnauthorizedException('Log in to see pending friend requests!')
+      throw new UnauthorizedException("Log in to see pending friend requests!")
     }
 
-    const requests = await this.prisma.pending_friend_request.findMany({
-      where: { friendID: loggedInUserId },
+    const pending_request = await this.prisma.pending_friend_request.findMany({
+      where: {
+        OR: [
+          {
+            userID: loggedInUserId,
+          },
+          {
+            friendID: loggedInUserId
+          }
+        ]
+      },
       include: {
-        user: {
+        friend: {
           select: {
             id: true,
             userName: true
           },
         },
+        user: {
+          select: {
+            id: true,
+            userName: true
+          }
+        }
       },
     })
 
-    return requests.map((r) => ({
-      id: r.id,
-      userID: r.userID,
-      userName: r.user.userName,
-    }))
+    if(!pending_request) {
+      throw new NotFoundException("You don't have any pending friend requests!")
+    }
+
+    return pending_request.map((p) => (
+      p.user.id == loggedInUserId ? p.friend : p.user
+    ))
   }
 
   /*
@@ -402,8 +455,6 @@ export class UserService {
     INTERESTS
     ----------------------------------------------------------------------------------------------------------
   */
-
-
 
   async deleteUserInterest(id: number, loggedInUserId: number): Promise<user_interest> {
     const interest = await this.prisma.user_interest.findFirst({

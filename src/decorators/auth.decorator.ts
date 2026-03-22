@@ -28,20 +28,11 @@ export function Login() {
             }
         }),
         ApiNotFoundResponse({
-            description: "Nem található a komment amit el szeretne fogadni az admin",
+            description: "Az email cím amivel be próbál jelentkezni nem található",
             schema: {
                 type: "object",
                 properties: {
-                    message: { type: "string", example: "Comment not found!" }
-                }
-            }
-        }),
-        ApiForbiddenResponse({
-            description: "Csak adminnak van hozzáférése",
-            schema: {
-                type: "object",
-                properties: {
-                    messsage: { type: "string", example: "Forbidden resource!" }
+                    message: { type: "string", example: "User not found!" }
                 }
             }
         })

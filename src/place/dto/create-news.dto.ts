@@ -4,7 +4,7 @@ import { IsNotEmpty, IsNumber, IsString, Length, } from "class-validator";
 import sanitizeHtml from 'sanitize-html'
 
 export class CreateNewsDto {
-    @ApiProperty({ default: "Hely neve" })
+    @ApiProperty({ default: "Ez egy hír" })
     @IsString()
     @Length(10, 4000)
     @Transform((params: TransformFnParams) =>
