@@ -5,7 +5,7 @@ import sanitizeHtml from 'sanitize-html'
 
 export class CreatePlaceDto {
     @ApiProperty({ default: "PELDA123ID" })
-    @IsAlphanumeric()
+    @IsString()
     @Length(1, 200)
     @Transform((params: TransformFnParams) =>
         sanitizeHtml(
