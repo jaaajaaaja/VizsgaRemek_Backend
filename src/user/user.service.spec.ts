@@ -274,8 +274,8 @@ describe('UserService', () => {
       expect(mockPrismaService.pending_friend_request.findFirst).toHaveBeenCalledWith({
         where: { userID: 2, friendID: 1 }
       })
-      expect(mockPrismaService.user_friend.create).toHaveBeenCalledWith({ data: mockRequest })
-      expect(mockPrismaService.pending_friend_request.delete).toHaveBeenCalledWith({ where: mockRequest })
+      expect(mockPrismaService.user_friend.create).toHaveBeenCalledWith({ data: { userID: 2, friendID: 1 } })
+      expect(mockPrismaService.pending_friend_request.delete).toHaveBeenCalledWith({ where: { id: 1, userID: 2, friendID: 1 } })
     })
 
     it("should reject friend request and delete it", async () => {
@@ -318,8 +318,18 @@ describe('UserService', () => {
   describe("friendlist", () => {
     it("should return list of friends with id and userName", async () => {
       const friendsData = [
-        { friendID: 2, friend: { id: 2, userName: "friend1" } },
-        { friendID: 3, friend: { id: 3, userName: "friend2" } }
+        { 
+          userID: 1, 
+          friendID: 2,
+          user: { id: 1, userName: "currentUser" },
+          friend: { id: 2, userName: "friend1" } 
+        },
+        { 
+          userID: 3, 
+          friendID: 1,
+          user: { id: 3, userName: "friend2" },
+          friend: { id: 1, userName: "currentUser" } 
+        }
       ]
 
       mockPrismaService.user_friend.findMany.mockResolvedValue(friendsData)
@@ -331,9 +341,17 @@ describe('UserService', () => {
         { id: 3, userName: "friend2" }
       ])
       expect(mockPrismaService.user_friend.findMany).toHaveBeenCalledWith({
-        where: { userID: 1 },
+        where: {
+          OR: [
+            { userID: 1 },
+            { friendID: 1 }
+          ]
+        },
         include: {
           friend: {
+            select: { id: true, userName: true }
+          },
+          user: {
             select: { id: true, userName: true }
           }
         }

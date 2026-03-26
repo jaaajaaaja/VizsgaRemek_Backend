@@ -7,6 +7,7 @@ import { AuthGuard } from './auth.guard';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 import { AuthenticatedRequest } from 'src/types/user-types';
+import { sign } from 'node:crypto';
 
 describe('AuthController', () => {
   let controller: AuthController
@@ -110,7 +111,8 @@ describe('AuthController', () => {
       {
         "httpOnly": true,
         "path": "/",
-        "sameSite": "lax"
+        "sameSite": "lax",
+        "signed": true
       }
     )
     expect(result).toEqual({ message: 'Logged out successfully' })
