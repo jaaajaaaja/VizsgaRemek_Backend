@@ -129,7 +129,9 @@ Ha változtatni szeretnél a környezeti változókon akkor a `docker-compose.ym
 ---
 
 #### Fontos!
-Ha Windows operációs rendszeren akarod futtatni a konténert CMD-ből (parancssorból) add ki a következő utasításokat NE PowerShell-ből, különben nem fogja az ```docker-entrypoint.sh``` fájlt megtalálni. 
+Ha Windows operációs rendszeren akarod futtatni a konténert 
+&#8594; a Dockerfile, docker-entrypoint.sh, docker-compose.yml és a .dockerignore sor végi karakterkódolását allítsd át CRLF-ről LF-re (Linux-osra)
+&#8594; CMD-ből (parancssorból) add ki a következő utasításokat NE PowerShell-ből, különben nem fogja az ```docker-entrypoint.sh``` fájlt megtalálni. 
 Azonban ha egyszer elindítottad CMD-ből utána el tudod indítani PowerShell-ből is.
 
 ---
