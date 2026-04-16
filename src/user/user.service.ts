@@ -439,7 +439,7 @@ export class UserService {
     }
 
     return pending_request.map((p) => (
-      p.friend
+      p.user.id == loggedInUserId ? p.friend : p.user
     ))
   }
 
