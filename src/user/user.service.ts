@@ -261,7 +261,7 @@ export class UserService {
       throw new NotFoundException("The user you are trying to send the request to does not exist!")
     }
 
-    if(user.id == loggedInUserId) {
+    if (user.id == loggedInUserId) {
       throw new ConflictException("You can not send a friend request to yourself!")
     }
 
@@ -416,14 +416,7 @@ export class UserService {
 
     const pending_request = await this.prisma.pending_friend_request.findMany({
       where: {
-        OR: [
-          {
-            userID: loggedInUserId,
-          },
-          {
-            friendID: loggedInUserId
-          }
-        ]
+        friendID: loggedInUserId
       },
       include: {
         friend: {
@@ -441,12 +434,12 @@ export class UserService {
       },
     })
 
-    if(!pending_request) {
+    if (!pending_request) {
       throw new NotFoundException("You don't have any pending friend requests!")
     }
 
     return pending_request.map((p) => (
-      p.user.id == loggedInUserId ? p.friend : p.user
+      p.friend
     ))
   }
 
