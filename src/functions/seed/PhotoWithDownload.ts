@@ -48,7 +48,7 @@ export async function PhotoWithDownload(
     for (const image of images) {
         const photo = {
             location: `uploads/${image.location}`,
-            type: `image/${image.type}`,
+            type: image.type,
             userID: faker.helpers.arrayElement(users).id!!,
             placeID: faker.helpers.arrayElement(places).id!!,
             approved: faker.datatype.boolean(0.5),
